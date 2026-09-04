@@ -1,0 +1,12 @@
+.vs/
+bin/
+obj/
+
+*.db
+*.db-shm
+*.db-wal
+
+SecureUploads/
+
+*.csproj.user
+*.csproj.Backup.tmp

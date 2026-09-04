@@ -1,0 +1,220 @@
+﻿@model RecruitmentAndCandidateScreeningSystem.ViewModels.CandidateProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">My Profile</h2>
+        <p class="text-muted">
+            Manage your personal, education, experience, skills and documents.
+        </p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <form asp-action="Index"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <!-- BASIC INFORMATION -->
+
+                <h5 class="fw-bold mb-3">Basic Information</h5>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+
+                        <input asp-for="FullName"
+                               class="form-control" />
+
+                        <span asp-validation-for="FullName"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NationalId"
+                               class="form-label"></label>
+
+                        <input asp-for="NationalId"
+                               class="form-control" />
+
+                        <span asp-validation-for="NationalId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PhoneNumber"
+                               class="form-label"></label>
+
+                        <input asp-for="PhoneNumber"
+                               class="form-control" />
+
+                        <span asp-validation-for="PhoneNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Address"
+                               class="form-label"></label>
+
+                        <input asp-for="Address"
+                               class="form-control" />
+                    </div>
+
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- EDUCATION -->
+
+                <h5 class="fw-bold mb-3">Education</h5>
+
+                <div class="mb-3">
+                    <label asp-for="HighestQualification"
+                           class="form-label"></label>
+
+                    <input asp-for="HighestQualification"
+                           class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EducationDetails"
+                           class="form-label"></label>
+
+                    <textarea asp-for="EducationDetails"
+                              class="form-control"
+                              rows="4"></textarea>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- EXPERIENCE AND SKILLS -->
+
+                <h5 class="fw-bold mb-3">Experience & Skills</h5>
+
+                <div class="mb-3">
+                    <label asp-for="ExperienceDetails"
+                           class="form-label"></label>
+
+                    <textarea asp-for="ExperienceDetails"
+                              class="form-control"
+                              rows="4"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Skills"
+                           class="form-label"></label>
+
+                    <textarea asp-for="Skills"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Example: C#, ASP.NET Core, SQL, Python"></textarea>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- DOCUMENTS -->
+
+                <h5 class="fw-bold mb-3">Documents & Files</h5>
+
+                <div class="row">
+
+                    <!-- PROFILE PHOTO -->
+
+                    <div class="col-md-4 mb-4">
+
+                        <label asp-for="Photo"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="Photo"
+                               type="file"
+                               class="form-control"
+                               accept=".jpg,.jpeg,.png" />
+
+                        <small class="text-muted">
+                            JPG, JPEG or PNG — maximum 2 MB
+                        </small>
+
+                    </div>
+
+                    <!-- SIGNATURE -->
+
+                    <div class="col-md-4 mb-4">
+
+                        <label asp-for="Signature"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="Signature"
+                               type="file"
+                               class="form-control"
+                               accept=".jpg,.jpeg,.png" />
+
+                        <small class="text-muted">
+                            JPG, JPEG or PNG — maximum 2 MB
+                        </small>
+
+                    </div>
+
+                    <!-- CV -->
+
+                    <div class="col-md-4 mb-4">
+
+                        <label asp-for="CV"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="CV"
+                               type="file"
+                               class="form-control"
+                               accept=".pdf,.doc,.docx" />
+
+                        <small class="text-muted">
+                            PDF, DOC or DOCX — maximum 5 MB
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- SAVE -->
+
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    Save Profile
+                </button>
+
+                <a asp-controller="Candidate"
+                   asp-action="Dashboard"
+                   class="btn btn-secondary px-4 ms-2">
+                    Back to Dashboard
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

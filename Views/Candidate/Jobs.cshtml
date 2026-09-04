@@ -1,0 +1,194 @@
+﻿@model IEnumerable<RecruitmentAndCandidateScreeningSystem.Models.JobCircular>
+
+@{
+    ViewData["Title"] = "Available Jobs";
+
+    var search = ViewBag.Search as string;
+    var sort = ViewBag.Sort as string ?? "newest";
+}
+
+<div class="container">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold">Available Jobs</h2>
+
+        <p class="text-muted">
+            Explore current job opportunities and find the right position for you.
+        </p>
+    </div>
+
+    <!-- Search and Sort -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <form asp-action="Index" method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <!-- Search -->
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Search Jobs
+                        </label>
+
+                        <input type="text"
+                               name="search"
+                               value="@search"
+                               class="form-control"
+                               placeholder="Search by job title, department or location..." />
+
+                    </div>
+
+                    <!-- Sort -->
+                    <div class="col-md-4">
+
+                        <label class="form-label fw-semibold">
+                            Sort By
+                        </label>
+
+                        <select name="sort" class="form-select">
+
+                            <option value="newest"
+                                    selected="@(sort == "newest")">
+                                Newest Jobs
+                            </option>
+
+                            <option value="oldest"
+                                    selected="@(sort == "oldest")">
+                                Oldest Jobs
+                            </option>
+
+                            <option value="deadline_soon"
+                                    selected="@(sort == "deadline_soon")">
+                                Deadline: Soonest
+                            </option>
+
+                            <option value="deadline_late"
+                                    selected="@(sort == "deadline_late")">
+                                Deadline: Latest
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="col-md-2 d-flex gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary flex-grow-1">
+                            Search
+                        </button>
+
+                        <a asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            Clear
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Search Result Information -->
+    @if (!string.IsNullOrWhiteSpace(search))
+    {
+        <div class="mb-3">
+
+            <span class="text-muted">
+                Search results for:
+            </span>
+
+            <strong>
+                "@search"
+            </strong>
+
+            <span class="text-muted">
+                (@Model.Count() job(s))
+            </span>
+
+        </div>
+    }
+
+    <!-- Job List -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <strong>No jobs found.</strong>
+            <br />
+            Try another search term or clear the filters.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var job in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card job-card h-100 shadow-sm border-0">
+
+                        <div class="card-body d-flex flex-column">
+
+                            <h4 class="fw-bold">
+                                @job.Title
+                            </h4>
+
+                            @if (!string.IsNullOrWhiteSpace(job.Department))
+                            {
+                                <p class="mb-1">
+                                    <strong>Department:</strong>
+                                    @job.Department
+                                </p>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(job.Location))
+                            {
+                                <p class="mb-1">
+                                    <strong>Location:</strong>
+                                    @job.Location
+                                </p>
+                            }
+
+                            <p class="mb-1">
+                                <strong>Published:</strong>
+                                @job.PublishedAt
+                                .ToLocalTime()
+                                .ToString("dd MMM yyyy")
+                            </p>
+
+                            <p class="mb-3">
+                                <strong>Deadline:</strong>
+                                @job.ApplicationDeadline
+                                .ToLocalTime()
+                                .ToString("dd MMM yyyy")
+                            </p>
+
+                            <p class="text-muted flex-grow-1">
+                                @job.JobDescription
+                            </p>
+
+                            <a asp-action="Details"
+                               asp-route-id="@job.Id"
+                               class="btn btn-primary mt-3">
+                                View Details
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

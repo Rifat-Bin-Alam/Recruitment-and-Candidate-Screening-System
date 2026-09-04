@@ -1,0 +1,125 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+
+            <div class="col-lg-7 text-center text-lg-start">
+                <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2">
+                    Smart Recruitment Platform
+                </span>
+
+                <h1 class="display-4 fw-bold mb-3">
+                    Find Your Next
+                    <span class="text-primary">Career Opportunity</span>
+                </h1>
+
+                <p class="lead text-muted mb-4">
+                    Discover job opportunities, submit your application,
+                    and let our smart screening system connect your skills
+                    with the right career.
+                </p>
+
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+                    <a asp-controller="JobCirculars"
+                       asp-action="Index"
+                       class="btn btn-primary btn-lg px-4">
+                        Browse Jobs
+                    </a>
+
+                    <a asp-area="Identity"
+                       asp-page="/Account/Register"
+                       class="btn btn-outline-primary btn-lg px-4">
+                        Register as Candidate
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-5 mt-5 mt-lg-0">
+                <div class="hero-card shadow-sm">
+                    <div class="hero-icon">
+                        <span>💼</span>
+                    </div>
+
+                    <h3 class="fw-bold mt-3">
+                        Your Career Starts Here
+                    </h3>
+
+                    <p class="text-muted">
+                        Apply for suitable positions and manage your
+                        recruitment journey from one place.
+                    </p>
+
+                    <div class="row text-center mt-4">
+                        <div class="col-4">
+                            <h4 class="fw-bold text-primary">01</h4>
+                            <small class="text-muted">Apply</small>
+                        </div>
+
+                        <div class="col-4">
+                            <h4 class="fw-bold text-primary">02</h4>
+                            <small class="text-muted">Screen</small>
+                        </div>
+
+                        <div class="col-4">
+                            <h4 class="fw-bold text-primary">03</h4>
+                            <small class="text-muted">Get Hired</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">A Smarter Way to Recruit</h2>
+            <p class="text-muted">
+                Everything you need for a simple and efficient recruitment process.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">📄</div>
+                    <h4 class="fw-bold">Easy Application</h4>
+                    <p class="text-muted mb-0">
+                        Create your profile, upload your CV and apply
+                        for available job opportunities easily.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">🤖</div>
+                    <h4 class="fw-bold">AI-Powered Screening</h4>
+                    <p class="text-muted mb-0">
+                        Applications are intelligently evaluated based
+                        on skills, qualifications and job requirements.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">📊</div>
+                    <h4 class="fw-bold">Track Your Application</h4>
+                    <p class="text-muted mb-0">
+                        Keep track of your application status throughout
+                        the recruitment process.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

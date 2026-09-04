@@ -1,0 +1,162 @@
+﻿@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
+
+@{
+    ViewData["Title"] = "Job Details";
+}
+
+<div class="container">
+
+    <div class="mb-4">
+        <a asp-action="Index"
+           class="btn btn-outline-secondary mb-3">
+            ← Back to Jobs
+        </a>
+
+        <h2 class="fw-bold">
+            @Model.JobTitle
+        </h2>
+
+        <p class="text-muted">
+            @Model.Department
+        </p>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <div class="row mb-4">
+
+                <div class="col-md-4">
+                    <strong>Location</strong>
+                    <p class="text-muted">
+                        @(Model.Location ?? "Not specified")
+                    </p>
+                </div>
+
+                <div class="col-md-4">
+                    <strong>Application Fee</strong>
+                    <p class="text-muted">
+                        @(Model.ApplicationFee?.ToString("0.00") ?? "Free")
+                    </p>
+                </div>
+
+                <div class="col-md-4">
+                    <strong>Application Deadline</strong>
+                    <p class="text-muted">
+                        @Model.ApplicationDeadline.ToLocalTime()
+                    </p>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <h4 class="fw-bold mb-3">
+                Job Description
+            </h4>
+
+            <p>
+                @Model.JobDescription
+            </p>
+
+            <hr />
+
+            <h4 class="fw-bold mb-3">
+                Job Requirements
+            </h4>
+
+            @if (Model.JobRequirement != null)
+            {
+                <div class="mb-3">
+                    <strong>Required Qualifications</strong>
+                    <p class="text-muted">
+                        @Model.JobRequirement.RequiredQualifications
+                    </p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Required Skills</strong>
+                    <p class="text-muted">
+                        @(Model.JobRequirement.RequiredSkills ?? "Not specified")
+                    </p>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Required Experience</strong>
+                    <p class="text-muted">
+                        @(Model.JobRequirement.RequiredExperience ?? "Not specified")
+                    </p>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(
+                    Model.JobRequirement.AdditionalRequirements))
+                {
+                    <div class="mb-3">
+                        <strong>Additional Requirements</strong>
+                        <p class="text-muted">
+                            @Model.JobRequirement.AdditionalRequirements
+                        </p>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted">
+                    No additional requirements specified.
+                </p>
+            }
+
+            <hr />
+
+            <div class="mt-4">
+
+                <a asp-controller="CandidateProfiles"
+                   asp-action="Index"
+                   class="btn btn-outline-primary me-2">
+                    Check My Profile
+                </a>
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger mt-4">
+                        @TempData["Error"]
+                    </div>
+                }
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success mt-4">
+                        @TempData["Success"]
+                    </div>
+                }
+
+                <div class="mt-4">
+
+                    <a asp-controller="CandidateProfiles"
+                       asp-action="Index"
+                       class="btn btn-outline-primary me-2">
+                        Check My Profile
+                    </a>
+
+                    <form asp-action="Apply"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          class="d-inline">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Apply for This Job
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

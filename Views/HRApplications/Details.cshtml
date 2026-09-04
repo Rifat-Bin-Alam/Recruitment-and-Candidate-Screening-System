@@ -1,0 +1,410 @@
+﻿@model RecruitmentAndCandidateScreeningSystem.Models.JobApplication
+
+@{
+    ViewData["Title"] = "Application Details";
+
+    var candidate = Model.CandidateProfile;
+
+    var currentCV = candidate?.CVs?
+        .FirstOrDefault(c => c.IsCurrent);
+}
+
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold">Application Details</h2>
+
+            <p class="text-muted mb-0">
+                Review candidate information and application details.
+            </p>
+        </div>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            Back to Applications
+        </a>
+
+    </div>
+
+
+    <!-- Candidate Information -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Candidate Information</h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <!-- Photo -->
+
+                <div class="col-md-3 text-center">
+
+                    <strong class="d-block mb-2">
+                        Candidate Photo
+                    </strong>
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        candidate?.PhotoFilePath))
+                    {
+                        <img src="@Url.Action(
+                                                    "CandidateFile",
+                                                    "HRApplications",
+                                                    new
+                                                    {
+                                                        applicationId = Model.Id,
+                                                        type = "photo"
+                                                    })"
+                             alt="Candidate Photo"
+                             class="img-thumbnail"
+                             style="width:180px;height:180px;object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            No photo available.
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- Signature -->
+
+                <div class="col-md-3 text-center">
+
+                    <strong class="d-block mb-2">
+                        Signature
+                    </strong>
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        candidate?.SignatureFilePath))
+                    {
+                        <img src="@Url.Action(
+                                                    "CandidateFile",
+                                                    "HRApplications",
+                                                    new
+                                                    {
+                                                        applicationId = Model.Id,
+                                                        type = "signature"
+                                                    })"
+                             alt="Candidate Signature"
+                             class="img-thumbnail"
+                             style="width:220px;height:120px;object-fit:contain;" />
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            No signature available.
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- Basic Information -->
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <strong>Name</strong>
+                        <div>
+                            @candidate?.FullName
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Email</strong>
+                        <div>
+                            @candidate?.ApplicationUser?.Email
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Phone</strong>
+                        <div>
+                            @(candidate?.PhoneNumber ?? "Not provided")
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Highest Qualification</strong>
+                        <div>
+                            @(candidate?.HighestQualification
+                                ?? "Not provided")
+                        </div>
+                    </div>
+
+                    <div>
+                        <strong>Address</strong>
+                        <div>
+                            @(candidate?.Address ?? "Not provided")
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Education and Experience -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-header">
+                    <h5 class="mb-0">Education</h5>
+                </div>
+
+                <div class="card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        candidate?.EducationDetails))
+                    {
+                        <p class="mb-0">
+                            @candidate.EducationDetails
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">
+                            No education details provided.
+                        </p>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-header">
+                    <h5 class="mb-0">Experience</h5>
+                </div>
+
+                <div class="card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        candidate?.ExperienceDetails))
+                    {
+                        <p class="mb-0">
+                            @candidate.ExperienceDetails
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">
+                            No experience details provided.
+                        </p>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Skills -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Skills</h5>
+        </div>
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(candidate?.Skills))
+            {
+                <p class="mb-0">
+                    @candidate.Skills
+                </p>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    No skills provided.
+                </p>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- Job Information -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Applied Job</h5>
+        </div>
+
+        <div class="card-body">
+
+            <h4 class="fw-bold">
+                @Model.JobCircular?.Title
+            </h4>
+
+            <p>
+                <strong>Department:</strong>
+                @(Model.JobCircular?.Department ?? "Not specified")
+            </p>
+
+            <p>
+                <strong>Location:</strong>
+                @(Model.JobCircular?.Location ?? "Not specified")
+            </p>
+
+            <p>
+                <strong>Application Date:</strong>
+                @Model.AppliedAt.ToLocalTime()
+            </p>
+
+            <p class="mb-0">
+                <strong>Application Status:</strong>
+                @Model.Status
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Job Requirements -->
+    @if (Model.JobCircular?.JobRequirement != null)
+    {
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header">
+                <h5 class="mb-0">Job Requirements</h5>
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    <strong>Required Skills:</strong>
+                </p>
+
+                <p>
+                    @(Model.JobCircular.JobRequirement.RequiredSkills
+                        ?? "Not specified")
+                </p>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- CV -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Candidate CV</h5>
+        </div>
+
+        <div class="card-body">
+
+            @if (currentCV != null)
+            {
+                <p class="mb-1">
+                    <strong>File:</strong>
+                    @currentCV.StoredFileName
+                </p>
+
+                <p class="text-muted">
+                    Uploaded:
+                    @currentCV.UploadedAt.ToLocalTime()
+                </p>
+
+                <span class="badge bg-success mb-3">
+                    Current CV
+                </span>
+
+                <div>
+                    <a asp-controller="HRApplications"
+                       asp-action="CandidateFile"
+                       asp-route-applicationId="@Model.Id"
+                       asp-route-type="cv"
+                       target="_blank"
+                       class="btn btn-primary">
+                        View CV
+                    </a>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    No current CV available.
+                </p>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- Payment -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Payment</h5>
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.Payment != null)
+            {
+                <p>
+                    <strong>Status:</strong>
+                    @Model.Payment.Status
+                </p>
+
+                <p>
+                    <strong>Amount:</strong>
+                    @Model.Payment.Amount
+                </p>
+
+                @if (Model.Payment.PaidAt.HasValue)
+                {
+                    <p class="mb-0">
+                        <strong>Paid At:</strong>
+                        @Model.Payment.PaidAt.Value.ToLocalTime()
+                    </p>
+                }
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    No payment required.
+                </p>
+            }
+
+        </div>
+
+    </div>
+
+</div>

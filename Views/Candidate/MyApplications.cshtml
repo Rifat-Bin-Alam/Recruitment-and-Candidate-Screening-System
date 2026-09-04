@@ -1,0 +1,146 @@
+﻿@model IEnumerable<RecruitmentAndCandidateScreeningSystem.ViewModels.CandidateApplicationViewModel>
+
+@{
+    ViewData["Title"] = "My Applications";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">My Applications</h2>
+            <p class="text-muted mb-0">
+                Track your job applications and payment status.
+            </p>
+        </div>
+
+        <a asp-controller="CandidateJobs"
+           asp-action="Index"
+           class="btn btn-primary">
+            Browse Jobs
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-light border">
+            You have not applied for any jobs yet.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var application in Model)
+            {
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+
+                            <div class="row align-items-center">
+
+                                <div class="col-md-4">
+                                    <h5 class="fw-bold mb-1">
+                                        @application.JobTitle
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        Applied:
+                                        @application.AppliedAt.ToLocalTime()
+                                    </small>
+                                </div>
+
+                                <div class="col-md-3 mt-3 mt-md-0">
+                                    <small class="text-muted d-block">
+                                        Application Status
+                                    </small>
+
+                                    <strong>
+                                        @application.ApplicationStatus
+                                    </strong>
+                                </div>
+
+                                <div class="col-md-3 mt-3 mt-md-0">
+                                    <small class="text-muted d-block">
+                                        Payment
+                                    </small>
+
+                                    @if (application.PaymentStatus == "Paid")
+                                    {
+                                        <span class="badge bg-success">
+                                            Paid ✓
+                                        </span>
+                                    }
+                                    else if (application.PaymentStatus == "Pending")
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Not Required
+                                        </span>
+                                    }
+
+                                    @if (application.PaymentAmount.HasValue)
+                                    {
+                                        <div class="small mt-1">
+                                            Amount:
+                                            @application.PaymentAmount.Value.ToString("0.00")
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="col-md-2 text-md-end mt-3 mt-md-0">
+
+                                    @if (application.CanPay)
+                                    {
+                                        <a asp-controller="CandidateJobs"
+                                           asp-action="PayNow"
+                                           asp-route-id="@application.Id"
+                                           class="btn btn-warning btn-sm">
+                                            Pay Now
+                                        </a>
+                                    }
+                                    else if (application.PaymentStatus == "Paid")
+                                    {
+                                        <span class="text-success fw-semibold">
+                                            Confirmed ✓
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Submitted
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(
+                                application.ApplicationReferenceId))
+                            {
+                                <hr />
+
+                                <div class="small">
+                                    <strong>
+                                        Application Reference:
+                                    </strong>
+
+                                    @application.ApplicationReferenceId
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

@@ -1,0 +1,53 @@
+﻿@model RecruitmentAndCandidateScreeningSystem.Models.JobApplication
+
+@{
+    ViewData["Title"] = "Payment Cancelled";
+}
+
+<div class="container py-5">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 650px;">
+        <div class="card-body text-center p-5">
+
+            <div class="mb-4">
+                <span class="display-4">!</span>
+            </div>
+
+            <h2 class="fw-bold text-warning">
+                Payment Cancelled
+            </h2>
+
+            <p class="text-muted mt-3">
+                Your payment was cancelled. Your application has not
+                been marked as paid.
+            </p>
+
+            <div class="alert alert-light border mt-4">
+                <p class="mb-2">
+                    <strong>Application Reference:</strong>
+                    @Model.ApplicationReferenceId
+                </p>
+
+                <p class="mb-0">
+                    <strong>Job:</strong>
+                    @Model.JobCircular?.Title
+                </p>
+            </div>
+
+            <div class="mt-4">
+                <a asp-controller="CandidateJobs"
+                   asp-action="Details"
+                   asp-route-id="@Model.JobCircularId"
+                   class="btn btn-primary">
+                    Return to Job
+                </a>
+
+                <a asp-controller="Candidate"
+                   asp-action="Dashboard"
+                   class="btn btn-outline-secondary ms-2">
+                    Dashboard
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
