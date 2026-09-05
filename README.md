@@ -2,7 +2,7 @@
 
 A web-based recruitment management and candidate screening system built
 with **ASP.NET Core MVC**, **C#**, **Entity Framework Core**,
-**SQLite**, **ASP.NET Core Identity**, and **Stripe**.
+**SQLite**, **ASP.NET Core Identity**, and **Stripe**
 
 The system is designed to manage the recruitment process from job
 circular creation and candidate applications to payment processing,
