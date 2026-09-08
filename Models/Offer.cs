@@ -18,11 +18,12 @@ public class Offer
 
     public OfferStatus Status { get; set; } = OfferStatus.Pending;
 
-    public CandidateDecision CandidateDecision { get; set; } = CandidateDecision.Pending;
+    public CandidateDecision CandidateDecision { get; set; }
+        = CandidateDecision.Pending;
 
     public DateTime? DecisionDate { get; set; }
 
-    public JobApplication JobApplication { get; set; } = null!;
+    public JobApplication? JobApplication { get; set; }
 
     public JoiningSchedule? JoiningSchedule { get; set; }
 }

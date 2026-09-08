@@ -27,29 +27,42 @@ public class CandidateJobsController : Controller
         _stripePaymentService = stripePaymentService;
     }
 
+
+    // ============================================================
+    // AVAILABLE JOBS
+    // ============================================================
+
     public async Task<IActionResult> Index(
-    string? search,
-    string? sort)
+        string? search,
+        string? sort)
     {
         var jobsQuery = _context.JobCirculars
             .Where(j =>
                 j.Status == JobCircularStatus.Published &&
                 j.ApplicationDeadline > DateTime.UtcNow);
 
-        // Search
+
+        // --------------------------------------------------------
+        // SEARCH
+        // --------------------------------------------------------
+
         if (!string.IsNullOrWhiteSpace(search))
         {
             search = search.Trim();
 
             jobsQuery = jobsQuery.Where(j =>
-                j.Title.Contains(search) ||
+                j.JobTitle.Contains(search) ||
                 (j.Department != null &&
                  j.Department.Contains(search)) ||
                 (j.Location != null &&
                  j.Location.Contains(search)));
         }
 
-        // Sorting
+
+        // --------------------------------------------------------
+        // SORTING
+        // --------------------------------------------------------
+
         jobsQuery = sort switch
         {
             "oldest" =>
@@ -59,11 +72,14 @@ public class CandidateJobsController : Controller
                 jobsQuery.OrderBy(j => j.ApplicationDeadline),
 
             "deadline_late" =>
-                jobsQuery.OrderByDescending(j => j.ApplicationDeadline),
+                jobsQuery.OrderByDescending(
+                    j => j.ApplicationDeadline),
 
             _ =>
-                jobsQuery.OrderByDescending(j => j.PublishedAt)
+                jobsQuery.OrderByDescending(
+                    j => j.PublishedAt)
         };
+
 
         var jobs = await jobsQuery.ToListAsync();
 
@@ -75,10 +91,16 @@ public class CandidateJobsController : Controller
             jobs);
     }
 
+
+    // ============================================================
+    // JOB DETAILS
+    // ============================================================
+
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
             return NotFound();
+
 
         var job = await _context.JobCirculars
             .Include(j => j.JobRequirement)
@@ -87,17 +109,23 @@ public class CandidateJobsController : Controller
                 j.Status == JobCircularStatus.Published &&
                 j.ApplicationDeadline > DateTime.UtcNow);
 
+
         if (job == null)
             return NotFound();
 
+
         var userId = _userManager.GetUserId(User);
+
 
         if (userId != null)
         {
-            var profileId = await _context.CandidateProfiles
-                .Where(p => p.ApplicationUserId == userId)
-                .Select(p => (int?)p.Id)
-                .FirstOrDefaultAsync();
+            var profileId =
+                await _context.CandidateProfiles
+                    .Where(p =>
+                        p.ApplicationUserId == userId)
+                    .Select(p => (int?)p.Id)
+                    .FirstOrDefaultAsync();
+
 
             if (profileId.HasValue)
             {
@@ -105,18 +133,27 @@ public class CandidateJobsController : Controller
                     await _context.JobApplications
                         .Include(a => a.Payment)
                         .FirstOrDefaultAsync(a =>
-                            a.CandidateProfileId == profileId.Value &&
-                            a.JobCircularId == job.Id);
+                            a.CandidateProfileId ==
+                                profileId.Value &&
+                            a.JobCircularId ==
+                                job.Id);
+
 
                 ViewBag.ExistingApplication =
                     existingApplication;
             }
         }
 
+
         return View(
             "~/Views/Candidate/JobDetails.cshtml",
             job);
     }
+
+
+    // ============================================================
+    // APPLY FOR JOB
+    // ============================================================
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -124,13 +161,21 @@ public class CandidateJobsController : Controller
     {
         var userId = _userManager.GetUserId(User);
 
+
         if (userId == null)
             return Challenge();
 
-        var profile = await _context.CandidateProfiles
-            .Include(p => p.CVs)
-            .FirstOrDefaultAsync(p =>
-                p.ApplicationUserId == userId);
+
+        // --------------------------------------------------------
+        // LOAD CANDIDATE PROFILE
+        // --------------------------------------------------------
+
+        var profile =
+            await _context.CandidateProfiles
+                .Include(p => p.CVs)
+                .FirstOrDefaultAsync(p =>
+                    p.ApplicationUserId == userId);
+
 
         if (profile == null)
         {
@@ -142,8 +187,15 @@ public class CandidateJobsController : Controller
                 new { id });
         }
 
-        var currentCV = profile.CVs
-            .FirstOrDefault(c => c.IsCurrent);
+
+        // --------------------------------------------------------
+        // CHECK CURRENT CV
+        // --------------------------------------------------------
+
+        var currentCV =
+            profile.CVs
+                .FirstOrDefault(c => c.IsCurrent);
+
 
         if (currentCV == null)
         {
@@ -155,31 +207,55 @@ public class CandidateJobsController : Controller
                 new { id });
         }
 
-        var job = await _context.JobCirculars
-            .FirstOrDefaultAsync(j =>
-                j.Id == id &&
-                j.Status == JobCircularStatus.Published &&
-                j.ApplicationDeadline > DateTime.UtcNow);
+
+        // --------------------------------------------------------
+        // LOAD JOB
+        // --------------------------------------------------------
+
+        var job =
+            await _context.JobCirculars
+                .FirstOrDefaultAsync(j =>
+                    j.Id == id &&
+                    j.Status ==
+                        JobCircularStatus.Published &&
+                    j.ApplicationDeadline >
+                        DateTime.UtcNow);
+
 
         if (job == null)
             return NotFound();
+
+
+        // --------------------------------------------------------
+        // CHECK DUPLICATE APPLICATION
+        // --------------------------------------------------------
 
         var existingApplication =
             await _context.JobApplications
                 .Include(a => a.Payment)
                 .FirstOrDefaultAsync(a =>
-                    a.CandidateProfileId == profile.Id &&
-                    a.JobCircularId == job.Id);
+                    a.CandidateProfileId ==
+                        profile.Id &&
+                    a.JobCircularId ==
+                        job.Id);
+
 
         if (existingApplication != null)
         {
+            // If payment is still pending,
+            // send candidate back to payment.
+
             if (existingApplication.Payment?.Status ==
                 PaymentStatus.Pending)
             {
                 return RedirectToAction(
                     nameof(PayNow),
-                    new { id = existingApplication.Id });
+                    new
+                    {
+                        id = existingApplication.Id
+                    });
             }
+
 
             TempData["Error"] =
                 "You have already applied for this job.";
@@ -189,97 +265,147 @@ public class CandidateJobsController : Controller
                 new { id });
         }
 
+
+        // --------------------------------------------------------
+        // CREATE APPLICATION
+        // --------------------------------------------------------
+
         var application = new JobApplication
         {
             ApplicationReferenceId =
                 $"APP-{Guid.NewGuid():N}",
 
-            CandidateProfileId = profile.Id,
-            JobCircularId = job.Id,
-            CVId = currentCV.Id,
+            CandidateProfileId =
+                profile.Id,
 
-            Status = JobApplicationStatus.Submitted,
+            JobCircularId =
+                job.Id,
 
-            AppliedAt = DateTime.UtcNow
+            CVId =
+                currentCV.Id,
+
+            Status =
+                JobApplicationStatus.Submitted,
+
+            AppliedAt =
+                DateTime.UtcNow
         };
+
 
         _context.JobApplications.Add(application);
 
-        // ==========================================
+
+        // ========================================================
         // PAID JOB
-        // ==========================================
+        // ========================================================
+
         if (job.ApplicationFee.HasValue &&
             job.ApplicationFee.Value > 0)
         {
             var payment = new Payment
             {
-                JobApplication = application,
+                JobApplication =
+                    application,
 
-                Amount = job.ApplicationFee.Value,
+                Amount =
+                    job.ApplicationFee.Value,
 
-                PaymentMethod = PaymentMethod.Stripe,
+                PaymentMethod =
+                    PaymentMethod.Stripe,
 
-                Status = PaymentStatus.Pending,
+                Status =
+                    PaymentStatus.Pending,
 
-                CreatedAt = DateTime.UtcNow
+                CreatedAt =
+                    DateTime.UtcNow
             };
+
 
             _context.Payments.Add(payment);
 
+
             await _context.SaveChangesAsync();
+
 
             var user =
                 await _userManager.GetUserAsync(User);
 
-            var successUrl = Url.Action(
-                nameof(PaymentSuccess),
-                "CandidateJobs",
-                new { id = application.Id },
-                Request.Scheme)!;
 
-            var cancelUrl = Url.Action(
-                nameof(PaymentCancelled),
-                "CandidateJobs",
-                new { id = application.Id },
-                Request.Scheme)!;
+            var successUrl =
+                Url.Action(
+                    nameof(PaymentSuccess),
+                    "CandidateJobs",
+                    new
+                    {
+                        id = application.Id
+                    },
+                    Request.Scheme)!;
+
+
+            var cancelUrl =
+                Url.Action(
+                    nameof(PaymentCancelled),
+                    "CandidateJobs",
+                    new
+                    {
+                        id = application.Id
+                    },
+                    Request.Scheme)!;
+
 
             var session =
                 await _stripePaymentService
                     .CreateCheckoutSessionAsync(
                         application.ApplicationReferenceId,
-                        job.Title,
+
+                        job.JobTitle,
+
                         job.ApplicationFee.Value,
-                        user?.Email ?? string.Empty,
+
+                        user?.Email ??
+                            string.Empty,
+
                         successUrl,
+
                         cancelUrl);
+
 
             return Redirect(session.Url);
         }
 
-        // ==========================================
+
+        // ========================================================
         // FREE JOB
-        // ==========================================
+        // ========================================================
+
         await _context.SaveChangesAsync();
+
 
         TempData["Success"] =
             $"Application submitted successfully. " +
             $"Reference ID: {application.ApplicationReferenceId}";
+
 
         return RedirectToAction(
             nameof(Details),
             new { id });
     }
 
-    // ==============================================
+
+    // ============================================================
     // PAY NOW
-    // ==============================================
+    // ============================================================
+
     [HttpGet]
     public async Task<IActionResult> PayNow(int id)
     {
-        var userId = _userManager.GetUserId(User);
+        var userId =
+            _userManager.GetUserId(User);
+
 
         if (userId == null)
             return Challenge();
+
 
         var application =
             await _context.JobApplications
@@ -288,54 +414,79 @@ public class CandidateJobsController : Controller
                 .Include(a => a.CandidateProfile)
                 .FirstOrDefaultAsync(a =>
                     a.Id == id &&
-                    a.CandidateProfile.ApplicationUserId ==
-                    userId);
+                    a.CandidateProfile
+                        .ApplicationUserId ==
+                        userId);
+
 
         if (application == null)
             return NotFound();
 
+
         if (application.Payment == null ||
             application.Payment.Status !=
-            PaymentStatus.Pending)
+                PaymentStatus.Pending)
         {
             return RedirectToAction(
                 nameof(MyApplications));
         }
 
+
         var user =
             await _userManager.GetUserAsync(User);
 
-        var successUrl = Url.Action(
-            nameof(PaymentSuccess),
-            "CandidateJobs",
-            new { id = application.Id },
-            Request.Scheme)!;
 
-        var cancelUrl = Url.Action(
-            nameof(PaymentCancelled),
-            "CandidateJobs",
-            new { id = application.Id },
-            Request.Scheme)!;
+        var successUrl =
+            Url.Action(
+                nameof(PaymentSuccess),
+                "CandidateJobs",
+                new
+                {
+                    id = application.Id
+                },
+                Request.Scheme)!;
+
+
+        var cancelUrl =
+            Url.Action(
+                nameof(PaymentCancelled),
+                "CandidateJobs",
+                new
+                {
+                    id = application.Id
+                },
+                Request.Scheme)!;
+
 
         var session =
             await _stripePaymentService
                 .CreateCheckoutSessionAsync(
                     application.ApplicationReferenceId,
-                    application.JobCircular!.Title,
+
+                    application.JobCircular!.JobTitle,
+
                     application.Payment.Amount,
-                    user?.Email ?? string.Empty,
+
+                    user?.Email ??
+                        string.Empty,
+
                     successUrl,
+
                     cancelUrl);
+
 
         return Redirect(session.Url);
     }
 
-    // ==============================================
+
+    // ============================================================
     // MY APPLICATIONS
-    // ==============================================
+    // ============================================================
+
     public async Task<IActionResult> MyApplications()
     {
-        var userId = _userManager.GetUserId(User);
+        var userId =
+            _userManager.GetUserId(User);
 
         if (userId == null)
             return Challenge();
@@ -345,53 +496,71 @@ public class CandidateJobsController : Controller
                 .Include(a => a.JobCircular)
                 .Include(a => a.Payment)
                 .Include(a => a.CandidateProfile)
+                .Include(a => a.CV)
                 .Where(a =>
-                    a.CandidateProfile.ApplicationUserId ==
-                    userId)
-                .OrderByDescending(a => a.AppliedAt)
-                .Select(a => new CandidateApplicationViewModel
-                {
-                    Id = a.Id,
+                    a.CandidateProfile
+                        .ApplicationUserId ==
+                        userId)
+                .OrderByDescending(a =>
+                    a.AppliedAt)
+                .Select(a =>
+                    new CandidateApplicationViewModel
+                    {
+                        Id =
+                            a.Id,
 
-                    JobTitle =
-                        a.JobCircular!.Title,
+                        JobTitle =
+                            a.JobCircular!.JobTitle,
 
-                    // Do not show reference ID
-                    // until payment is completed.
-                    ApplicationReferenceId =
-                        a.Payment != null &&
-                        a.Payment.Status !=
-                        PaymentStatus.Paid
-                            ? string.Empty
-                            : a.ApplicationReferenceId,
+                        ApplicationReferenceId =
+                            a.Payment != null &&
+                            a.Payment.Status !=
+                                PaymentStatus.Paid
 
-                    AppliedAt = a.AppliedAt,
+                                ? string.Empty
 
-                    ApplicationStatus =
-                        a.Payment != null &&
-                        a.Payment.Status !=
-                        PaymentStatus.Paid
-                            ? "Payment Pending"
-                            : a.Status.ToString(),
+                                : a.ApplicationReferenceId,
 
-                    HasPayment =
-                        a.Payment != null,
+                        AppliedAt =
+                            a.AppliedAt,
 
-                    PaymentStatus =
-                        a.Payment == null
-                            ? "Not Required"
-                            : a.Payment.Status.ToString(),
+                        ApplicationStatus =
+                            a.Payment != null &&
+                            a.Payment.Status !=
+                                PaymentStatus.Paid
 
-                    PaymentAmount =
-                        a.Payment == null
-                            ? null
-                            : a.Payment.Amount,
+                                ? "Payment Pending"
 
-                    CanPay =
-                        a.Payment != null &&
-                        a.Payment.Status ==
-                        PaymentStatus.Pending
-                })
+                                : a.Status.ToString(),
+
+                        HasPayment =
+                            a.Payment != null,
+
+                        PaymentStatus =
+                            a.Payment == null
+                                ? "Not Required"
+                                : a.Payment.Status.ToString(),
+
+                        PaymentAmount =
+                            a.Payment == null
+                                ? null
+                                : a.Payment.Amount,
+
+                        CanPay =
+                            a.Payment != null &&
+                            a.Payment.Status ==
+                                PaymentStatus.Pending,
+
+                        // Exact CV submitted with this application
+                        CVId =
+                            a.CVId,
+
+                        CVFileName =
+                            a.CV.StoredFileName,
+
+                        CVFilePath =
+                            a.CV.FilePath
+                    })
                 .ToListAsync();
 
         return View(
@@ -399,9 +568,58 @@ public class CandidateJobsController : Controller
             applications);
     }
 
-    // ==============================================
+    // ============================================================
+    // VIEW / DOWNLOAD SUBMITTED CV
+    // ============================================================
+
+    [Authorize(Roles = RoleNames.Candidate)]
+    public async Task<IActionResult> DownloadCV(int id)
+    {
+        var userId = _userManager.GetUserId(User);
+
+        if (userId == null)
+            return Challenge();
+
+        var cv = await _context.CVs
+            .Include(c => c.CandidateProfile)
+            .FirstOrDefaultAsync(c =>
+                c.Id == id &&
+                c.CandidateProfile.ApplicationUserId == userId);
+
+        if (cv == null)
+            return NotFound();
+
+        if (string.IsNullOrWhiteSpace(cv.FilePath))
+            return NotFound();
+
+        var fullPath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "SecureUploads",
+            cv.FilePath);
+
+        if (!System.IO.File.Exists(fullPath))
+            return NotFound();
+
+        var contentType = cv.FileExtension?.ToLowerInvariant() switch
+        {
+            ".pdf" => "application/pdf",
+
+            ".docx" =>
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+            _ => "application/octet-stream"
+        };
+
+        return PhysicalFile(
+            fullPath,
+            contentType,
+            cv.StoredFileName);
+    }
+
+    // ============================================================
     // STRIPE PAYMENT SUCCESS
-    // ==============================================
+    // ============================================================
+
     public async Task<IActionResult> PaymentSuccess(
         int id,
         string? session_id)
@@ -415,10 +633,14 @@ public class CandidateJobsController : Controller
                 nameof(MyApplications));
         }
 
-        var userId = _userManager.GetUserId(User);
+
+        var userId =
+            _userManager.GetUserId(User);
+
 
         if (userId == null)
             return Challenge();
+
 
         var application =
             await _context.JobApplications
@@ -427,11 +649,14 @@ public class CandidateJobsController : Controller
                 .Include(a => a.CandidateProfile)
                 .FirstOrDefaultAsync(a =>
                     a.Id == id &&
-                    a.CandidateProfile.ApplicationUserId ==
-                    userId);
+                    a.CandidateProfile
+                        .ApplicationUserId ==
+                        userId);
+
 
         if (application == null)
             return NotFound();
+
 
         if (application.Payment == null)
         {
@@ -442,23 +667,32 @@ public class CandidateJobsController : Controller
                 nameof(MyApplications));
         }
 
+
         try
         {
             var sessionService =
                 new Stripe.Checkout.SessionService();
 
+
             var session =
-                await sessionService.GetAsync(session_id);
+                await sessionService.GetAsync(
+                    session_id);
+
 
             var referenceId =
                 session.Metadata.TryGetValue(
                     "application_reference_id",
                     out var metadataReference)
+
                         ? metadataReference
+
                         : session.ClientReferenceId;
 
-            // Make sure this Stripe session belongs
-            // to this application.
+
+            // ----------------------------------------------------
+            // Verify Stripe session belongs to application
+            // ----------------------------------------------------
+
             if (referenceId !=
                 application.ApplicationReferenceId)
             {
@@ -469,7 +703,11 @@ public class CandidateJobsController : Controller
                     nameof(MyApplications));
             }
 
-            // Stripe must confirm the payment.
+
+            // ----------------------------------------------------
+            // Verify payment status
+            // ----------------------------------------------------
+
             if (session.PaymentStatus != "paid")
             {
                 TempData["Error"] =
@@ -479,7 +717,11 @@ public class CandidateJobsController : Controller
                     nameof(MyApplications));
             }
 
-            // Mark payment as paid.
+
+            // ----------------------------------------------------
+            // Mark payment as paid
+            // ----------------------------------------------------
+
             application.Payment.Status =
                 PaymentStatus.Paid;
 
@@ -489,7 +731,9 @@ public class CandidateJobsController : Controller
             application.Payment.TransactionId =
                 session.PaymentIntentId;
 
+
             await _context.SaveChangesAsync();
+
 
             return View(
                 "~/Views/Candidate/PaymentSuccess.cshtml",
@@ -505,16 +749,21 @@ public class CandidateJobsController : Controller
         }
     }
 
-    // ==============================================
+
+    // ============================================================
     // STRIPE PAYMENT CANCELLED
-    // ==============================================
+    // ============================================================
+
     public async Task<IActionResult> PaymentCancelled(
         int id)
     {
-        var userId = _userManager.GetUserId(User);
+        var userId =
+            _userManager.GetUserId(User);
+
 
         if (userId == null)
             return Challenge();
+
 
         var application =
             await _context.JobApplications
@@ -523,11 +772,14 @@ public class CandidateJobsController : Controller
                 .Include(a => a.CandidateProfile)
                 .FirstOrDefaultAsync(a =>
                     a.Id == id &&
-                    a.CandidateProfile.ApplicationUserId ==
-                    userId);
+                    a.CandidateProfile
+                        .ApplicationUserId ==
+                        userId);
+
 
         if (application == null)
             return NotFound();
+
 
         return View(
             "~/Views/Candidate/PaymentCancelled.cshtml",

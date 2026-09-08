@@ -10,3 +10,7 @@ SecureUploads/
 
 *.csproj.user
 *.csproj.Backup.tmp
+
+appsettings.Development.json
+
+*.log

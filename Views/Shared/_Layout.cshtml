@@ -4,6 +4,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -27,16 +28,20 @@
 <body>
 
 <header>
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
 
         <div class="container">
 
+            <!-- Brand -->
             <a class="navbar-brand fw-bold"
                asp-controller="Home"
                asp-action="Index">
                 Recruitment System
             </a>
 
+
+            <!-- Mobile Menu Button -->
             <button class="navbar-toggler"
                     type="button"
                     data-bs-toggle="collapse"
@@ -49,68 +54,171 @@
 
             </button>
 
-            <div class="collapse navbar-collapse" id="mainNavbar">
+
+            <!-- Navigation -->
+            <div class="collapse navbar-collapse"
+                 id="mainNavbar">
 
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     @if (SignInManager.IsSignedIn(User))
                     {
+
+                        <!-- ========================= -->
+                        <!-- CANDIDATE NAVIGATION -->
+                        <!-- ========================= -->
+
                         @if (User.IsInRole(RoleNames.Candidate))
                         {
                             <li class="nav-item">
+
                                 <a class="nav-link"
                                    asp-controller="Candidate"
                                    asp-action="Dashboard">
+
                                     Dashboard
+
                                 </a>
+
                             </li>
 
+
                             <li class="nav-item">
+
                                 <a class="nav-link"
                                    asp-controller="CandidateJobs"
                                    asp-action="Index">
+
                                     Jobs
+
                                 </a>
+
                             </li>
 
+
                             <li class="nav-item">
+
                                 <a class="nav-link"
                                    asp-controller="CandidateJobs"
                                    asp-action="MyApplications">
+
                                     My Applications
+
                                 </a>
+
                             </li>
 
+
+                            <!-- Offers -->
+
                             <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="CandidateOffers"
+                                   asp-action="Index">
+
+                                    Offers
+
+                                </a>
+
+                            </li>
+
+
+                            <li class="nav-item">
+
                                 <a class="nav-link"
                                    asp-controller="CandidateProfiles"
                                    asp-action="Index">
+
                                     Profile
+
                                 </a>
+
                             </li>
                         }
+
+
+                        <!-- ========================= -->
+                        <!-- HR MANAGER NAVIGATION -->
+                        <!-- ========================= -->
 
                         @if (User.IsInRole(RoleNames.HRManager))
                         {
+
+                            <!-- HR Dashboard -->
+
                             <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="HRDashboard"
+                                   asp-action="Index">
+
+                                    Dashboard
+
+                                </a>
+
+                            </li>
+
+
+                            <!-- Job Circulars -->
+
+                            <li class="nav-item">
+
                                 <a class="nav-link"
                                    asp-controller="JobCirculars"
                                    asp-action="Index">
+
                                     Job Circulars
+
                                 </a>
+
                             </li>
 
+
+                            <!-- Applications -->
+
                             <li class="nav-item">
+
                                 <a class="nav-link"
                                    asp-controller="HRApplications"
                                    asp-action="Index">
+
                                     Applications
+
+                                </a>
+
+                            </li>
+
+
+                            <!-- Offers -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="Offers"
+                                   asp-action="Index">
+
+                                    Offers
+
+                                </a>
+
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="HRReports"
+                                   asp-action="Index">
+                                    Reports
                                 </a>
                             </li>
+
                         }
+
                     }
 
                 </ul>
+
+
+                <!-- Login / Logout -->
 
                 <partial name="_LoginPartial" />
 
@@ -119,23 +227,38 @@
         </div>
 
     </nav>
+
 </header>
+
+
+<!-- Main Content -->
 
 <div class="container mt-4">
 
-    <main role="main" class="pb-4">
+    <main role="main"
+          class="pb-4">
+
         @RenderBody()
+
     </main>
 
 </div>
 
+
+<!-- Footer -->
+
 <footer class="border-top footer text-muted mt-5">
 
     <div class="container py-3">
+
         &copy; 2026 - Recruitment and Candidate Screening System
+
     </div>
 
 </footer>
+
+
+<!-- JavaScript -->
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
@@ -144,7 +267,10 @@
 <script src="~/js/site.js"
         asp-append-version="true"></script>
 
-@await RenderSectionAsync("Scripts", required: false)
+@await RenderSectionAsync(
+    "Scripts",
+    required: false)
 
 </body>
+
 </html>

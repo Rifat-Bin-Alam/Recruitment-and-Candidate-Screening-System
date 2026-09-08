@@ -14,7 +14,7 @@ public class HomeController : Controller
             {
                 return RedirectToAction(
                     "Index",
-                    "JobCirculars");
+                    "HRDashboard");
             }
 
             if (User.IsInRole(RoleNames.Candidate))

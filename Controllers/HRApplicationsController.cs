@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RecruitmentAndCandidateScreeningSystem.Data;
 using RecruitmentAndCandidateScreeningSystem.Models;
 using RecruitmentAndCandidateScreeningSystem.Models.Enums;
+using RecruitmentAndCandidateScreeningSystem.Services;
 using RecruitmentAndCandidateScreeningSystem.ViewModels;
 
 namespace RecruitmentAndCandidateScreeningSystem.Controllers;
@@ -13,13 +14,19 @@ public class HRApplicationsController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly IWebHostEnvironment _environment;
+    private readonly AIMatchingService _aiMatchingService;
+    private readonly CVTextExtractionService _cvTextExtractionService;
 
     public HRApplicationsController(
         ApplicationDbContext context,
-        IWebHostEnvironment environment)
+        IWebHostEnvironment environment,
+        AIMatchingService aiMatchingService,
+        CVTextExtractionService cvTextExtractionService)
     {
         _context = context;
         _environment = environment;
+        _aiMatchingService = aiMatchingService;
+        _cvTextExtractionService = cvTextExtractionService;
     }
 
     public async Task<IActionResult> Index(
@@ -32,6 +39,7 @@ public class HRApplicationsController : Controller
                     .ThenInclude(p => p.ApplicationUser)
                 .Include(a => a.JobCircular)
                 .Include(a => a.Payment)
+                .Include(a => a.AIMatchingResult)
                 .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -43,7 +51,7 @@ public class HRApplicationsController : Controller
                     a.CandidateProfile.FullName.Contains(search) ||
                     a.CandidateProfile.ApplicationUser.Email!
                         .Contains(search) ||
-                    a.JobCircular!.Title.Contains(search));
+                    a.JobCircular!.JobTitle.Contains(search));
         }
 
         if (!string.IsNullOrWhiteSpace(status))
@@ -80,7 +88,7 @@ public class HRApplicationsController : Controller
                         ?? string.Empty,
 
                     JobTitle =
-                        a.JobCircular!.Title,
+                        a.JobCircular!.JobTitle,
 
                     AppliedAt =
                         a.AppliedAt,
@@ -99,7 +107,17 @@ public class HRApplicationsController : Controller
                     PaymentAmount =
                         a.Payment == null
                             ? null
-                            : a.Payment.Amount
+                            : a.Payment.Amount,
+
+                                        AIMatchingScore =
+                        a.AIMatchingResult == null
+                            ? null
+                            : a.AIMatchingResult.MatchingScore,
+
+                                        AIDecision =
+                        a.AIMatchingResult == null
+                            ? null
+                            : a.AIMatchingResult.Decision
                 })
                 .ToListAsync();
 
@@ -125,6 +143,7 @@ public class HRApplicationsController : Controller
                 .Include(a => a.JobCircular)
                     .ThenInclude(j => j.JobRequirement)
                 .Include(a => a.Payment)
+                .Include(a => a.AIMatchingResult)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
         if (application == null)
@@ -133,6 +152,125 @@ public class HRApplicationsController : Controller
         return View(
             "~/Views/HRApplications/Details.cshtml",
             application);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AIMatch(int id)
+    {
+        var application =
+            await _context.JobApplications
+                .Include(a => a.CandidateProfile)
+                    .ThenInclude(p => p.CVs)
+                .Include(a => a.JobCircular)
+                    .ThenInclude(j => j.JobRequirement)
+                .Include(a => a.AIMatchingResult)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (application == null)
+            return NotFound();
+
+        var currentCV =
+            application.CandidateProfile.CVs
+                .FirstOrDefault(c => c.IsCurrent);
+
+        if (currentCV == null)
+        {
+            TempData["Error"] =
+                "This candidate does not have a current CV.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id });
+        }
+
+        if (application.JobCircular?.JobRequirement == null)
+        {
+            TempData["Error"] =
+                "Job requirements have not been configured.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id });
+        }
+
+        try
+        {
+            var cvText =
+                await _cvTextExtractionService
+                    .ExtractTextAsync(currentCV.FilePath);
+
+            if (string.IsNullOrWhiteSpace(cvText))
+            {
+                TempData["Error"] =
+                    "Unable to extract text from the CV.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new { id });
+            }
+
+            var evaluation =
+                await _aiMatchingService.EvaluateAsync(
+                    cvText,
+                    application.JobCircular.JobRequirement);
+
+            var decision =
+                evaluation.Score >= 80
+                    ? "SHORTLISTED"
+                    : evaluation.Score >= 60
+                        ? "MANUAL REVIEW"
+                        : "REJECTED";
+
+            if (application.AIMatchingResult == null)
+            {
+                application.AIMatchingResult =
+                    new AIMatchingResult();
+            }
+
+            application.AIMatchingResult.MatchingScore =
+                evaluation.Score;
+
+            application.AIMatchingResult.Decision =
+                decision;
+
+            application.AIMatchingResult.MatchedSkills =
+                evaluation.MatchedSkills;
+
+            application.AIMatchingResult.MatchingDetails =
+                evaluation.MatchingDetails;
+
+            application.AIMatchingResult.EvaluatedAt =
+                DateTime.UtcNow;
+
+            application.Status =
+                decision switch
+                {
+                    "SHORTLISTED" =>
+                        JobApplicationStatus.Shortlisted,
+
+                    "MANUAL REVIEW" =>
+                        JobApplicationStatus.ManualReview,
+
+                    _ =>
+                        JobApplicationStatus.Rejected
+                };
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                $"AI screening completed. " +
+                $"Score: {evaluation.Score:0.##}% — {decision}";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] =
+                $"AI screening failed: {ex.Message}";
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id });
     }
 
     [HttpGet]
@@ -158,25 +296,32 @@ public class HRApplicationsController : Controller
         switch (type.ToLowerInvariant())
         {
             case "photo":
+
                 relativePath =
                     application.CandidateProfile.PhotoFilePath;
+
                 break;
 
             case "signature":
+
                 relativePath =
                     application.CandidateProfile.SignatureFilePath;
+
                 break;
 
             case "cv":
+
                 var currentCV =
                     application.CandidateProfile.CVs
                         .FirstOrDefault(c => c.IsCurrent);
 
                 relativePath =
                     currentCV?.FilePath;
+
                 break;
 
             default:
+
                 return BadRequest();
         }
 
@@ -211,13 +356,23 @@ public class HRApplicationsController : Controller
 
         var contentType = extension switch
         {
-            ".jpg" or ".jpeg" => "image/jpeg",
-            ".png" => "image/png",
-            ".pdf" => "application/pdf",
-            ".doc" => "application/msword",
+            ".jpg" or ".jpeg" =>
+                "image/jpeg",
+
+            ".png" =>
+                "image/png",
+
+            ".pdf" =>
+                "application/pdf",
+
+            ".doc" =>
+                "application/msword",
+
             ".docx" =>
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            _ => "application/octet-stream"
+
+            _ =>
+                "application/octet-stream"
         };
 
         return PhysicalFile(

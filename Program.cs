@@ -18,7 +18,10 @@ StripeConfiguration.ApiKey =
 
 // Add Stripe payment service.
 builder.Services.AddScoped<StripePaymentService>();
-
+// Add Gemini 
+builder.Services.AddScoped<GeminiService>();
+builder.Services.AddScoped<AIMatchingService>();
+builder.Services.AddScoped<CVTextExtractionService>();
 // Add ASP.NET Core Identity.
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
