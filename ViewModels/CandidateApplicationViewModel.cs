@@ -19,4 +19,11 @@ public class CandidateApplicationViewModel
     public decimal? PaymentAmount { get; set; }
 
     public bool CanPay { get; set; }
+
+    // CV used for this specific application
+    public int CVId { get; set; }
+
+    public string CVFileName { get; set; } = string.Empty;
+
+    public string CVFilePath { get; set; } = string.Empty;
 }

@@ -10,7 +10,7 @@
         <div>
             <h2 class="fw-bold">My Applications</h2>
             <p class="text-muted mb-0">
-                Track your job applications and payment status.
+                Track your applications, payment status, and submitted CV.
             </p>
         </div>
 
@@ -34,23 +34,45 @@
             @foreach (var application in Model)
             {
                 <div class="col-12">
+
                     <div class="card border-0 shadow-sm">
+
                         <div class="card-body">
 
-                            <div class="row align-items-center">
+                            <div class="row g-4">
 
+                                <!-- JOB INFORMATION -->
                                 <div class="col-md-4">
+
                                     <h5 class="fw-bold mb-1">
                                         @application.JobTitle
                                     </h5>
 
-                                    <small class="text-muted">
+                                    <small class="text-muted d-block mb-3">
                                         Applied:
                                         @application.AppliedAt.ToLocalTime()
                                     </small>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        application.ApplicationReferenceId))
+                                    {
+                                        <div class="small">
+                                            <span class="text-muted">
+                                                Application Reference:
+                                            </span>
+
+                                            <div class="fw-semibold">
+                                                @application.ApplicationReferenceId
+                                            </div>
+                                        </div>
+                                    }
+
                                 </div>
 
-                                <div class="col-md-3 mt-3 mt-md-0">
+
+                                <!-- APPLICATION STATUS -->
+                                <div class="col-md-2">
+
                                     <small class="text-muted d-block">
                                         Application Status
                                     </small>
@@ -58,10 +80,14 @@
                                     <strong>
                                         @application.ApplicationStatus
                                     </strong>
+
                                 </div>
 
-                                <div class="col-md-3 mt-3 mt-md-0">
-                                    <small class="text-muted d-block">
+
+                                <!-- PAYMENT -->
+                                <div class="col-md-3">
+
+                                    <small class="text-muted d-block mb-1">
                                         Payment
                                     </small>
 
@@ -88,32 +114,40 @@
                                     {
                                         <div class="small mt-1">
                                             Amount:
-                                            @application.PaymentAmount.Value.ToString("0.00")
+                                            @application.PaymentAmount.Value
+                                            .ToString("0.00")
                                         </div>
                                     }
+
                                 </div>
 
-                                <div class="col-md-2 text-md-end mt-3 mt-md-0">
 
-                                    @if (application.CanPay)
+                                <!-- CV -->
+                                <div class="col-md-3">
+
+                                    <small class="text-muted d-block mb-1">
+                                        CV Submitted
+                                    </small>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        application.CVFileName))
                                     {
+                                        <div class="small fw-semibold text-truncate"
+                                             title="@application.CVFileName">
+                                            @application.CVFileName
+                                        </div>
+
                                         <a asp-controller="CandidateJobs"
-                                           asp-action="PayNow"
-                                           asp-route-id="@application.Id"
-                                           class="btn btn-warning btn-sm">
-                                            Pay Now
+                                           asp-action="DownloadCV"
+                                           asp-route-id="@application.CVId"
+                                           class="btn btn-outline-primary btn-sm mt-2">
+                                            View CV
                                         </a>
-                                    }
-                                    else if (application.PaymentStatus == "Paid")
-                                    {
-                                        <span class="text-success fw-semibold">
-                                            Confirmed ✓
-                                        </span>
                                     }
                                     else
                                     {
                                         <span class="text-muted">
-                                            Submitted
+                                            CV not available
                                         </span>
                                     }
 
@@ -121,22 +155,56 @@
 
                             </div>
 
-                            @if (!string.IsNullOrWhiteSpace(
-                                application.ApplicationReferenceId))
-                            {
-                                <hr />
 
-                                <div class="small">
-                                    <strong>
-                                        Application Reference:
-                                    </strong>
+                            <!-- ACTIONS -->
+                            <hr class="my-4" />
 
-                                    @application.ApplicationReferenceId
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <div>
+
+                                    @if (application.CanPay)
+                                    {
+                                        <span class="text-warning fw-semibold">
+                                            Payment required to complete application.
+                                        </span>
+                                    }
+                                    else if (application.PaymentStatus == "Paid")
+                                    {
+                                        <span class="text-success fw-semibold">
+                                            Application submitted ✓
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Application submitted.
+                                        </span>
+                                    }
+
                                 </div>
-                            }
+
+
+                                <div>
+
+                                    @if (application.CanPay)
+                                    {
+                                        <a asp-controller="CandidateJobs"
+                                           asp-action="PayNow"
+                                           asp-route-id="@application.Id"
+                                           class="btn btn-warning">
+                                            Pay Now
+                                        </a>
+                                    }
+
+                                </div>
+
+                            </div>
 
                         </div>
+
                     </div>
+
                 </div>
             }
 

@@ -1,0 +1,432 @@
+﻿@model RecruitmentAndCandidateScreeningSystem.ViewModels.RecruitmentReportViewModel
+
+@{
+    ViewData["Title"] = "Recruitment Report";
+}
+
+<div class="container py-4" id="reportContent">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Recruitment Report
+            </h2>
+
+            <p class="text-muted mb-0">
+                Overview of recruitment activities,
+                applications, screening, offers and payments.
+            </p>
+        </div>
+
+        <button type="button"
+                class="btn btn-outline-primary"
+                onclick="window.print()">
+            Print Report
+        </button>
+
+    </div>
+
+
+    <!-- APPLICATION STATISTICS -->
+    <h5 class="fw-bold mb-3">
+        Application Statistics
+    </h5>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Total Applications
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        @Model.TotalApplications
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        AI Evaluated
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        @Model.AIEvaluated
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Shortlisted
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        @Model.Shortlisted
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Manual Review
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        @Model.ManualReview
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Rejected
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        @Model.Rejected
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Interview
+                    </small>
+
+                    <h3 class="fw-bold mt-2">
+                        @Model.InterviewCandidates
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- RECRUITMENT FUNNEL -->
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body p-4">
+
+            <h5 class="fw-bold mb-4">
+                Recruitment Funnel
+            </h5>
+
+            <div class="row text-center">
+
+                <div class="col-md">
+                    <div class="fw-bold fs-4">
+                        @Model.TotalApplications
+                    </div>
+
+                    <small class="text-muted">
+                        Applications
+                    </small>
+                </div>
+
+                <div class="col-md">
+                    <div class="fw-bold fs-4">
+                        @Model.AIEvaluated
+                    </div>
+
+                    <small class="text-muted">
+                        AI Evaluated
+                    </small>
+                </div>
+
+                <div class="col-md">
+                    <div class="fw-bold fs-4">
+                        @Model.Shortlisted
+                    </div>
+
+                    <small class="text-muted">
+                        Shortlisted
+                    </small>
+                </div>
+
+                <div class="col-md">
+                    <div class="fw-bold fs-4">
+                        @Model.InterviewCandidates
+                    </div>
+
+                    <small class="text-muted">
+                        Interview
+                    </small>
+                </div>
+
+                <div class="col-md">
+                    <div class="fw-bold fs-4">
+                        @Model.AcceptedOffers
+                    </div>
+
+                    <small class="text-muted">
+                        Hired / Accepted
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- OFFERS & PAYMENTS -->
+    <div class="row g-4 mb-4">
+
+        <!-- OFFERS -->
+
+        <div class="col-md-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        Offer Statistics
+                    </h5>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Total Offers</span>
+                        <strong>
+                            @Model.TotalOffers
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Pending</span>
+                        <strong>
+                            @Model.PendingOffers
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Accepted</span>
+                        <strong>
+                            @Model.AcceptedOffers
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <span>Rejected</span>
+                        <strong>
+                            @Model.RejectedOffers
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAYMENTS -->
+
+        <div class="col-md-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        Payment Statistics
+                    </h5>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Paid Applications</span>
+                        <strong>
+                            @Model.PaidApplications
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <span>Pending Payments</span>
+                        <strong>
+                            @Model.PendingPayments
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- JOB STATISTICS -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between
+                align-items-center mb-3">
+
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        Job-wise Recruitment Statistics
+                    </h5>
+
+                    <small class="text-muted">
+                        Published Jobs:
+                        @Model.PublishedJobs
+                    </small>
+                </div>
+
+            </div>
+
+
+            @if (!Model.JobStatistics.Any())
+            {
+                <div class="alert alert-light border mb-0">
+                    No job recruitment data available.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>Job</th>
+                                <th>Applications</th>
+                                <th>AI Evaluated</th>
+                                <th>Shortlisted</th>
+                                <th>Manual Review</th>
+                                <th>Rejected</th>
+                                <th>Interview</th>
+                                <th>Offers</th>
+                                <th>Accepted</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var job in Model.JobStatistics)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <strong>
+                                            @job.JobTitle
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        @job.TotalApplications
+                                    </td>
+
+                                    <td>
+                                        @job.AIEvaluated
+                                    </td>
+
+                                    <td>
+                                        @job.Shortlisted
+                                    </td>
+
+                                    <td>
+                                        @job.ManualReview
+                                    </td>
+
+                                    <td>
+                                        @job.Rejected
+                                    </td>
+
+                                    <td>
+                                        @job.InterviewCandidates
+                                    </td>
+
+                                    <td>
+                                        @job.Offers
+                                    </td>
+
+                                    <td>
+                                        @job.AcceptedOffers
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- REPORT FOOTER -->
+
+    <div class="text-muted small">
+        Report generated:
+        @DateTime.Now.ToString("dd MMM yyyy hh:mm tt")
+    </div>
+
+</div>
+
+
+<style>
+    @@media print {
+        nav,
+        footer,
+        .btn,
+        .navbar,
+        .footer {
+            display: none !important;
+        }
+
+        body {
+            background: white !important;
+        }
+
+        #reportContent {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+
+        .table {
+            font-size: 12px;
+        }
+    }
+</style>
