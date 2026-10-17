@@ -70,3 +70,11 @@ Configure your local database and Stripe test credentials as needed.
 - Sensitive configuration excluded from source control
 
 > **Note:** Never commit real passwords, Stripe secret keys, production databases, or private candidate documents to GitHub.
+
+---
+
+## Author
+- **Developer:** Rifat Bin Alam
+- **Email:** [rifat5566123@gmail.com](mailto:rifat5566123@gmail.com)
+- **GitHub:** [https://github.com/Rifat-Bin-Alam](https://github.com/Rifat-Bin-Alam)
+
