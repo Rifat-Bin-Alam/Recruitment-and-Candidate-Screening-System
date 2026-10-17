@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +36,7 @@ public class CandidateOffersController : Controller
 
         if (profile == null)
         {
-            return NotFound();
+            return View(new List<Offer>());
         }
 
         var offers = await _context.Offers

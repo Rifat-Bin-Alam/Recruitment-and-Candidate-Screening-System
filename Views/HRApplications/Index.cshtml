@@ -1,438 +1,307 @@
-﻿@using RecruitmentAndCandidateScreeningSystem.Models.Enums
+@using RecruitmentAndCandidateScreeningSystem.Models.Enums
 @model IEnumerable<RecruitmentAndCandidateScreeningSystem.ViewModels.HRApplicationViewModel>
 
 @{
-    ViewData["Title"] = "Applications";
+    ViewData["Title"] = "Candidate Applications Management";
 
     var search = ViewBag.Search as string;
     var selectedStatus = ViewBag.Status as string;
 }
 
-<div class="container">
+<div class="container py-4">
 
-    <!-- Header -->
-    <div class="mb-4">
-        <h2 class="fw-bold">Job Applications</h2>
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                    <i class="bi bi-people me-1"></i>Applicant Tracking Pipeline
+                </span>
+            </div>
+            <h2 class="fw-bold text-slate-900 mb-1">Candidate Applications</h2>
+            <p class="text-muted mb-0 small">
+                Review candidate submissions, payment verification, and AI matching evaluation results.
+            </p>
+        </div>
 
-        <p class="text-muted">
-            Review candidate applications, payments, and AI screening results.
-        </p>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-controller="HRReports" asp-action="Index" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-file-earmark-bar-graph me-1"></i>Recruitment Report
+            </a>
+            <a asp-controller="Offers" asp-action="Index" class="btn btn-outline-success btn-sm px-3">
+                <i class="bi bi-award me-1"></i>Offer Pipeline
+            </a>
+        </div>
     </div>
 
+    <!-- Search & Multi-Filter Bar -->
+    <div class="filter-toolbar">
+        <form asp-action="Index" method="get">
+            <div class="row g-3 align-items-end">
 
-    <!-- Search and Filters -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-body">
-
-            <form asp-action="Index" method="get">
-
-                <div class="row g-3 align-items-end">
-
-                    <!-- Search -->
-                    <div class="col-md-5">
-
-                        <label class="form-label fw-semibold">
-                            Search
-                        </label>
-
+                <!-- Search Input -->
+                <div class="col-lg-5 col-md-6">
+                    <label class="form-label small fw-semibold text-slate-800">Search Candidates or Positions</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
                         <input type="text"
                                name="search"
                                value="@search"
                                class="form-control"
-                               placeholder="Candidate name, email or job title..." />
-
+                               placeholder="Filter by name, email, or job title..." />
                     </div>
-
-
-                    <!-- Application Status -->
-                    <div class="col-md-3">
-
-                        <label class="form-label fw-semibold">
-                            Application Status
-                        </label>
-
-                        <select name="status"
-                                class="form-select">
-
-                            <option value="">
-                                All Applications
-                            </option>
-
-                            @foreach (var item in Enum.GetValues<JobApplicationStatus>())
-                            {
-                                if (selectedStatus == item.ToString())
-                                {
-                                    <option value="@item" selected>
-                                        @item
-                                    </option>
-                                }
-                                else
-                                {
-                                    <option value="@item">
-                                        @item
-                                    </option>
-                                }
-                            }
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- AI Decision -->
-                    <div class="col-md-2">
-
-                        <label class="form-label fw-semibold">
-                            AI Decision
-                        </label>
-
-                        <select id="aiDecisionFilter"
-                                class="form-select">
-
-                            <option value="">
-                                All
-                            </option>
-
-                            <option value="SHORTLISTED">
-                                Shortlisted
-                            </option>
-
-                            <option value="MANUAL REVIEW">
-                                Manual Review
-                            </option>
-
-                            <option value="REJECTED">
-                                Rejected
-                            </option>
-
-                            <option value="NOT_EVALUATED">
-                                Not Evaluated
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- Buttons -->
-                    <div class="col-md-2 d-flex gap-2">
-
-                        <button type="submit"
-                                class="btn btn-primary flex-grow-1">
-                            Search
-                        </button>
-
-                        <a asp-action="Index"
-                           class="btn btn-outline-secondary">
-                            Clear
-                        </a>
-
-                    </div>
-
                 </div>
 
-            </form>
+                <!-- Application Lifecycle Status -->
+                <div class="col-lg-3 col-md-3">
+                    <label class="form-label small fw-semibold text-slate-800">Application Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Applications</option>
+                        @foreach (var item in Enum.GetValues<JobApplicationStatus>())
+                        {
+                            if (selectedStatus == item.ToString())
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
 
-        </div>
+                <!-- AI Decision Filter (Client-side) -->
+                <div class="col-lg-2 col-md-3">
+                    <label class="form-label small fw-semibold text-slate-800">AI Screening</label>
+                    <select id="aiDecisionFilter" class="form-select">
+                        <option value="">All Decisions</option>
+                        <option value="SHORTLISTED">Shortlisted</option>
+                        <option value="MANUAL REVIEW">Manual Review</option>
+                        <option value="REJECTED">Rejected</option>
+                        <option value="NOT_EVALUATED">Not Evaluated</option>
+                    </select>
+                </div>
 
+                <!-- Action Buttons -->
+                <div class="col-lg-2 col-md-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 shadow-sm">
+                        <i class="bi bi-funnel me-1"></i>Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Clear Filters">
+                        Reset
+                    </a>
+                </div>
+
+            </div>
+        </form>
     </div>
 
-
-    <!-- Applications -->
+    <!-- Applications Table -->
     @if (!Model.Any())
     {
-        <div class="alert alert-info">
-            No applications found.
+        <div class="card border-0 shadow-sm rounded-3 p-5 text-center bg-white">
+            <div class="text-slate-400 mb-3">
+                <i class="bi bi-inbox display-4"></i>
+            </div>
+            <h5 class="fw-bold text-slate-800">No Applications Found</h5>
+            <p class="text-muted small mb-0">No candidate submissions match your current search criteria.</p>
         </div>
     }
     else
     {
-        <div class="card shadow-sm border-0">
-
+        <div class="table-container">
             <div class="table-responsive">
-
-                <table id="applicationsTable"
-                       class="table table-hover align-middle mb-0">
-
-                    <thead class="table-light">
-
+                <table id="applicationsTable" class="table-saas">
+                    <thead>
                         <tr>
-
-                            <th>
-                                Candidate
-                            </th>
-
-                            <th>
-                                Job
-                            </th>
-
-                            <th>
-                                Applied
-                            </th>
-
-                            <th>
-                                AI Score
-                            </th>
-
-                            <th>
-                                AI Decision
-                            </th>
-
-                            <th>
-                                Payment
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Reference
-                            </th>
-
-                            <th>
-                                Action
-                            </th>
-
+                            <th class="ps-3 py-3">Candidate</th>
+                            <th class="py-3">Position</th>
+                            <th class="py-3">Applied</th>
+                            <th class="py-3">AI Score</th>
+                            <th class="py-3">AI Decision</th>
+                            <th class="py-3">Payment</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Reference ID</th>
+                            <th class="text-end pe-3 py-3">Actions</th>
                         </tr>
-
                     </thead>
-
-
                     <tbody>
-
                         @foreach (var application in Model)
                         {
-                            var aiDecision =
-                                application.AIDecision
-                                ?? "NOT_EVALUATED";
+                            var aiDecision = application.AIDecision ?? "NOT_EVALUATED";
 
                             <tr data-ai-decision="@aiDecision">
-
-                                <!-- Candidate -->
-                                <td>
-
-                                    <strong>
-                                        @application.CandidateName
-                                    </strong>
-
-                                    <br />
-
-                                    <small class="text-muted">
-                                        @application.CandidateEmail
-                                    </small>
-
+                                <!-- Candidate Info -->
+                                <td class="ps-3">
+                                    <div class="fw-bold text-slate-900">@application.CandidateName</div>
+                                    <div class="small text-muted">@application.CandidateEmail</div>
                                 </td>
 
-
-                                <!-- Job -->
+                                <!-- Job Title -->
                                 <td>
-                                    @application.JobTitle
+                                    <span class="text-slate-800 fw-medium">@application.JobTitle</span>
                                 </td>
 
-
-                                <!-- Applied -->
+                                <!-- Applied Date -->
                                 <td>
-                                    @application.AppliedAt
-                                    .ToLocalTime()
-                                    .ToString("dd MMM yyyy")
+                                    <span class="small text-muted">
+                                        @application.AppliedAt.ToLocalTime().ToString("dd MMM yyyy")
+                                    </span>
                                 </td>
-
 
                                 <!-- AI Score -->
                                 <td>
-
                                     @if (application.AIMatchingScore.HasValue)
                                     {
-                                        <strong>
+                                        <span class="fw-bold @(application.AIMatchingScore.Value >= 80 ? "text-success" : application.AIMatchingScore.Value >= 60 ? "text-warning-emphasis" : "text-danger")">
                                             @application.AIMatchingScore.Value.ToString("0.##")%
-                                        </strong>
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="text-muted">
-                                            —
-                                        </span>
+                                        <span class="text-muted small">—</span>
                                     }
-
                                 </td>
 
-
-                                <!-- AI Decision -->
+                                <!-- AI Decision Badge -->
                                 <td>
-
                                     @if (application.AIDecision == "SHORTLISTED")
                                     {
-                                        <span class="badge bg-success">
-                                            SHORTLISTED
+                                        <span class="status-pill status-pill-success">
+                                            <span class="status-dot"></span>SHORTLISTED
                                         </span>
                                     }
                                     else if (application.AIDecision == "MANUAL REVIEW")
                                     {
-                                        <span class="badge bg-warning text-dark">
-                                            MANUAL REVIEW
+                                        <span class="status-pill status-pill-warning">
+                                            <span class="status-dot"></span>MANUAL REVIEW
                                         </span>
                                     }
                                     else if (application.AIDecision == "REJECTED")
                                     {
-                                        <span class="badge bg-danger">
-                                            REJECTED
+                                        <span class="status-pill status-pill-danger">
+                                            <span class="status-dot"></span>REJECTED
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary">
-                                            Not Evaluated
+                                        <span class="status-pill status-pill-neutral">
+                                            <span class="status-dot"></span>Not Evaluated
                                         </span>
                                     }
-
                                 </td>
 
-
-                                <!-- Payment -->
+                                <!-- Payment Status -->
                                 <td>
-
                                     @if (application.PaymentStatus == "Paid")
                                     {
-                                        <span class="badge bg-success">
-                                            Paid
+                                        <span class="status-pill status-pill-success">
+                                            <span class="status-dot"></span>Paid
                                         </span>
                                     }
                                     else if (application.PaymentStatus == "Pending")
                                     {
-                                        <span class="badge bg-warning text-dark">
-                                            Pending
+                                        <span class="status-pill status-pill-warning">
+                                            <span class="status-dot"></span>Pending
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary">
-                                            Not Required
+                                        <span class="status-pill status-pill-neutral">
+                                            <span class="status-dot"></span>Free
                                         </span>
                                     }
-
                                 </td>
-
 
                                 <!-- Application Status -->
                                 <td>
                                     @if (application.ApplicationStatus == "Shortlisted")
                                     {
-                                        <span class="badge bg-success">
-                                            Shortlisted
+                                        <span class="status-pill status-pill-success">
+                                            <span class="status-dot"></span>Shortlisted
                                         </span>
                                     }
                                     else if (application.ApplicationStatus == "ManualReview")
                                     {
-                                        <span class="badge bg-warning text-dark">
-                                            Manual Review
+                                        <span class="status-pill status-pill-warning">
+                                            <span class="status-dot"></span>Manual Review
                                         </span>
                                     }
                                     else if (application.ApplicationStatus == "Rejected")
                                     {
-                                        <span class="badge bg-danger">
-                                            Rejected
+                                        <span class="status-pill status-pill-danger">
+                                            <span class="status-dot"></span>Rejected
                                         </span>
                                     }
                                     else if (application.ApplicationStatus == "Payment Pending")
                                     {
-                                        <span class="badge bg-warning text-dark">
-                                            Payment Pending
+                                        <span class="status-pill status-pill-warning">
+                                            <span class="status-dot"></span>Payment Pending
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary">
-                                            @application.ApplicationStatus
+                                        <span class="status-pill status-pill-neutral">
+                                            <span class="status-dot"></span>@application.ApplicationStatus
                                         </span>
                                     }
                                 </td>
 
-
-                                <!-- Reference -->
+                                <!-- Reference ID -->
                                 <td>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        application.ApplicationReferenceId))
+                                    @if (!string.IsNullOrWhiteSpace(application.ApplicationReferenceId))
                                     {
-                                        <span>
+                                        <code class="fw-semibold text-slate-800 small">
                                             @application.ApplicationReferenceId
-                                        </span>
+                                        </code>
                                     }
                                     else
                                     {
-                                        <span class="text-muted">
-                                            —
-                                        </span>
+                                        <span class="text-muted small">—</span>
                                     }
-
                                 </td>
-
 
                                 <!-- Action -->
-                                <td>
-
-                                    <a asp-action="Details"
-                                       asp-route-id="@application.Id"
-                                       class="btn btn-sm btn-primary">
-                                        View
+                                <td class="text-end pe-3">
+                                    <a asp-action="Details" asp-route-id="@application.Id" class="btn btn-sm btn-outline-primary px-3">
+                                        Review <i class="bi bi-chevron-right ms-1"></i>
                                     </a>
-
                                 </td>
-
                             </tr>
                         }
-
                     </tbody>
-
                 </table>
-
             </div>
-
         </div>
     }
 
 </div>
 
-
 @section Scripts
 {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            const filter = document.getElementById("aiDecisionFilter");
+            const rows = document.querySelectorAll("#applicationsTable tbody tr");
 
-            const filter =
-                document.getElementById("aiDecisionFilter");
+            if (filter) {
+                filter.addEventListener("change", function () {
+                    const selected = this.value;
 
-            const rows =
-                document.querySelectorAll(
-                    "#applicationsTable tbody tr");
+                    rows.forEach(function (row) {
+                        const decision = row.getAttribute("data-ai-decision");
 
-            filter.addEventListener("change", function () {
-
-                const selected =
-                    this.value;
-
-                rows.forEach(function (row) {
-
-                    const decision =
-                        row.getAttribute(
-                            "data-ai-decision");
-
-                    if (
-                        selected === "" ||
-                        decision === selected
-                    ) {
-                        row.style.display = "";
-                    }
-                    else {
-                        row.style.display = "none";
-                    }
-
+                        if (selected === "" || decision === selected) {
+                            row.style.display = "";
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
                 });
-
-            });
-
+            }
         });
     </script>
 }

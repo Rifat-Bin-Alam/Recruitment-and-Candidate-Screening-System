@@ -1,25 +1,41 @@
-﻿@model ErrorViewModel
+@model ErrorViewModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "System Notification";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border shadow-sm p-4 p-md-5 text-center bg-white">
+                <div class="rcss-icon-box bg-danger-subtle text-danger mx-auto mb-3" style="width: 54px; height: 54px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+                        <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                    </svg>
+                </div>
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
+                <h3 class="fw-bold text-dark mb-2">Request Processing Notice</h3>
+                <p class="text-secondary small mb-4">
+                    An unexpected condition occurred while processing your request. The system has safely logged the event to prevent data inconsistency.
+                </p>
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+                @if (Model.ShowRequestId)
+                {
+                    <div class="p-3 bg-light rounded border text-muted small mb-4">
+                        <span class="text-uppercase fw-semibold">Tracking Reference ID:</span>
+                        <code class="text-dark fw-bold ms-1">@Model.RequestId</code>
+                    </div>
+                }
+
+                <div class="d-flex justify-content-center gap-2">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">
+                        Return to Homepage
+                    </a>
+                    <button type="button" onclick="history.back()" class="btn btn-outline-secondary px-3">
+                        Go Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

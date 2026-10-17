@@ -1,6 +1,53 @@
-﻿@{
+@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card border shadow-sm p-4 p-md-5 bg-white">
+                <div class="mb-4 pb-3 border-bottom">
+                    <span class="badge text-bg-secondary px-2.5 py-1 mb-2">Data Protection</span>
+                    <h2 class="fw-bold text-dark mb-1">Privacy & Data Governance Policy</h2>
+                    <p class="text-secondary small mb-0">Last updated: October 2026 &bull; Recruitment & Candidate Screening System</p>
+                </div>
+
+                <div class="d-flex flex-column gap-4 text-secondary">
+                    <section>
+                        <h5 class="fw-bold text-dark">1. Candidate Information Collection</h5>
+                        <p class="small mb-0">
+                            Our recruitment platform collects information submitted voluntarily by candidates, including full legal name, national identification number, contact telephone number, postal address, educational qualifications, employment history, and technical competencies.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h5 class="fw-bold text-dark">2. Secure Document Storage & Isolation</h5>
+                        <p class="small mb-0">
+                            Uploaded candidate documents—including profile photographs, signatures, and curriculum vitae (CV)—are stored in private, authorization-protected directories outside public web root access. Direct URL access to candidate assets is strictly blocked; documents are accessible solely to authenticated candidates for their own records and authorized HR staff during active application review.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h5 class="fw-bold text-dark">3. Evaluation & AI Matching Fairness</h5>
+                        <p class="small mb-0">
+                            The candidate screening architecture operates under strict fairness directives. Automated and assisted CV evaluations focus solely on job-related qualifications, skills, and professional experience. Protected demographic categories (including gender, age, nationality, marital status, and religion) are never factored into screening scores or recruitment decisions.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h5 class="fw-bold text-dark">4. Deployment Demonstration Notice</h5>
+                        <p class="small mb-0">
+                            In this demonstration deployment, external API dependencies (such as Stripe payment processing and Google Gemini AI) are operated in controlled modes with explicit integration notices to protect candidate credentials and maintain predictable demonstration behavior.
+                        </p>
+                    </section>
+
+                    <div class="pt-3 border-top">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                            &larr; Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

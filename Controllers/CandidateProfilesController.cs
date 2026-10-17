@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,9 +15,9 @@ public class CandidateProfilesController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _environment;
 
-    private const long MaxPhotoSize = 2 * 1024 * 1024;
-    private const long MaxSignatureSize = 2 * 1024 * 1024;
-    private const long MaxCVSize = 5 * 1024 * 1024;
+    private const long MaxPhotoSize = 500 * 1024; // 500 KB
+    private const long MaxSignatureSize = 500 * 1024; // 500 KB
+    private const long MaxCVSize = 4 * 1024 * 1024; // 4 MB
 
     private static readonly string[] ImageExtensions =
     {
@@ -484,10 +484,17 @@ public class CandidateProfilesController : Controller
         if (file.Length <= 0 ||
             file.Length > maxSize)
         {
+            var maxFriendly = folder switch
+            {
+                "Photos" => "500 KB",
+                "Signatures" => "500 KB",
+                "CVs" => "4 MB",
+                _ => $"{maxSize / 1024} KB"
+            };
+
             ModelState.AddModelError(
                 string.Empty,
-                $"The {folder} file exceeds " +
-                $"the allowed size.");
+                $"The {folder} file exceeds the allowed maximum size of {maxFriendly}.");
 
             return null;
         }

@@ -1,0 +1,105 @@
+@model RecruitmentAndCandidateScreeningSystem.Models.JobApplication
+
+@{
+    ViewData["Title"] = "Integration Notice - Payment Processing";
+    var contactEmail = "rifat5566123@gmail.com";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            
+            <div class="card border-0 shadow-sm rcss-card">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <!-- Notice Header -->
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <div class="rcss-icon-box bg-warning-subtle text-warning-emphasis">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="badge text-bg-warning px-2.5 py-1 mb-1 fw-semibold">Demonstration Mode</span>
+                            <h3 class="fw-bold mb-0 text-dark">Integration Notice</h3>
+                        </div>
+                    </div>
+
+                    <!-- Exact Required Notice -->
+                    <div class="alert alert-warning border-warning-subtle bg-warning-subtle text-warning-emphasis p-4 mb-4">
+                        <h5 class="fw-bold mb-2">Integration Notice</h5>
+                        <p class="mb-2">
+                            This demonstration version has certain external API integrations disabled for deployment purposes.
+                        </p>
+                        <p class="mb-0">
+                            For access to the full functionality, including payment processing and AI-powered CV matching, please contact me by email.
+                        </p>
+                    </div>
+
+                    <!-- Application Details -->
+                    <div class="card border bg-light-subtle mb-4">
+                        <div class="card-header bg-transparent py-3">
+                            <h6 class="fw-bold mb-0 text-secondary text-uppercase tracking-wider small">Application Summary</h6>
+                        </div>
+                        <div class="card-body p-3 p-md-4">
+                            <dl class="row mb-0 g-2">
+                                <dt class="col-sm-5 text-muted">Position:</dt>
+                                <dd class="col-sm-7 fw-semibold text-dark">@(Model.JobCircular?.JobTitle ?? "N/A")</dd>
+
+                                <dt class="col-sm-5 text-muted">Reference ID:</dt>
+                                <dd class="col-sm-7">
+                                    <code class="text-primary fw-semibold">@Model.ApplicationReferenceId</code>
+                                </dd>
+
+                                <dt class="col-sm-5 text-muted">Application Fee:</dt>
+                                <dd class="col-sm-7 fw-semibold">
+                                    @(Model.Payment?.Amount.ToString("0.00") ?? Model.JobCircular?.ApplicationFee?.ToString("0.00") ?? "0.00") USD
+                                </dd>
+
+                                <dt class="col-sm-5 text-muted">Payment Status:</dt>
+                                <dd class="col-sm-7">
+                                    <span class="badge bg-warning text-dark px-2.5 py-1">Payment Pending</span>
+                                </dd>
+
+                                <dt class="col-sm-5 text-muted">Submission Date:</dt>
+                                <dd class="col-sm-7 text-secondary">
+                                    @Model.AppliedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-2 bg-body-tertiary border mb-4 small text-secondary">
+                        <strong>Security & Policy Note:</strong> In accordance with genuine verification rules, applications requiring payment are not marked as paid while the Stripe payment gateway is disabled for this public demo. Your application record and reference ID have been preserved. Free application workflows remain fully active.
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-between align-items-sm-center pt-2">
+                        <a href="mailto:@contactEmail?subject=Recruitment%20System%20Integration%20Access%20Request&body=Hello,%20I%20am%20inquiring%20about%20full%20API%20access%20for%20application%20@(Model.ApplicationReferenceId)."
+                           class="btn btn-outline-dark d-inline-flex align-items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
+                            </svg>
+                            Contact via Email (@contactEmail)
+                        </a>
+
+                        <div class="d-flex gap-2">
+                            <a asp-controller="CandidateJobs"
+                               asp-action="MyApplications"
+                               class="btn btn-primary px-3">
+                                My Applications
+                            </a>
+                            <a asp-controller="Candidate"
+                               asp-action="Dashboard"
+                               class="btn btn-outline-secondary px-3">
+                                Dashboard
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

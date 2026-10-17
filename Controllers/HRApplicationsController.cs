@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecruitmentAndCandidateScreeningSystem.Data;
@@ -188,6 +188,16 @@ public class HRApplicationsController : Controller
         {
             TempData["Error"] =
                 "Job requirements have not been configured.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id });
+        }
+
+        if (!_aiMatchingService.IsAvailable())
+        {
+            TempData["IntegrationNotice"] =
+                "This demonstration version has certain external API integrations disabled for deployment purposes. For access to the full functionality, including payment processing and AI-powered CV matching, please contact me by email.";
 
             return RedirectToAction(
                 nameof(Details),

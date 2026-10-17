@@ -1,4 +1,4 @@
-﻿using Stripe.Checkout;
+using Stripe.Checkout;
 
 namespace RecruitmentAndCandidateScreeningSystem.Services;
 
@@ -9,6 +9,12 @@ public class StripePaymentService
     public StripePaymentService(IConfiguration configuration)
     {
         _configuration = configuration;
+    }
+
+    public bool IsAvailable()
+    {
+        var key = _configuration["Stripe:SecretKey"];
+        return !string.IsNullOrWhiteSpace(key);
     }
 
     public async Task<Session> CreateCheckoutSessionAsync(

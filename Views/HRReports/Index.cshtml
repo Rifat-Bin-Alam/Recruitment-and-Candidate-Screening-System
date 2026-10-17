@@ -1,432 +1,294 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.ViewModels.RecruitmentReportViewModel
+@model RecruitmentAndCandidateScreeningSystem.ViewModels.RecruitmentReportViewModel
 
 @{
-    ViewData["Title"] = "Recruitment Report";
+    ViewData["Title"] = "Executive Recruitment Analytics Report";
 }
 
 <div class="container py-4" id="reportContent">
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
+    <!-- Header & Action Bar -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
-            <h2 class="fw-bold mb-1">
-                Recruitment Report
-            </h2>
-
-            <p class="text-muted mb-0">
-                Overview of recruitment activities,
-                applications, screening, offers and payments.
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                    <i class="bi bi-graph-up me-1"></i>Talent Intelligence &amp; Analytics
+                </span>
+            </div>
+            <h2 class="fw-bold text-slate-900 mb-1">Recruitment Analytics Report</h2>
+            <p class="text-muted mb-0 small">
+                Comprehensive executive overview of applicant volume, screening funnel, offer conversions, and fee collections.
             </p>
         </div>
 
-        <button type="button"
-                class="btn btn-outline-primary"
-                onclick="window.print()">
-            Print Report
-        </button>
-
+        <div class="d-print-none d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary px-3 shadow-sm" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i>Print / Export PDF
+            </button>
+            <a asp-controller="HRDashboard" asp-action="Index" class="btn btn-outline-secondary px-3">
+                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+            </a>
+        </div>
     </div>
 
+    <!-- Application KPI Metric Cards -->
+    <div class="mb-4">
+        <h6 class="text-muted fw-bold text-uppercase small mb-3" style="letter-spacing: 0.5px; font-size: 0.72rem;">Applicant Volume &amp; Status Breakdown</h6>
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <span class="stat-label">Total Applied</span>
+                    <div class="stat-value text-slate-900 mt-1">@Model.TotalApplications</div>
+                    <span class="text-muted" style="font-size: 0.75rem;">All candidates</span>
+                </div>
+            </div>
 
-    <!-- APPLICATION STATISTICS -->
-    <h5 class="fw-bold mb-3">
-        Application Statistics
-    </h5>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <span class="stat-label">AI Evaluated</span>
+                    <div class="stat-value text-info mt-1">@Model.AIEvaluated</div>
+                    <span class="text-muted" style="font-size: 0.75rem;">Screened CVs</span>
+                </div>
+            </div>
 
-    <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <span class="stat-label">Shortlisted</span>
+                    <div class="stat-value text-success mt-1">@Model.Shortlisted</div>
+                    <span class="text-muted" style="font-size: 0.75rem;">Qualified</span>
+                </div>
+            </div>
 
-        <div class="col-md-4 col-lg-2">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <small class="text-muted">
-                        Total Applications
-                    </small>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <span class="stat-label">Manual Review</span>
+                    <div class="stat-value text-warning-emphasis mt-1">@Model.ManualReview</div>
+                    <span class="text-muted" style="font-size: 0.75rem;">Pending action</span>
+                </div>
+            </div>
 
-                    <h3 class="fw-bold mt-2">
-                        @Model.TotalApplications
-                    </h3>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <span class="stat-label">Rejected</span>
+                    <div class="stat-value text-danger mt-1">@Model.Rejected</div>
+                    <span class="text-muted" style="font-size: 0.75rem;">Unqualified</span>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <span class="stat-label">Interview Stage</span>
+                    <div class="stat-value text-primary mt-1">@Model.InterviewCandidates</div>
+                    <span class="text-muted" style="font-size: 0.75rem;">In review</span>
                 </div>
             </div>
         </div>
-
-
-        <div class="col-md-4 col-lg-2">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <small class="text-muted">
-                        AI Evaluated
-                    </small>
-
-                    <h3 class="fw-bold mt-2">
-                        @Model.AIEvaluated
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-4 col-lg-2">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <small class="text-muted">
-                        Shortlisted
-                    </small>
-
-                    <h3 class="fw-bold mt-2">
-                        @Model.Shortlisted
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-4 col-lg-2">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <small class="text-muted">
-                        Manual Review
-                    </small>
-
-                    <h3 class="fw-bold mt-2">
-                        @Model.ManualReview
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-4 col-lg-2">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <small class="text-muted">
-                        Rejected
-                    </small>
-
-                    <h3 class="fw-bold mt-2">
-                        @Model.Rejected
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-4 col-lg-2">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <small class="text-muted">
-                        Interview
-                    </small>
-
-                    <h3 class="fw-bold mt-2">
-                        @Model.InterviewCandidates
-                    </h3>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-
-    <!-- RECRUITMENT FUNNEL -->
-    <div class="card border-0 shadow-sm mb-4">
-
+    <!-- Recruitment Funnel Diagram -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+        <div class="card-header bg-white border-bottom py-3">
+            <h6 class="fw-bold mb-0 text-slate-900">
+                <i class="bi bi-funnel text-primary me-2"></i>Executive Recruitment Velocity Funnel
+            </h6>
+        </div>
         <div class="card-body p-4">
-
-            <h5 class="fw-bold mb-4">
-                Recruitment Funnel
-            </h5>
-
-            <div class="row text-center">
-
-                <div class="col-md">
-                    <div class="fw-bold fs-4">
-                        @Model.TotalApplications
+            <div class="row g-3 text-center">
+                <div class="col">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <div class="fs-3 fw-bold text-slate-900">@Model.TotalApplications</div>
+                        <div class="small fw-semibold text-muted text-uppercase mt-1" style="font-size: 0.72rem;">Inbound Applications</div>
                     </div>
-
-                    <small class="text-muted">
-                        Applications
-                    </small>
                 </div>
 
-                <div class="col-md">
-                    <div class="fw-bold fs-4">
-                        @Model.AIEvaluated
-                    </div>
-
-                    <small class="text-muted">
-                        AI Evaluated
-                    </small>
+                <div class="col-auto d-none d-md-flex align-items-center text-muted">
+                    <i class="bi bi-chevron-right fs-4"></i>
                 </div>
 
-                <div class="col-md">
-                    <div class="fw-bold fs-4">
-                        @Model.Shortlisted
+                <div class="col">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <div class="fs-3 fw-bold text-slate-900">@Model.AIEvaluated</div>
+                        <div class="small fw-semibold text-muted text-uppercase mt-1" style="font-size: 0.72rem;">AI Evaluated</div>
                     </div>
-
-                    <small class="text-muted">
-                        Shortlisted
-                    </small>
                 </div>
 
-                <div class="col-md">
-                    <div class="fw-bold fs-4">
-                        @Model.InterviewCandidates
-                    </div>
-
-                    <small class="text-muted">
-                        Interview
-                    </small>
+                <div class="col-auto d-none d-md-flex align-items-center text-muted">
+                    <i class="bi bi-chevron-right fs-4"></i>
                 </div>
 
-                <div class="col-md">
-                    <div class="fw-bold fs-4">
-                        @Model.AcceptedOffers
+                <div class="col">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <div class="fs-3 fw-bold text-slate-900">@Model.Shortlisted</div>
+                        <div class="small fw-semibold text-muted text-uppercase mt-1" style="font-size: 0.72rem;">Shortlisted</div>
                     </div>
-
-                    <small class="text-muted">
-                        Hired / Accepted
-                    </small>
                 </div>
 
+                <div class="col-auto d-none d-md-flex align-items-center text-muted">
+                    <i class="bi bi-chevron-right fs-4"></i>
+                </div>
+
+                <div class="col">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <div class="fs-3 fw-bold text-slate-900">@Model.InterviewCandidates</div>
+                        <div class="small fw-semibold text-muted text-uppercase mt-1" style="font-size: 0.72rem;">Interviews</div>
+                    </div>
+                </div>
+
+                <div class="col-auto d-none d-md-flex align-items-center text-muted">
+                    <i class="bi bi-chevron-right fs-4"></i>
+                </div>
+
+                <div class="col">
+                    <div class="p-3 border rounded-3 bg-success-subtle border-success-subtle">
+                        <div class="fs-3 fw-bold text-success">@Model.AcceptedOffers</div>
+                        <div class="small fw-bold text-success text-uppercase mt-1" style="font-size: 0.72rem;">Hired / Accepted</div>
+                    </div>
+                </div>
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- OFFERS & PAYMENTS -->
+    <!-- Offers & Payments Section -->
     <div class="row g-4 mb-4">
-
-        <!-- OFFERS -->
-
+        <!-- Offers Performance -->
         <div class="col-md-6">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-body p-4">
-
-                    <h5 class="fw-bold mb-4">
-                        Offer Statistics
-                    </h5>
-
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Total Offers</span>
-                        <strong>
-                            @Model.TotalOffers
-                        </strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Pending</span>
-                        <strong>
-                            @Model.PendingOffers
-                        </strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Accepted</span>
-                        <strong>
-                            @Model.AcceptedOffers
-                        </strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                        <span>Rejected</span>
-                        <strong>
-                            @Model.RejectedOffers
-                        </strong>
-                    </div>
-
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-award text-success me-2"></i>Offer Conversion Metrics
+                    </h6>
                 </div>
-
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Total Offers Generated</span>
+                        <strong class="text-slate-900 fs-6">@Model.TotalOffers</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Offers Pending Candidate Response</span>
+                        <span class="status-pill status-pill-warning">
+                            <span class="status-dot"></span>@Model.PendingOffers Pending
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Offers Formally Accepted</span>
+                        <span class="status-pill status-pill-success">
+                            <span class="status-dot"></span>@Model.AcceptedOffers Accepted
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2">
+                        <span class="text-muted">Offers Declined / Rejected</span>
+                        <span class="status-pill status-pill-danger">
+                            <span class="status-dot"></span>@Model.RejectedOffers Declined
+                        </span>
+                    </div>
+                </div>
             </div>
-
         </div>
 
-
-        <!-- PAYMENTS -->
-
+        <!-- Payments Performance -->
         <div class="col-md-6">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-body p-4">
-
-                    <h5 class="fw-bold mb-4">
-                        Payment Statistics
-                    </h5>
-
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Paid Applications</span>
-                        <strong>
-                            @Model.PaidApplications
-                        </strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                        <span>Pending Payments</span>
-                        <strong>
-                            @Model.PendingPayments
-                        </strong>
-                    </div>
-
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-credit-card text-primary me-2"></i>Application Fee Audit
+                    </h6>
                 </div>
-
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Verified Paid Applications</span>
+                        <span class="status-pill status-pill-success">
+                            <span class="status-dot"></span>@Model.PaidApplications Paid
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Unpaid / Pending Payments</span>
+                        <span class="status-pill status-pill-warning">
+                            <span class="status-dot"></span>@Model.PendingPayments Pending
+                        </span>
+                    </div>
+                    <div class="mt-4 p-3 bg-light rounded-3 small text-muted">
+                        <i class="bi bi-shield-check text-success me-1"></i>
+                        In demonstration mode, Stripe verification prevents unverified transactions from being marked as paid.
+                    </div>
+                </div>
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- JOB STATISTICS -->
-
-    <div class="card border-0 shadow-sm mb-4">
-
-        <div class="card-body p-4">
-
-            <div class="d-flex justify-content-between
-                align-items-center mb-3">
-
-                <div>
-                    <h5 class="fw-bold mb-1">
-                        Job-wise Recruitment Statistics
-                    </h5>
-
-                    <small class="text-muted">
-                        Published Jobs:
-                        @Model.PublishedJobs
-                    </small>
-                </div>
-
+    <!-- Job-wise Detailed Table -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white overflow-hidden">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="fw-bold mb-0 text-slate-900">
+                    <i class="bi bi-table text-primary me-2"></i>Requisition-Level Pipeline Performance
+                </h6>
+                <small class="text-muted">Total active published circulars: @Model.PublishedJobs</small>
             </div>
+        </div>
 
-
+        <div class="card-body p-0">
             @if (!Model.JobStatistics.Any())
             {
-                <div class="alert alert-light border mb-0">
-                    No job recruitment data available.
+                <div class="p-4 text-center text-muted">
+                    No individual job requisition data recorded.
                 </div>
             }
             else
             {
                 <div class="table-responsive">
-
-                    <table class="table table-hover align-middle">
-
-                        <thead class="table-light">
-
+                    <table class="table-saas">
+                        <thead>
                             <tr>
-                                <th>Job</th>
-                                <th>Applications</th>
-                                <th>AI Evaluated</th>
-                                <th>Shortlisted</th>
-                                <th>Manual Review</th>
-                                <th>Rejected</th>
-                                <th>Interview</th>
-                                <th>Offers</th>
-                                <th>Accepted</th>
+                                <th class="ps-3 py-3">Position Title</th>
+                                <th class="py-3 text-center">Applications</th>
+                                <th class="py-3 text-center">AI Screened</th>
+                                <th class="py-3 text-center">Shortlisted</th>
+                                <th class="py-3 text-center">Manual Review</th>
+                                <th class="py-3 text-center">Rejected</th>
+                                <th class="py-3 text-center">Interviews</th>
+                                <th class="py-3 text-center">Offers</th>
+                                <th class="py-3 text-center pe-3">Accepted</th>
                             </tr>
-
                         </thead>
-
                         <tbody>
-
                             @foreach (var job in Model.JobStatistics)
                             {
                                 <tr>
-
-                                    <td>
-                                        <strong>
-                                            @job.JobTitle
-                                        </strong>
+                                    <td class="ps-3">
+                                        <div class="fw-bold text-slate-900">@job.JobTitle</div>
                                     </td>
-
-                                    <td>
-                                        @job.TotalApplications
+                                    <td class="text-center fw-medium">@job.TotalApplications</td>
+                                    <td class="text-center text-muted">@job.AIEvaluated</td>
+                                    <td class="text-center">
+                                        <span class="status-pill status-pill-success">@job.Shortlisted</span>
                                     </td>
-
-                                    <td>
-                                        @job.AIEvaluated
+                                    <td class="text-center">
+                                        <span class="status-pill status-pill-warning">@job.ManualReview</span>
                                     </td>
-
-                                    <td>
-                                        @job.Shortlisted
+                                    <td class="text-center">
+                                        <span class="status-pill status-pill-danger">@job.Rejected</span>
                                     </td>
-
-                                    <td>
-                                        @job.ManualReview
+                                    <td class="text-center text-muted">@job.InterviewCandidates</td>
+                                    <td class="text-center fw-medium">@job.Offers</td>
+                                    <td class="text-center pe-3">
+                                        <span class="status-pill status-pill-success fw-bold">@job.AcceptedOffers</span>
                                     </td>
-
-                                    <td>
-                                        @job.Rejected
-                                    </td>
-
-                                    <td>
-                                        @job.InterviewCandidates
-                                    </td>
-
-                                    <td>
-                                        @job.Offers
-                                    </td>
-
-                                    <td>
-                                        @job.AcceptedOffers
-                                    </td>
-
                                 </tr>
                             }
-
                         </tbody>
-
                     </table>
-
                 </div>
             }
-
         </div>
-
     </div>
 
-
-    <!-- REPORT FOOTER -->
-
-    <div class="text-muted small">
-        Report generated:
-        @DateTime.Now.ToString("dd MMM yyyy hh:mm tt")
+    <!-- Generated Timestamp Footer -->
+    <div class="d-flex justify-content-between align-items-center text-muted small pt-2">
+        <div>
+            <span>Report generated on @DateTime.Now.ToString("dd MMM yyyy, hh:mm tt")</span>
+        </div>
+        <div>
+            <span>Recruitment &amp; Candidate Screening System</span>
+        </div>
     </div>
 
 </div>
-
-
-<style>
-    @@media print {
-        nav,
-        footer,
-        .btn,
-        .navbar,
-        .footer {
-            display: none !important;
-        }
-
-        body {
-            background: white !important;
-        }
-
-        #reportContent {
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .card {
-            box-shadow: none !important;
-            border: 1px solid #ddd !important;
-        }
-
-        .table {
-            font-size: 12px;
-        }
-    }
-</style>

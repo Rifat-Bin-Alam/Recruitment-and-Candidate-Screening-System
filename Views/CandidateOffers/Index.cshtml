@@ -1,176 +1,158 @@
-﻿@model IEnumerable<RecruitmentAndCandidateScreeningSystem.Models.Offer>
+@model IEnumerable<RecruitmentAndCandidateScreeningSystem.Models.Offer>
 
 @{
-    ViewData["Title"] = "My Offers";
+    ViewData["Title"] = "Employment Offers";
 }
 
-<div class="container">
+<div class="container py-4">
 
     <!-- Header -->
-    <div class="mb-4">
-        <h2 class="fw-bold">My Offers</h2>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                    <i class="bi bi-award me-1"></i>Candidate Portal
+                </span>
+                <span class="text-muted small">&bull; Decision Required</span>
+            </div>
+            <h2 class="fw-bold text-slate-900 mb-1">Employment Offers</h2>
+            <p class="text-muted small mb-0">Review formalized job offers, compensation terms, and submitted joining schedules.</p>
+        </div>
 
-        <p class="text-muted mb-0">
-            View and respond to employment offers.
-        </p>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-light border text-slate-700 px-3 py-2">
+                Total Offers: <strong class="text-slate-900">@Model.Count()</strong>
+            </span>
+        </div>
     </div>
 
-
-    <!-- Messages -->
+    <!-- Alert Messages -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">
-            @TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <div>@TempData["Error"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-
-    <!-- Offers -->
-    <div class="card shadow-sm border-0">
-
-        <div class="card-header">
-            <h5 class="mb-0">
-                Employment Offers
-            </h5>
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm p-5 text-center bg-white rounded-3">
+            <div class="text-slate-400 mb-3">
+                <i class="bi bi-envelope-open fs-1"></i>
+            </div>
+            <h5 class="fw-bold text-slate-800 mb-1">No Employment Offers Available</h5>
+            <p class="text-muted small mb-3">You do not have any active employment offers at this stage of candidate screening.</p>
+            <div>
+                <a asp-controller="CandidateJobs" asp-action="MyApplications" class="btn btn-outline-secondary btn-sm px-3">
+                    View My Applications
+                </a>
+            </div>
         </div>
-
-        <div class="card-body p-0">
-
-            @if (Model.Any())
-            {
-                <div class="table-responsive">
-
-                    <table class="table table-hover align-middle mb-0">
-
-                        <thead class="table-light">
+    }
+    else
+    {
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table-saas">
+                    <thead>
+                        <tr>
+                            <th class="ps-3 py-3">Position</th>
+                            <th class="py-3">Offer Date</th>
+                            <th class="py-3">Response Deadline</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Your Decision</th>
+                            <th class="text-end pe-3 py-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var offer in Model)
+                        {
                             <tr>
-                                <th>Job</th>
-                                <th>Offer Date</th>
-                                <th>Response Deadline</th>
-                                <th>Status</th>
-                                <th>Decision</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            @foreach (var offer in Model)
-                            {
-                                <tr>
-
-                                    <td>
-                                        <span class="fw-semibold">
-                                            @offer.JobApplication?.JobCircular?.JobTitle
+                                <td class="ps-3">
+                                    <div class="fw-bold text-slate-900">
+                                        @(offer.JobApplication?.JobCircular?.JobTitle ?? "Job Position")
+                                    </div>
+                                    <small class="text-muted">Offer #@offer.Id</small>
+                                </td>
+                                <td class="small text-muted">
+                                    @offer.OfferDate.ToLocalTime().ToString("dd MMM yyyy")
+                                </td>
+                                <td class="small">
+                                    @if (offer.ResponseDeadline.HasValue)
+                                    {
+                                        <span class="text-slate-800 fw-semibold">
+                                            @offer.ResponseDeadline.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                                         </span>
-                                    </td>
-
-                                    <td>
-                                        @offer.OfferDate
-                                        .ToLocalTime()
-                                        .ToString("dd MMM yyyy")
-                                    </td>
-
-                                    <td>
-                                        @if (offer.ResponseDeadline.HasValue)
-                                        {
-                                            @(offer.ResponseDeadline.Value
-                                                .ToLocalTime()
-                                                .ToString("dd MMM yyyy hh:mm tt"))
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">
-                                                No deadline
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">
-                                                No deadline
-                                            </span>
-                                        }
-                                    </td>
-
-                                    <td>
-                                        @if (offer.Status ==
-                                            RecruitmentAndCandidateScreeningSystem.Models.Enums.OfferStatus.Accepted)
-                                        {
-                                            <span class="badge bg-success">
-                                                Accepted
-                                            </span>
-                                        }
-                                        else if (offer.Status ==
-                                            RecruitmentAndCandidateScreeningSystem.Models.Enums.OfferStatus.Rejected)
-                                        {
-                                            <span class="badge bg-danger">
-                                                Rejected
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-warning text-dark">
-                                                Pending
-                                            </span>
-                                        }
-                                    </td>
-
-                                    <td>
-                                        @if (offer.CandidateDecision ==
-                                            RecruitmentAndCandidateScreeningSystem.Models.Enums.CandidateDecision.Accepted)
-                                        {
-                                            <span class="badge bg-success">
-                                                Accepted
-                                            </span>
-                                        }
-                                        else if (offer.CandidateDecision ==
-                                            RecruitmentAndCandidateScreeningSystem.Models.Enums.CandidateDecision.Rejected)
-                                        {
-                                            <span class="badge bg-danger">
-                                                Rejected
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">
-                                                Pending
-                                            </span>
-                                        }
-                                    </td>
-
-                                    <td>
-                                        <a asp-action="Details"
-                                           asp-route-id="@offer.Id"
-                                           class="btn btn-sm btn-outline-primary">
-                                            View Offer
-                                        </a>
-                                    </td>
-
-                                </tr>
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-            }
-            else
-            {
-                <div class="p-4 text-center text-muted">
-                    You do not have any offers yet.
-                </div>
-            }
-
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No deadline specified</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (offer.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.OfferStatus.Accepted)
+                                    {
+                                        <span class="status-pill status-pill-success">
+                                            <span class="status-dot"></span>Accepted
+                                        </span>
+                                    }
+                                    else if (offer.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.OfferStatus.Rejected)
+                                    {
+                                        <span class="status-pill status-pill-danger">
+                                            <span class="status-dot"></span>Declined
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill status-pill-warning">
+                                            <span class="status-dot"></span>Pending
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (offer.CandidateDecision == RecruitmentAndCandidateScreeningSystem.Models.Enums.CandidateDecision.Accepted)
+                                    {
+                                        <span class="status-pill status-pill-success">
+                                            <span class="status-dot"></span>Accepted &check;
+                                        </span>
+                                    }
+                                    else if (offer.CandidateDecision == RecruitmentAndCandidateScreeningSystem.Models.Enums.CandidateDecision.Rejected)
+                                    {
+                                        <span class="status-pill status-pill-danger">
+                                            <span class="status-dot"></span>Declined
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill status-pill-neutral">
+                                            <span class="status-dot"></span>Awaiting Response
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-end pe-3">
+                                    <a asp-action="Details"
+                                       asp-route-id="@offer.Id"
+                                       class="btn btn-outline-primary btn-sm px-3">
+                                        Review Offer <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-    </div>
+    }
 
 </div>

@@ -1,372 +1,343 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.ViewModels.HRDashboardViewModel
+@model RecruitmentAndCandidateScreeningSystem.ViewModels.HRDashboardViewModel
 
 @{
-    ViewData["Title"] = "HR Dashboard";
+    ViewData["Title"] = "HR Executive Dashboard";
 }
 
-<div class="container">
+<div class="container py-4">
 
-    <!-- Header -->
-    <div class="mb-4">
-        <h2 class="fw-bold">HR Dashboard</h2>
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                    <i class="bi bi-shield-lock me-1"></i>HR Administration Portal
+                </span>
+            </div>
+            <h2 class="fw-bold text-slate-900 mb-1">Recruitment Overview</h2>
+            <p class="text-muted mb-0 small">
+                Real-time applicant tracking, screening intelligence, and requisition pipeline.
+            </p>
+        </div>
 
-        <p class="text-muted mb-0">
-            Recruitment overview and candidate screening summary.
-        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="JobCirculars" asp-action="Create" class="btn btn-primary btn-sm px-3 shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i>Post New Job
+            </a>
+            <a asp-controller="HRReports" asp-action="Index" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-bar-chart me-1"></i>Analytics &amp; Reports
+            </a>
+        </div>
     </div>
 
-
-    <!-- Summary Cards -->
-    <div class="row g-4 mb-4">
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted">
-                        Total Applications
-                    </div>
-
-                    <div class="display-6 fw-bold">
-                        @Model.TotalApplications
-                    </div>
+    <!-- KPI Summary Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label">Total Applications</span>
+                    <span class="badge bg-light text-primary rounded-circle p-2"><i class="bi bi-people fs-6"></i></span>
                 </div>
+                <div class="stat-value text-slate-900">@Model.TotalApplications</div>
+                <div class="small text-muted mt-1">Across all positions</div>
             </div>
         </div>
 
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted">
-                        AI Evaluated
-                    </div>
-
-                    <div class="display-6 fw-bold">
-                        @Model.AIEvaluated
-                    </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label">AI Evaluated</span>
+                    <span class="badge bg-light text-info rounded-circle p-2"><i class="bi bi-cpu fs-6"></i></span>
                 </div>
+                <div class="stat-value text-slate-900">@Model.AIEvaluated</div>
+                <div class="small text-muted mt-1">Automated CV matches</div>
             </div>
         </div>
 
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted">
-                        Shortlisted
-                    </div>
-
-                    <div class="display-6 fw-bold text-success">
-                        @Model.Shortlisted
-                    </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label">Shortlisted</span>
+                    <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-check-circle fs-6"></i></span>
                 </div>
+                <div class="stat-value text-success">@Model.Shortlisted</div>
+                <div class="small text-muted mt-1">Qualified candidates</div>
             </div>
         </div>
 
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted">
-                        Manual Review
-                    </div>
-
-                    <div class="display-6 fw-bold text-warning">
-                        @Model.ManualReview
-                    </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label">Manual Review</span>
+                    <span class="badge bg-warning-subtle text-warning-emphasis rounded-circle p-2"><i class="bi bi-person-exclamation fs-6"></i></span>
                 </div>
+                <div class="stat-value text-warning-emphasis">@Model.ManualReview</div>
+                <div class="small text-muted mt-1">Action required</div>
             </div>
         </div>
-
     </div>
 
-
-    <!-- Second Row -->
-    <div class="row g-4 mb-4">
-
+    <!-- Secondary Row -->
+    <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted">
-                        Rejected
-                    </div>
-
-                    <div class="display-6 fw-bold text-danger">
-                        @Model.Rejected
-                    </div>
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Disqualified / Rejected</span>
+                    <span class="badge bg-danger-subtle text-danger"><i class="bi bi-x-circle me-1"></i>Rejected</span>
                 </div>
+                <div class="fs-3 fw-bold text-danger mt-1">@Model.Rejected</div>
+                <div class="small text-muted">Did not meet minimum qualifications</div>
             </div>
         </div>
 
-
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted">
-                        Payment Pending
-                    </div>
-
-                    <div class="display-6 fw-bold">
-                        @Model.PaymentPending
-                    </div>
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Payment Pending</span>
+                    <span class="badge bg-warning-subtle text-dark"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
                 </div>
+                <div class="fs-3 fw-bold text-slate-800 mt-1">@Model.PaymentPending</div>
+                <div class="small text-muted">Awaiting fee verification</div>
             </div>
         </div>
 
-
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <div class="text-muted">
-                        Published Jobs
-                    </div>
-
-                    <div class="display-6 fw-bold">
-                        @Model.PublishedJobs
-                    </div>
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Published Circulars</span>
+                    <span class="badge bg-primary-subtle text-primary"><i class="bi bi-briefcase me-1"></i>Active</span>
                 </div>
+                <div class="fs-3 fw-bold text-primary mt-1">@Model.PublishedJobs</div>
+                <div class="small text-muted">Live openings accepting applications</div>
             </div>
         </div>
-
     </div>
-
 
     <!-- Recruitment Funnel -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-                Recruitment Funnel
-            </h5>
-        </div>
-
-        <div class="card-body">
-
-            <div class="row text-center g-3">
-
-                <div class="col-md-4">
-                    <div class="border rounded p-4">
-                        <div class="text-muted">
-                            Applications
-                        </div>
-
-                        <div class="display-6 fw-bold">
-                            @Model.TotalApplications
-                        </div>
-                    </div>
+    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+        <div class="card-header bg-white border-bottom py-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-funnel text-primary me-2"></i>Recruitment Screening Pipeline
+                    </h5>
+                    <small class="text-muted">Progression from initial submission to final shortlist</small>
                 </div>
-
-
-                <div class="col-md-4">
-                    <div class="border rounded p-4">
-                        <div class="text-muted">
-                            AI Evaluated
-                        </div>
-
-                        <div class="display-6 fw-bold">
-                            @Model.AIEvaluated
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="col-md-4">
-                    <div class="border rounded p-4">
-                        <div class="text-muted">
-                            Shortlisted
-                        </div>
-
-                        <div class="display-6 fw-bold text-success">
-                            @Model.Shortlisted
-                        </div>
-                    </div>
-                </div>
-
             </div>
-
         </div>
 
+        <div class="card-body p-4">
+            <div class="row text-center g-3">
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <div class="text-muted small text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Stage 1: Inflow</div>
+                        <div class="h3 fw-bold text-slate-900 mb-1">@Model.TotalApplications</div>
+                        <div class="text-muted small">Submitted Applications</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <div class="text-muted small text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Stage 2: Intelligence Screen</div>
+                        <div class="h3 fw-bold text-slate-900 mb-1">@Model.AIEvaluated</div>
+                        <div class="text-muted small">Evaluated via AI Matching</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-3 border rounded-3 bg-success-subtle border-success-subtle">
+                        <div class="text-success small text-uppercase fw-bold mb-1" style="font-size: 0.72rem;">Stage 3: Decision Target</div>
+                        <div class="h3 fw-bold text-success mb-1">@Model.Shortlisted</div>
+                        <div class="text-success small">Shortlisted Candidates</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Recent Applications Table -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white overflow-hidden">
+        <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h5 class="fw-bold mb-0 text-slate-900">Recent Candidate Applications</h5>
+                <small class="text-muted">Latest submissions requiring review or decision</small>
+            </div>
 
-    <!-- Recent Applications -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">
-                Recent Applications
-            </h5>
-
-            <a asp-controller="HRApplications"
-               asp-action="Index"
-               class="btn btn-sm btn-outline-primary">
-                View All
+            <a asp-controller="HRApplications" asp-action="Index" class="btn btn-sm btn-outline-primary px-3">
+                View Full Pipeline <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
 
         <div class="card-body p-0">
-
             @if (Model.RecentApplications.Any())
             {
                 <div class="table-responsive">
-
-                    <table class="table table-hover align-middle mb-0">
-
-                        <thead class="table-light">
+                    <table class="table-saas">
+                        <thead>
                             <tr>
-                                <th>Reference</th>
+                                <th class="ps-3">Reference</th>
                                 <th>Candidate</th>
-                                <th>Job</th>
-                                <th>Applied</th>
-                                <th>Status</th>
-                                <th>AI Score</th>
+                                <th>Position</th>
+                                <th>Applied Date</th>
+                                <th>Review Status</th>
+                                <th>Match Score</th>
                                 <th>AI Decision</th>
+                                <th class="text-end pe-3">Action</th>
                             </tr>
                         </thead>
-
                         <tbody>
-
                             @foreach (var application in Model.RecentApplications)
                             {
                                 <tr>
-
-                                    <td>
-                                        <span class="fw-semibold">
-                                            @application.ApplicationReferenceId
-                                        </span>
+                                    <td class="ps-3">
+                                        <code class="fw-semibold text-slate-800">
+                                            @(string.IsNullOrWhiteSpace(application.ApplicationReferenceId) ? "—" : application.ApplicationReferenceId)
+                                        </code>
                                     </td>
-
                                     <td>
-                                        @application.CandidateName
+                                        <div class="fw-bold text-slate-900">@application.CandidateName</div>
                                     </td>
-
                                     <td>
-                                        @application.JobTitle
+                                        <div class="text-slate-800">@application.JobTitle</div>
                                     </td>
-
                                     <td>
-                                        @application.AppliedAt.ToLocalTime().ToString("dd MMM yyyy")
+                                        <div class="small text-muted">@application.AppliedAt.ToLocalTime().ToString("dd MMM yyyy")</div>
                                     </td>
-
                                     <td>
                                         @if (application.ApplicationStatus == "Shortlisted")
                                         {
-                                            <span class="badge bg-success">
-                                                Shortlisted
+                                            <span class="status-pill status-pill-success">
+                                                <span class="status-dot"></span>Shortlisted
                                             </span>
                                         }
                                         else if (application.ApplicationStatus == "ManualReview")
                                         {
-                                            <span class="badge bg-warning text-dark">
-                                                Manual Review
+                                            <span class="status-pill status-pill-warning">
+                                                <span class="status-dot"></span>Manual Review
                                             </span>
                                         }
                                         else if (application.ApplicationStatus == "Rejected")
                                         {
-                                            <span class="badge bg-danger">
-                                                Rejected
+                                            <span class="status-pill status-pill-danger">
+                                                <span class="status-dot"></span>Rejected
                                             </span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">
-                                                @application.ApplicationStatus
+                                            <span class="status-pill status-pill-neutral">
+                                                <span class="status-dot"></span>@application.ApplicationStatus
                                             </span>
                                         }
                                     </td>
-
                                     <td>
                                         @if (application.AIMatchingScore.HasValue)
                                         {
-                                            <span class="fw-semibold">
+                                            <span class="fw-bold @(application.AIMatchingScore.Value >= 80 ? "text-success" : application.AIMatchingScore.Value >= 60 ? "text-warning-emphasis" : "text-danger")">
                                                 @application.AIMatchingScore.Value.ToString("0.##")%
                                             </span>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">
-                                                Not evaluated
-                                            </span>
+                                            <span class="text-muted small">Not evaluated</span>
                                         }
                                     </td>
-
                                     <td>
                                         @if (application.AIDecision == "SHORTLISTED")
                                         {
-                                            <span class="badge bg-success">
-                                                SHORTLISTED
+                                            <span class="status-pill status-pill-success">
+                                                <span class="status-dot"></span>SHORTLISTED
                                             </span>
                                         }
                                         else if (application.AIDecision == "MANUAL REVIEW")
                                         {
-                                            <span class="badge bg-warning text-dark">
-                                                MANUAL REVIEW
+                                            <span class="status-pill status-pill-warning">
+                                                <span class="status-dot"></span>MANUAL REVIEW
                                             </span>
                                         }
                                         else if (application.AIDecision == "REJECTED")
                                         {
-                                            <span class="badge bg-danger">
-                                                REJECTED
+                                            <span class="status-pill status-pill-danger">
+                                                <span class="status-dot"></span>REJECTED
                                             </span>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">
-                                                Not evaluated
-                                            </span>
+                                            <span class="text-muted small">—</span>
                                         }
                                     </td>
-
+                                    <td class="text-end pe-3">
+                                        <a asp-controller="HRApplications" asp-action="Details" asp-route-id="@application.Id" class="btn btn-sm btn-outline-primary py-1 px-3">
+                                            Inspect <i class="bi bi-chevron-right ms-1"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                             }
-
                         </tbody>
-
                     </table>
-
                 </div>
             }
             else
             {
-                <div class="p-4 text-center text-muted">
-                    No applications have been submitted yet.
+                <div class="p-5 text-center text-muted">
+                    <i class="bi bi-inbox fs-2 d-block mb-2 text-slate-400"></i>
+                    <p class="mb-0">No candidate applications have been recorded yet.</p>
                 </div>
             }
-
         </div>
-
     </div>
 
-
-    <!-- Quick Actions -->
-    <div class="card shadow-sm border-0 mb-5">
-
-        <div class="card-header">
-            <h5 class="mb-0">
-                Quick Actions
-            </h5>
-        </div>
-
-        <div class="card-body">
-
-            <div class="d-flex flex-wrap gap-2">
-
-                <a asp-controller="JobCirculars"
-                   asp-action="Index"
-                   class="btn btn-primary">
-                    Manage Job Circulars
-                </a>
-
-                <a asp-controller="HRApplications"
-                   asp-action="Index"
-                   class="btn btn-outline-primary">
-                    Review Applications
-                </a>
-
+    <!-- Quick Management Hub -->
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="rounded-circle bg-primary-subtle text-primary p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="bi bi-briefcase fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-slate-900">Job Circulars</h6>
+                        <p class="small text-muted mb-2">Create, draft, and publish job postings.</p>
+                        <a asp-controller="JobCirculars" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                            Manage Circulars
+                        </a>
+                    </div>
+                </div>
             </div>
-
         </div>
 
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="rounded-circle bg-success-subtle text-success p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="bi bi-award fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-slate-900">Offers &amp; Joining</h6>
+                        <p class="small text-muted mb-2">Send formal offers to shortlisted talent.</p>
+                        <a asp-controller="Offers" asp-action="Index" class="btn btn-sm btn-outline-success">
+                            Manage Offers
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="rounded-circle bg-info-subtle text-info p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="bi bi-file-earmark-bar-graph fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-slate-900">Recruitment Reports</h6>
+                        <p class="small text-muted mb-2">Comprehensive funnel, hiring metrics &amp; printouts.</p>
+                        <a asp-controller="HRReports" asp-action="Index" class="btn btn-sm btn-outline-info">
+                            View Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

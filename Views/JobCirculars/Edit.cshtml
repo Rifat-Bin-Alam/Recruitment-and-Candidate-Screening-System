@@ -1,27 +1,74 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
+@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
 
 @{
     ViewData["Title"] = "Edit Job Circular";
 }
 
-<h2 class="mb-4">Edit Job Circular</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
 
-<form asp-action="Edit" method="post">
+            <!-- Breadcrumb / Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <a asp-action="Index" class="text-decoration-none text-muted small">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Circulars
+                    </a>
+                    <h2 class="fw-bold text-slate-900 mt-1 mb-0">Edit Job Circular</h2>
+                    <p class="text-muted small mb-0">Modify specifications, application fee, or deadline for this position.</p>
+                </div>
 
-    @Html.AntiForgeryToken()
+                <div>
+                    @if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobCircularStatus.Published)
+                    {
+                        <span class="status-pill status-pill-success">
+                            <span class="status-dot"></span>Published
+                        </span>
+                    }
+                    else if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobCircularStatus.Draft)
+                    {
+                        <span class="status-pill status-pill-neutral">
+                            <span class="status-dot"></span>Draft
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="status-pill status-pill-danger">
+                            <span class="status-dot"></span>Closed
+                        </span>
+                    }
+                </div>
+            </div>
 
-    <input type="hidden" asp-for="Id" />
+            <div class="card border-0 shadow-sm rounded-3 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-pencil-square text-primary me-2"></i>Edit Position Details
+                    </h6>
+                </div>
 
-    <partial name="_Form" model="Model" />
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
 
-    <button type="submit" class="btn btn-primary">
-        Save Changes
-    </button>
+                        <partial name="_Form" model="Model" />
 
-    <a asp-action="Index" class="btn btn-secondary">
-        Cancel
-    </a>
-</form>
+                        <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-3">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                <i class="bi bi-check2 me-1"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
