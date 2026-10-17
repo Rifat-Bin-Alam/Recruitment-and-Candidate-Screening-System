@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,15 +16,18 @@ public class CandidateJobsController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly StripePaymentService _stripePaymentService;
+    private readonly IWebHostEnvironment _environment;
 
     public CandidateJobsController(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
-        StripePaymentService stripePaymentService)
+        StripePaymentService stripePaymentService,
+        IWebHostEnvironment environment)
     {
         _context = context;
         _userManager = userManager;
         _stripePaymentService = stripePaymentService;
+        _environment = environment;
     }
 
 
@@ -353,6 +356,13 @@ public class CandidateJobsController : Controller
                     Request.Scheme)!;
 
 
+            if (!_stripePaymentService.IsAvailable())
+            {
+                // In demo deployment without Stripe credentials, redirect to professional Integration Notice.
+                // Payment remains Pending; application is NOT marked as paid.
+                return RedirectToAction(nameof(PaymentNotice), new { id = application.Id });
+            }
+
             var session =
                 await _stripePaymentService
                     .CreateCheckoutSessionAsync(
@@ -431,6 +441,12 @@ public class CandidateJobsController : Controller
                 nameof(MyApplications));
         }
 
+        if (!_stripePaymentService.IsAvailable())
+        {
+            // In demo deployment without Stripe credentials, redirect to professional Integration Notice.
+            return RedirectToAction(nameof(PaymentNotice), new { id = application.Id });
+        }
+
 
         var user =
             await _userManager.GetUserAsync(User);
@@ -476,6 +492,32 @@ public class CandidateJobsController : Controller
 
 
         return Redirect(session.Url);
+    }
+
+    // ============================================================
+    // PAYMENT INTEGRATION NOTICE
+    // ============================================================
+
+    [HttpGet]
+    public async Task<IActionResult> PaymentNotice(int id)
+    {
+        var userId = _userManager.GetUserId(User);
+
+        if (userId == null)
+            return Challenge();
+
+        var application = await _context.JobApplications
+            .Include(a => a.JobCircular)
+            .Include(a => a.Payment)
+            .Include(a => a.CandidateProfile)
+            .FirstOrDefaultAsync(a =>
+                a.Id == id &&
+                a.CandidateProfile.ApplicationUserId == userId);
+
+        if (application == null)
+            return NotFound();
+
+        return View("~/Views/Candidate/PaymentNotice.cshtml", application);
     }
 
 
@@ -593,7 +635,7 @@ public class CandidateJobsController : Controller
             return NotFound();
 
         var fullPath = Path.Combine(
-            Directory.GetCurrentDirectory(),
+            _environment.ContentRootPath,
             "SecureUploads",
             cv.FilePath);
 

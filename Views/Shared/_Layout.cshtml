@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using RecruitmentAndCandidateScreeningSystem.Models
 @inject SignInManager<ApplicationUser> SignInManager
 
@@ -9,39 +9,52 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - Recruitment System</title>
+    <title>@ViewData["Title"] - Recruitment & Candidate Screening System</title>
 
-    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
     <link rel="stylesheet"
           href="~/css/site.css"
-          asp-append-version="true" />
-
-    <link rel="stylesheet"
-          href="~/RecruitmentAndCandidateScreeningSystem.styles.css"
           asp-append-version="true" />
 </head>
 
 <body>
 
 <header>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-
-        <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark rcss-navbar">
+        <div class="container-fluid px-lg-4">
 
             <!-- Brand -->
-            <a class="navbar-brand fw-bold"
+            <a class="rcss-brand"
                asp-controller="Home"
                asp-action="Index">
-                Recruitment System
+                <span class="rcss-brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+                    </svg>
+                </span>
+                <span>TalentScreen</span>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    @if (User.IsInRole(RoleNames.HRManager))
+                    {
+                        <span class="rcss-portal-badge hr">HR Portal</span>
+                    }
+                    else if (User.IsInRole(RoleNames.Candidate))
+                    {
+                        <span class="rcss-portal-badge">Candidate</span>
+                    }
+                }
             </a>
 
-
-            <!-- Mobile Menu Button -->
+            <!-- Mobile Toggler -->
             <button class="navbar-toggler"
                     type="button"
                     data-bs-toggle="collapse"
@@ -49,160 +62,94 @@
                     aria-controls="mainNavbar"
                     aria-expanded="false"
                     aria-label="Toggle navigation">
-
                 <span class="navbar-toggler-icon"></span>
-
             </button>
 
-
-            <!-- Navigation -->
+            <!-- Navigation Links -->
             <div class="collapse navbar-collapse"
                  id="mainNavbar">
 
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
 
                     @if (SignInManager.IsSignedIn(User))
                     {
-
-                        <!-- ========================= -->
-                        <!-- CANDIDATE NAVIGATION -->
-                        <!-- ========================= -->
-
                         @if (User.IsInRole(RoleNames.Candidate))
                         {
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="Candidate"
                                    asp-action="Dashboard">
-
                                     Dashboard
-
                                 </a>
-
                             </li>
 
-
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="CandidateJobs"
                                    asp-action="Index">
-
                                     Jobs
-
                                 </a>
-
                             </li>
 
-
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="CandidateJobs"
                                    asp-action="MyApplications">
-
                                     My Applications
-
                                 </a>
-
                             </li>
 
-
-                            <!-- Offers -->
-
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="CandidateOffers"
                                    asp-action="Index">
-
                                     Offers
-
                                 </a>
-
                             </li>
 
-
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="CandidateProfiles"
                                    asp-action="Index">
-
                                     Profile
-
                                 </a>
-
                             </li>
                         }
 
-
-                        <!-- ========================= -->
-                        <!-- HR MANAGER NAVIGATION -->
-                        <!-- ========================= -->
-
                         @if (User.IsInRole(RoleNames.HRManager))
                         {
-
-                            <!-- HR Dashboard -->
-
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="HRDashboard"
                                    asp-action="Index">
-
-                                    Dashboard
-
+                                    Overview
                                 </a>
-
                             </li>
 
-
-                            <!-- Job Circulars -->
-
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="JobCirculars"
                                    asp-action="Index">
-
                                     Job Circulars
-
                                 </a>
-
                             </li>
 
-
-                            <!-- Applications -->
-
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="HRApplications"
                                    asp-action="Index">
-
                                     Applications
-
                                 </a>
-
                             </li>
 
-
-                            <!-- Offers -->
-
                             <li class="nav-item">
-
                                 <a class="nav-link"
                                    asp-controller="Offers"
                                    asp-action="Index">
-
                                     Offers
-
                                 </a>
-
                             </li>
+
                             <li class="nav-item">
                                 <a class="nav-link"
                                    asp-controller="HRReports"
@@ -210,67 +157,65 @@
                                     Reports
                                 </a>
                             </li>
-
                         }
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Home
+                            </a>
+                        </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="CandidateJobs"
+                               asp-action="Index">
+                                Browse Jobs
+                            </a>
+                        </li>
                     }
 
                 </ul>
-
-
-                <!-- Login / Logout -->
-
+                <div class="d-lg-none border-mobile-divider"></div>
+                <!-- Auth Controls -->
                 <partial name="_LoginPartial" />
 
             </div>
 
         </div>
-
     </nav>
-
 </header>
 
-
-<!-- Main Content -->
-
-<div class="container mt-4">
-
-    <main role="main"
-          class="pb-4">
-
-        @RenderBody()
-
-    </main>
-
-</div>
-
+<!-- Main Body -->
+<main role="main">
+    @RenderBody()
+</main>
 
 <!-- Footer -->
-
-<footer class="border-top footer text-muted mt-5">
-
-    <div class="container py-3">
-
-        &copy; 2026 - Recruitment and Candidate Screening System
-
+<footer class="rcss-footer">
+    <div class="container-fluid px-lg-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-center text-md-start">
+        <div>
+            &copy; 2026 <strong>TalentScreen</strong> &mdash; Recruitment & Candidate Screening System. All rights reserved.
+        </div>
+        <div class="d-flex align-items-center justify-content-center gap-3 small flex-wrap">
+            <a asp-controller="Home" asp-action="Privacy" class="text-secondary text-decoration-none">Privacy Policy</a>
+            <span class="text-secondary d-none d-sm-inline">&bull;</span>
+            <span class="text-secondary">MonsterASP.NET Ready</span>
+            <span class="text-secondary d-none d-sm-inline">&bull;</span>
+            <span class="text-secondary">.NET 10 MVC</span>
+        </div>
     </div>
-
 </footer>
 
-
-<!-- JavaScript -->
-
+<!-- Scripts -->
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
 
-<script src="~/js/site.js"
-        asp-append-version="true"></script>
-
-@await RenderSectionAsync(
-    "Scripts",
-    required: false)
+@await RenderSectionAsync("Scripts", required: false)
 
 </body>
-
 </html>

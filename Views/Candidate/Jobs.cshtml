@@ -1,276 +1,170 @@
-﻿@model IEnumerable<RecruitmentAndCandidateScreeningSystem.Models.JobCircular>
+@model IEnumerable<RecruitmentAndCandidateScreeningSystem.Models.JobCircular>
 
 @{
-    ViewData["Title"] = "Available Jobs";
-
+    ViewData["Title"] = "Open Positions & Career Opportunities";
     var search = ViewBag.Search as string;
     var sort = ViewBag.Sort as string ?? "newest";
 }
 
-<div class="container">
+<div class="container py-4">
 
-    <div class="mb-4">
-        <h2 class="fw-bold">Available Jobs</h2>
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 mb-1">
+                <span class="status-pill status-pill-info">Career Opportunities</span>
+                <span class="text-slate-500 small">&bull; Active Requisitions</span>
+            </div>
+            <h2 class="fw-bold text-slate-900 tracking-tight mb-1">Available Positions</h2>
+            <p class="text-slate-500 small mb-0">Browse current job vacancies and submit your application online.</p>
+        </div>
 
-        <p class="text-muted">
-            Explore current job opportunities and find the right position for you.
-        </p>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-controller="CandidateJobs" asp-action="MyApplications" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-clock-history me-1"></i>My Applications
+            </a>
+        </div>
     </div>
 
-
-    <!-- Search and Sort -->
-
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-body">
-
-            <form asp-action="Index" method="get">
-
-                <div class="row g-3 align-items-end">
-
-                    <div class="col-md-6">
-
-                        <label class="form-label fw-semibold">
-                            Search Jobs
-                        </label>
-
+    <!-- Search & Filter Toolbar -->
+    <div class="filter-toolbar">
+        <form asp-action="Index" method="get">
+            <div class="row g-3 align-items-end">
+                
+                <div class="col-md-6 col-lg-7">
+                    <label class="form-label">Search Positions</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
                         <input type="text"
                                name="search"
                                value="@search"
-                               class="form-control"
-                               placeholder="Search by job title, department or location..." />
-
+                               class="form-control border-start-0"
+                               placeholder="Search by title, department, or location..." />
                     </div>
-
-
-                    <div class="col-md-4">
-
-                        <label class="form-label fw-semibold">
-                            Sort By
-                        </label>
-
-                        <select name="sort"
-                                class="form-select">
-
-                            @if (sort == "newest")
-                            {
-                                <option value="newest" selected>
-                                    Newest Jobs
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="newest">
-                                    Newest Jobs
-                                </option>
-                            }
-
-                            @if (sort == "oldest")
-                            {
-                                <option value="oldest" selected>
-                                    Oldest Jobs
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="oldest">
-                                    Oldest Jobs
-                                </option>
-                            }
-
-                            @if (sort == "deadline_soon")
-                            {
-                                <option value="deadline_soon" selected>
-                                    Deadline: Soonest
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="deadline_soon">
-                                    Deadline: Soonest
-                                </option>
-                            }
-
-                            @if (sort == "deadline_late")
-                            {
-                                <option value="deadline_late" selected>
-                                    Deadline: Latest
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="deadline_late">
-                                    Deadline: Latest
-                                </option>
-                            }
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="col-md-2 d-flex gap-2">
-
-                        <button type="submit"
-                                class="btn btn-primary flex-grow-1">
-                            Search
-                        </button>
-
-                        <a asp-action="Index"
-                           class="btn btn-outline-secondary">
-                            Clear
-                        </a>
-
-                    </div>
-
                 </div>
 
-            </form>
+                <div class="col-md-3 col-lg-3">
+                    <label class="form-label">Order By</label>
+                    <select name="sort" class="form-select">
+                        <option value="newest" selected="@(sort == "newest")">Newest Published</option>
+                        <option value="oldest" selected="@(sort == "oldest")">Oldest Published</option>
+                        <option value="deadline_soon" selected="@(sort == "deadline_soon")">Deadline (Soonest)</option>
+                        <option value="deadline_late" selected="@(sort == "deadline_late")">Deadline (Latest)</option>
+                    </select>
+                </div>
 
-        </div>
+                <div class="col-md-3 col-lg-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 shadow-sm">
+                        <i class="bi bi-filter me-1"></i>Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Clear filters">
+                        Clear
+                    </a>
+                </div>
 
+            </div>
+        </form>
     </div>
 
-
-    <!-- Search Result Information -->
+    <!-- Active Search Filter Banner -->
     @if (!string.IsNullOrWhiteSpace(search))
     {
-        <div class="mb-3">
-
-            <span class="text-muted">
-                Search results for:
-            </span>
-
-            <strong>
-                "@search"
-            </strong>
-
-            <span class="text-muted">
-                (@Model.Count() job(s))
-            </span>
-
+        <div class="d-flex align-items-center justify-content-between p-2.5 px-3 mb-4 rounded bg-light border small">
+            <div>
+                Showing results matching: <strong class="text-slate-900">"@search"</strong>
+                <span class="text-slate-500 ms-1">(@Model.Count() found)</span>
+            </div>
+            <a asp-action="Index" class="text-slate-500 text-decoration-none small">&times; Reset search</a>
         </div>
     }
 
-
-    <!-- Jobs -->
+    <!-- Job Cards -->
     @if (!Model.Any())
     {
-        <div class="alert alert-info">
-
-            <strong>No jobs found.</strong>
-
-            <br />
-
-            Try another search term or clear the filters.
-
+        <div class="card border shadow-sm p-5 text-center bg-white">
+            <div class="icon-box icon-box-neutral mx-auto mb-3" style="width: 48px; height: 48px;">
+                <i class="bi bi-inbox fs-4"></i>
+            </div>
+            <h5 class="fw-bold text-slate-900 mb-1">No Matching Positions Found</h5>
+            <p class="text-slate-500 small mb-3">Try adjusting your search criteria or check back later for new openings.</p>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    View All Positions
+                </a>
+            </div>
         </div>
     }
     else
     {
         <div class="row g-4">
-
             @foreach (var job in Model)
             {
                 <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border shadow-sm d-flex flex-column bg-white">
+                        <div class="card-body p-4 d-flex flex-column">
+                            
+                            <!-- Badges -->
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                <span class="badge bg-light text-slate-700 border text-truncate" style="max-width: 160px;">
+                                    <i class="bi bi-building me-1 text-muted"></i>@(job.Department ?? "General")
+                                </span>
+                                
+                                @if (job.ApplicationFee.HasValue && job.ApplicationFee.Value > 0)
+                                {
+                                    <span class="status-pill status-pill-warning">
+                                        Fee: $@job.ApplicationFee.Value.ToString("0.00") USD
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-pill status-pill-success">
+                                        <span class="status-dot"></span>Free Application
+                                    </span>
+                                }
+                            </div>
 
-                    <div class="card job-card h-100 shadow-sm border-0">
+                            <!-- Title -->
+                            <h5 class="fw-bold text-slate-900 mb-2">
+                                <a asp-action="Details" asp-route-id="@job.Id" class="text-slate-900 text-decoration-none">
+                                    @job.JobTitle
+                                </a>
+                            </h5>
 
-                        <div class="card-body d-flex flex-column">
+                            <!-- Meta -->
+                            <div class="d-flex flex-column gap-1.5 mb-3 small text-slate-600">
+                                @if (!string.IsNullOrWhiteSpace(job.Location))
+                                {
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-geo-alt text-muted"></i>
+                                        <span>@job.Location</span>
+                                    </div>
+                                }
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-calendar-event text-muted"></i>
+                                    <span>Deadline: <strong class="text-slate-900">@job.ApplicationDeadline.ToLocalTime().ToString("dd MMM yyyy")</strong></span>
+                                </div>
+                            </div>
 
-                            <!-- JOB TITLE -->
-
-                            <h4 class="fw-bold mb-3">
-                                @job.JobTitle
-                            </h4>
-
-
-                            <!-- DEPARTMENT -->
-                            @if (!string.IsNullOrWhiteSpace(job.Department))
-                            {
-                                <p class="mb-2">
-
-                                    <strong>
-                                        Department:
-                                    </strong>
-
-                                    @job.Department
-
-                                </p>
-                            }
-
-
-                            <!-- LOCATION -->
-                            @if (!string.IsNullOrWhiteSpace(job.Location))
-                            {
-                                <p class="mb-2">
-
-                                    <strong>
-                                        Location:
-                                    </strong>
-
-                                    @job.Location
-
-                                </p>
-                            }
-
-
-                            <!-- PUBLISHED DATE -->
-
-                            <p class="mb-2">
-
-                                <strong>
-                                    Published:
-                                </strong>
-
-                                @job.PublishedAt
-                                .ToLocalTime()
-                                .ToString("dd MMM yyyy")
-
-                            </p>
-
-
-                            <!-- DEADLINE -->
-
-                            <p class="mb-3">
-
-                                <strong>
-                                    Deadline:
-                                </strong>
-
-                                @job.ApplicationDeadline
-                                .ToLocalTime()
-                                .ToString("dd MMM yyyy")
-
-                            </p>
-
-
-                            <!-- DESCRIPTION -->
-
-                            <p class="text-muted flex-grow-1">
-
+                            <!-- Description Snippet -->
+                            <p class="text-slate-600 small mb-4 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
                                 @job.JobDescription
-
                             </p>
 
-
-                            <!-- DETAILS -->
-
-                            <a asp-action="Details"
-                               asp-route-id="@job.Id"
-                               class="btn btn-primary mt-3">
-
-                                View Details
-
-                            </a>
+                            <!-- Button -->
+                            <div class="pt-3 border-top mt-auto">
+                                <a asp-action="Details"
+                                   asp-route-id="@job.Id"
+                                   class="btn btn-outline-primary btn-sm w-100 fw-semibold">
+                                    View Requirements &amp; Apply &rarr;
+                                </a>
+                            </div>
 
                         </div>
-
                     </div>
-
                 </div>
             }
-
         </div>
     }
 

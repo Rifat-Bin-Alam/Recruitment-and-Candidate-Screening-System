@@ -1,686 +1,603 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.Models.JobApplication
+@model RecruitmentAndCandidateScreeningSystem.Models.JobApplication
 
 @{
-    ViewData["Title"] = "Application Details";
+    ViewData["Title"] = "Candidate Screening Dossier & CV Workspace";
 
     var candidate = Model.CandidateProfile;
-
-    var currentCV = candidate?.CVs?
-        .FirstOrDefault(c => c.IsCurrent);
-
+    var currentCV = candidate?.CVs?.FirstOrDefault(c => c.IsCurrent);
     var aiResult = Model.AIMatchingResult;
+    var contactEmail = "rifat5566123@gmail.com";
 }
 
-<div class="container">
+<div class="container-fluid px-lg-5 py-4">
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Header & Top Navigation -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
         <div>
-            <h2 class="fw-bold mb-1">Application Details</h2>
-            <p class="text-muted mb-0">
-                Review candidate information and AI screening results.
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-2">
+                <i class="bi bi-arrow-left me-1"></i>Back to Candidate Pipeline
+            </a>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <h2 class="fw-bold text-slate-900 mb-0">Candidate Screening Dossier</h2>
+                @if (!string.IsNullOrWhiteSpace(Model.ApplicationReferenceId))
+                {
+                    <code class="badge bg-light text-slate-800 border fs-6 px-2.5 py-1">@Model.ApplicationReferenceId</code>
+                }
+                @if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobApplicationStatus.Shortlisted)
+                {
+                    <span class="status-pill status-pill-success">
+                        <span class="status-dot"></span>Shortlisted
+                    </span>
+                }
+                else if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobApplicationStatus.ManualReview)
+                {
+                    <span class="status-pill status-pill-warning">
+                        <span class="status-dot"></span>Manual Review Required
+                    </span>
+                }
+                else if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobApplicationStatus.Rejected)
+                {
+                    <span class="status-pill status-pill-danger">
+                        <span class="status-dot"></span>Rejected
+                    </span>
+                }
+                else
+                {
+                    <span class="status-pill status-pill-info">
+                        <span class="status-dot"></span>@Model.Status
+                    </span>
+                }
+            </div>
+            <p class="text-muted small mb-0 mt-1">
+                Candidate: <strong class="text-slate-800">@(candidate?.FullName ?? "Unknown")</strong> &bull; Target: <strong class="text-slate-800">@(Model.JobCircular?.JobTitle ?? "Unknown Position")</strong> &bull; Submitted: @Model.AppliedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
             </p>
         </div>
 
-        <a asp-action="Index"
-           class="btn btn-outline-secondary">
-            Back to Applications
-        </a>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-list-ul me-1"></i>All Applications
+            </a>
+            @if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobApplicationStatus.Shortlisted)
+            {
+                <a asp-controller="Offers" asp-action="Index" class="btn btn-success btn-sm px-3 shadow-sm">
+                    <i class="bi bi-award me-1"></i>Proceed to Offer
+                </a>
+            }
+        </div>
     </div>
 
+    <!-- Integration Notice Banner (Exact Required Text) -->
+    @if (TempData["IntegrationNotice"] != null)
+    {
+        <div class="card border-0 shadow-sm rounded-3 mb-4 border-start border-4 border-primary bg-white">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="p-2 bg-primary-subtle text-primary rounded-circle">
+                        <i class="bi bi-info-circle-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-slate-900 mb-1">Integration Notice</h5>
+                        <p class="text-slate-700 mb-1">
+                            This demonstration version has certain external API integrations disabled for deployment purposes.
+                        </p>
+                        <p class="text-slate-700 mb-2">
+                            For access to the full functionality, including payment processing and AI-powered CV matching, please contact me by email.
+                        </p>
+                        <div class="small fw-semibold text-primary">
+                            <i class="bi bi-envelope me-1"></i>@contactEmail
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 
-    <!-- Messages -->
+    <!-- Feedback Alerts -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show"
-             role="alert">
-            @TempData["Success"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill fs-5 me-2"></i>
+                <div>@TempData["Success"]</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show"
-             role="alert">
-            @TempData["Error"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                <div>@TempData["Error"]</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
+    <!-- TWO-COLUMN RECRUITMENT WORKSPACE -->
+    <div class="row g-4">
 
-    <!-- Candidate Information -->
-    <div class="card shadow-sm border-0 mb-4">
+        <!-- ========================================================= -->
+        <!-- LEFT COLUMN: Candidate Profile, Background & Documents     -->
+        <!-- ========================================================= -->
+        <div class="col-xl-6 col-lg-6">
 
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Candidate Information</h5>
-        </div>
-
-        <div class="card-body">
-
-            <div class="row g-4">
-
-                <!-- Photo -->
-                <div class="col-md-3 text-center">
-
-                    <strong class="d-block mb-2">
-                        Candidate Photo
-                    </strong>
-
-                    @if (!string.IsNullOrWhiteSpace(
-                        candidate?.PhotoFilePath))
-                    {
-                        <img src="@Url.Action(
-                                                    "CandidateFile",
-                                                    "HRApplications",
-                                                    new
-                                                    {
-                                                        applicationId = Model.Id,
-                                                        type = "photo"
-                                                    })"
-                             alt="Candidate Photo"
-                             class="img-thumbnail"
-                             style="width:180px;
-                        height:180px;
-                        object-fit:cover;" />
-                    }
-                    else
-                    {
-                        <div class="text-muted">
-                            No photo available.
-                        </div>
-                    }
-
-                </div>
-
-
-                <!-- Signature -->
-                <div class="col-md-3 text-center">
-
-                    <strong class="d-block mb-2">
-                        Signature
-                    </strong>
-
-                    @if (!string.IsNullOrWhiteSpace(
-                        candidate?.SignatureFilePath))
-                    {
-                        <img src="@Url.Action(
-                                                    "CandidateFile",
-                                                    "HRApplications",
-                                                    new
-                                                    {
-                                                        applicationId = Model.Id,
-                                                        type = "signature"
-                                                    })"
-                             alt="Candidate Signature"
-                             class="img-thumbnail"
-                             style="width:220px;
-                        height:120px;
-                        object-fit:contain;" />
-                    }
-                    else
-                    {
-                        <div class="text-muted">
-                            No signature available.
-                        </div>
-                    }
-
-                </div>
-
-
-                <!-- Basic Information -->
-                <div class="col-md-6">
-
-                    <div class="mb-3">
-                        <strong>Name</strong>
-                        <div>
-                            @candidate?.FullName
-                        </div>
+            <!-- 1. Verified Identity & Contact Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white overflow-hidden">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0 text-slate-900">
+                            <i class="bi bi-person-badge text-primary me-2"></i>Candidate Profile &amp; Identity Assets
+                        </h6>
+                        <span class="badge bg-light border text-slate-600">ID: #@(candidate?.Id ?? 0)</span>
                     </div>
-
-                    <div class="mb-3">
-                        <strong>Email</strong>
-                        <div>
-                            @candidate?.ApplicationUser?.Email
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <strong>Phone</strong>
-                        <div>
-                            @(candidate?.PhoneNumber ?? "Not provided")
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <strong>Highest Qualification</strong>
-                        <div>
-                            @(candidate?.HighestQualification
-                                ?? "Not provided")
-                        </div>
-                    </div>
-
-                    <div>
-                        <strong>Address</strong>
-                        <div>
-                            @(candidate?.Address ?? "Not provided")
-                        </div>
-                    </div>
-
                 </div>
 
-            </div>
-
-        </div>
-    </div>
-
-
-    <!-- Education and Experience -->
-    <div class="row g-4 mb-4">
-
-        <div class="col-md-6">
-
-            <div class="card shadow-sm border-0 h-100">
-
-                <div class="card-header">
-                    <h5 class="mb-0">Education</h5>
-                </div>
-
-                <div class="card-body">
-
-                    @if (!string.IsNullOrWhiteSpace(
-                        candidate?.EducationDetails))
-                    {
-                        <p class="mb-0">
-                            @candidate.EducationDetails
-                        </p>
-                    }
-                    else
-                    {
-                        <p class="text-muted mb-0">
-                            No education details provided.
-                        </p>
-                    }
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-6">
-
-            <div class="card shadow-sm border-0 h-100">
-
-                <div class="card-header">
-                    <h5 class="mb-0">Experience</h5>
-                </div>
-
-                <div class="card-body">
-
-                    @if (!string.IsNullOrWhiteSpace(
-                        candidate?.ExperienceDetails))
-                    {
-                        <p class="mb-0">
-                            @candidate.ExperienceDetails
-                        </p>
-                    }
-                    else
-                    {
-                        <p class="text-muted mb-0">
-                            No experience details provided.
-                        </p>
-                    }
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- Skills -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header">
-            <h5 class="mb-0">Skills</h5>
-        </div>
-
-        <div class="card-body">
-
-            @if (!string.IsNullOrWhiteSpace(candidate?.Skills))
-            {
-                <p class="mb-0">
-                    @candidate.Skills
-                </p>
-            }
-            else
-            {
-                <p class="text-muted mb-0">
-                    No skills provided.
-                </p>
-            }
-
-        </div>
-
-    </div>
-
-
-    <!-- Applied Job -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header bg-light">
-            <h5 class="mb-0">Applied Job</h5>
-        </div>
-
-        <div class="card-body">
-
-            <h4 class="fw-bold">
-                @Model.JobCircular?.JobTitle
-            </h4>
-
-            <p>
-                <strong>Department:</strong>
-                @(Model.JobCircular?.Department
-                    ?? "Not specified")
-            </p>
-
-            <p>
-                <strong>Location:</strong>
-                @(Model.JobCircular?.Location
-                    ?? "Not specified")
-            </p>
-
-            <p>
-                <strong>Application Date:</strong>
-                @Model.AppliedAt.ToLocalTime()
-            </p>
-
-            <p class="mb-0">
-                <strong>Application Status:</strong>
-
-                <span class="badge bg-secondary">
-                    @Model.Status
-                </span>
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <!-- Job Requirements -->
-    @if (Model.JobCircular?.JobRequirement != null)
-    {
-        <div class="card shadow-sm border-0 mb-4">
-
-            <div class="card-header">
-                <h5 class="mb-0">Job Requirements</h5>
-            </div>
-
-            <div class="card-body">
-
-                <div class="mb-3">
-                    <strong>Required Qualifications</strong>
-
-                    <p class="mt-2 mb-0">
-                        @Model.JobCircular
-                        .JobRequirement
-                        .RequiredQualifications
-                    </p>
-                </div>
-
-                <div class="mb-3">
-                    <strong>Required Skills</strong>
-
-                    <p class="mt-2 mb-0">
-                        @(Model.JobCircular
-                            .JobRequirement
-                            .RequiredSkills
-                            ?? "Not specified")
-                    </p>
-                </div>
-
-                <div class="mb-3">
-                    <strong>Required Experience</strong>
-
-                    <p class="mt-2 mb-0">
-                        @(Model.JobCircular
-                            .JobRequirement
-                            .RequiredExperience
-                            ?? "Not specified")
-                    </p>
-                </div>
-
-                <div>
-                    <strong>Additional Requirements</strong>
-
-                    <p class="mt-2 mb-0">
-                        @(Model.JobCircular
-                            .JobRequirement
-                            .AdditionalRequirements
-                            ?? "Not specified")
-                    </p>
-                </div>
-
-            </div>
-
-        </div>
-    }
-
-
-    <!-- Candidate CV -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header">
-            <h5 class="mb-0">Candidate CV</h5>
-        </div>
-
-        <div class="card-body">
-
-            @if (currentCV != null)
-            {
-                <p class="mb-1">
-                    <strong>File:</strong>
-                    @currentCV.StoredFileName
-                </p>
-
-                <p class="text-muted">
-                    Uploaded:
-                    @currentCV.UploadedAt.ToLocalTime()
-                </p>
-
-                <span class="badge bg-success mb-3">
-                    Current CV
-                </span>
-
-                <div>
-                    <a asp-controller="HRApplications"
-                       asp-action="CandidateFile"
-                       asp-route-applicationId="@Model.Id"
-                       asp-route-type="cv"
-                       target="_blank"
-                       class="btn btn-primary">
-                        View CV
-                    </a>
-                </div>
-            }
-            else
-            {
-                <p class="text-muted mb-0">
-                    No current CV available.
-                </p>
-            }
-
-        </div>
-
-    </div>
-
-
-    <!-- AI MATCHING -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">
-                AI Candidate Screening
-            </h5>
-        </div>
-
-        <div class="card-body">
-
-            @if (currentCV != null &&
-                 Model.JobCircular?.JobRequirement != null)
-            {
-                <div class="mb-4">
-
-                    <p class="text-muted">
-                        Use Gemini AI to compare the candidate's CV
-                        with the job requirements.
-                    </p>
-
-                    <form asp-controller="HRApplications"
-                          asp-action="AIMatch"
-                          asp-route-id="@Model.Id"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <button type="submit"
-                                class="btn btn-dark">
-
-                            🤖
-                            @(aiResult == null
-                                ? "AI Match Candidate"
-                                : "Run AI Matching Again")
-
-                        </button>
-
-                    </form>
-
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-warning mb-0">
-
-                    @if (currentCV == null)
-                    {
-                        <span>
-                            AI matching cannot be performed because
-                            the candidate does not have a current CV.
-                        </span>
-                    }
-                    else
-                    {
-                        <span>
-                            AI matching cannot be performed because
-                            job requirements have not been configured.
-                        </span>
-                    }
-
-                </div>
-            }
-
-
-            @if (aiResult != null)
-            {
-                <hr class="my-4" />
-
-                <h5 class="fw-bold mb-3">
-                    AI Matching Result
-                </h5>
-
-                <div class="row g-3">
-
-                    <!-- Score -->
-                    <div class="col-md-4">
-
-                        <div class="border rounded p-4 text-center h-100">
-
-                            <div class="text-muted mb-2">
-                                Matching Score
-                            </div>
-
-                            <div class="display-5 fw-bold">
-                                @aiResult.MatchingScore.ToString("0.##")%
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Decision -->
-                    <div class="col-md-4">
-
-                        <div class="border rounded p-4 text-center h-100">
-
-                            <div class="text-muted mb-2">
-                                AI Decision
-                            </div>
-
-                            @if (aiResult.Decision == "SHORTLISTED")
+                <div class="card-body p-4">
+                    <div class="row g-3 align-items-center mb-4 pb-3 border-bottom">
+                        <!-- Candidate Photo -->
+                        <div class="col-sm-4 text-center">
+                            @if (!string.IsNullOrWhiteSpace(candidate?.PhotoFilePath))
                             {
-                                <span class="badge bg-success fs-6 px-3 py-2">
-                                    SHORTLISTED
-                                </span>
-                            }
-                            else if (aiResult.Decision == "MANUAL REVIEW")
-                            {
-                                <span class="badge bg-warning text-dark fs-6 px-3 py-2">
-                                    MANUAL REVIEW
-                                </span>
+                                <div class="p-1 border rounded bg-light d-inline-block shadow-xs mb-2">
+                                    <img src="@Url.Action("CandidateFile", "HRApplications", new { applicationId = Model.Id, type = "photo" })"
+                                         alt="Candidate Photo"
+                                         class="rounded"
+                                         style="width: 120px; height: 135px; object-fit: cover;" />
+                                </div>
+                                <div>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.72rem;">
+                                        <i class="bi bi-check2 me-1"></i>Verified Photo
+                                    </span>
+                                </div>
                             }
                             else
                             {
-                                <span class="badge bg-danger fs-6 px-3 py-2">
-                                    REJECTED
-                                </span>
+                                <div class="border rounded p-3 bg-light text-muted d-inline-flex flex-column align-items-center justify-content-center" style="width: 120px; height: 135px;">
+                                    <i class="bi bi-person display-5 text-slate-400"></i>
+                                    <span class="small mt-1" style="font-size: 0.72rem;">No Photo</span>
+                                </div>
                             }
-
                         </div>
 
-                    </div>
-
-
-                    <!-- Evaluated -->
-                    <div class="col-md-4">
-
-                        <div class="border rounded p-4 text-center h-100">
-
-                            <div class="text-muted mb-2">
-                                Evaluated At
+                        <!-- Candidate Signature -->
+                        <div class="col-sm-8">
+                            <div class="fw-bold text-slate-900 fs-5 mb-1">@candidate?.FullName</div>
+                            <div class="text-muted small mb-2">
+                                <i class="bi bi-envelope me-1 text-slate-400"></i>@candidate?.ApplicationUser?.Email
+                            </div>
+                            <div class="text-muted small mb-3">
+                                <i class="bi bi-telephone me-1 text-slate-400"></i>@(candidate?.PhoneNumber ?? "No contact telephone")
                             </div>
 
                             <div>
-                                @aiResult.EvaluatedAt.ToLocalTime()
+                                <small class="text-muted d-block text-uppercase fw-semibold mb-1" style="font-size: 0.7rem;">Verified Signature</small>
+                                @if (!string.IsNullOrWhiteSpace(candidate?.SignatureFilePath))
+                                {
+                                    <div class="p-1 border rounded bg-light d-inline-block">
+                                        <img src="@Url.Action("CandidateFile", "HRApplications", new { applicationId = Model.Id, type = "signature" })"
+                                             alt="Candidate Signature"
+                                             class="bg-white rounded p-1"
+                                             style="max-width: 180px; max-height: 55px; object-fit: contain;" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No signature uploaded</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Meta details -->
+                    <div class="row g-3 small">
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block text-uppercase fw-semibold" style="font-size: 0.7rem;">National ID / Passport:</span>
+                            <span class="text-slate-800 fw-medium">@(candidate?.NationalId ?? "Not provided")</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block text-uppercase fw-semibold" style="font-size: 0.7rem;">Highest Degree:</span>
+                            <span class="text-slate-800 fw-medium">@(candidate?.HighestQualification ?? "Not specified")</span>
+                        </div>
+                        <div class="col-12">
+                            <span class="text-muted d-block text-uppercase fw-semibold" style="font-size: 0.7rem;">Residential Address:</span>
+                            <span class="text-slate-800">@(candidate?.Address ?? "Not provided")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Submitted Curriculum Vitae (CV) Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-file-earmark-pdf text-primary me-2"></i>Submitted Curriculum Vitae (CV)
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    @if (currentCV != null)
+                    {
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-3 bg-light rounded-3 border">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="p-3 bg-white border rounded-3 text-primary shadow-xs">
+                                    <i class="bi bi-file-earmark-text fs-3"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-slate-900 text-truncate" style="max-width: 250px;">@currentCV.StoredFileName</div>
+                                    <div class="small text-muted">
+                                        Uploaded: @currentCV.UploadedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                    </div>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle mt-1" style="font-size: 0.7rem;">
+                                        Active Primary CV
+                                    </span>
+                                </div>
                             </div>
 
+                            <div>
+                                <a asp-controller="HRApplications"
+                                   asp-action="CandidateFile"
+                                   asp-route-applicationId="@Model.Id"
+                                   asp-route-type="cv"
+                                   target="_blank"
+                                   class="btn btn-primary btn-sm px-3 shadow-sm">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>Inspect / Download CV
+                                </a>
+                            </div>
                         </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning border-0 rounded-3 mb-0 small">
+                            <i class="bi bi-exclamation-triangle me-1"></i>No current CV attached to this profile.
+                        </div>
+                    }
+                </div>
+            </div>
 
+            <!-- 3. Academic & Work Experience Details -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-mortarboard text-primary me-2"></i>Education &amp; Professional Background
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <label class="text-muted small fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem;">Academic History</label>
+                        @if (!string.IsNullOrWhiteSpace(candidate?.EducationDetails))
+                        {
+                            <div class="p-3 bg-light rounded-3 border text-slate-800 small" style="white-space: pre-line; line-height: 1.6;">
+                                @candidate.EducationDetails
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted small mb-0">No education details recorded.</p>
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem;">Work Experience</label>
+                        @if (!string.IsNullOrWhiteSpace(candidate?.ExperienceDetails))
+                        {
+                            <div class="p-3 bg-light rounded-3 border text-slate-800 small" style="white-space: pre-line; line-height: 1.6;">
+                                @candidate.ExperienceDetails
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted small mb-0">No work experience details recorded.</p>
+                        }
+                    </div>
+
+                    <div>
+                        <label class="text-muted small fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem;">Reported Skills &amp; Competencies</label>
+                        @if (!string.IsNullOrWhiteSpace(candidate?.Skills))
+                        {
+                            <div class="p-3 bg-light rounded-3 border text-slate-800 small" style="white-space: pre-line; line-height: 1.6;">
+                                @candidate.Skills
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted small mb-0">No skills reported.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Application Fee & Payment Verification -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-credit-card text-primary me-2"></i>Payment Verification
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    @if (Model.Payment != null)
+                    {
+                        <div class="row g-3 align-items-center">
+                            <div class="col-sm-4">
+                                <span class="text-muted small d-block text-uppercase fw-semibold" style="font-size: 0.7rem;">Payment Status</span>
+                                @if (Model.Payment.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.PaymentStatus.Paid)
+                                {
+                                    <span class="status-pill status-pill-success mt-1">
+                                        <span class="status-dot"></span>Paid &check;
+                                    </span>
+                                }
+                                else if (Model.Payment.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.PaymentStatus.Pending)
+                                {
+                                    <span class="status-pill status-pill-warning mt-1">
+                                        <span class="status-dot"></span>Pending
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-pill status-pill-danger mt-1">
+                                        <span class="status-dot"></span>@Model.Payment.Status
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="col-sm-4">
+                                <span class="text-muted small d-block text-uppercase fw-semibold" style="font-size: 0.7rem;">Fee Amount</span>
+                                <div class="fw-bold text-slate-900 fs-5 mt-1">$@Model.Payment.Amount.ToString("0.00") USD</div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <span class="text-muted small d-block text-uppercase fw-semibold" style="font-size: 0.7rem;">Transaction Date</span>
+                                <div class="text-slate-800 small mt-1">
+                                    @(Model.Payment.PaidAt.HasValue ? Model.Payment.PaidAt.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt") : "Not completed")
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted small">
+                            <i class="bi bi-check2-circle text-success me-1"></i>This position does not require an application fee (Free Application).
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- RIGHT COLUMN: Requisition Criteria & CV Screening Workspace-->
+        <!-- ========================================================= -->
+        <div class="col-xl-6 col-lg-6">
+
+            <!-- 1. Position Benchmark Requirements -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0 text-slate-900">
+                            <i class="bi bi-bullseye text-primary me-2"></i>Position Benchmark Requirements
+                        </h6>
+                        <span class="badge bg-light border text-slate-700">@Model.JobCircular?.Department</span>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-slate-900 mb-2">@Model.JobCircular?.JobTitle</h5>
+                    <div class="text-muted small mb-3">
+                        <i class="bi bi-geo-alt me-1"></i>@(Model.JobCircular?.Location ?? "Corporate") &bull; Deadline: @Model.JobCircular?.ApplicationDeadline.ToLocalTime().ToString("dd MMM yyyy")
+                    </div>
+
+                    @if (Model.JobCircular?.JobRequirement != null)
+                    {
+                        <div class="d-flex flex-column gap-2 small">
+                            <div class="p-2.5 rounded bg-light border">
+                                <strong class="text-slate-800 d-block">Academic Benchmark:</strong>
+                                <span class="text-muted">@Model.JobCircular.JobRequirement.RequiredQualifications</span>
+                            </div>
+                            <div class="p-2.5 rounded bg-light border">
+                                <strong class="text-slate-800 d-block">Technical Skills Benchmark:</strong>
+                                <span class="text-muted">@(Model.JobCircular.JobRequirement.RequiredSkills ?? "General domain skills")</span>
+                            </div>
+                            <div class="p-2.5 rounded bg-light border">
+                                <strong class="text-slate-800 d-block">Experience Benchmark:</strong>
+                                <span class="text-muted">@(Model.JobCircular.JobRequirement.RequiredExperience ?? "Open to suitable candidates")</span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(Model.JobCircular.JobRequirement.AdditionalRequirements))
+                            {
+                                <div class="p-2.5 rounded bg-light border">
+                                    <strong class="text-slate-800 d-block">Additional Benchmark:</strong>
+                                    <span class="text-muted">@Model.JobCircular.JobRequirement.AdditionalRequirements</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border small text-muted mb-0">
+                            No custom benchmark requirements defined for this circular.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 2. AI Screening & CV Matching Workspace (Centerpiece) -->
+            <div class="cv-screening-card mb-4">
+                <div class="cv-screening-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-cpu text-info fs-5"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-white">AI Screening &amp; CV Matching Intelligence</h6>
+                            <small class="text-slate-400" style="font-size: 0.75rem;">Powered by Gemini Screening Engine</small>
+                        </div>
+                    </div>
+                    <span class="badge bg-info-subtle text-info border border-info-subtle small">Automated Audit</span>
+                </div>
+
+                <div class="card-body p-4 bg-white">
+
+                    <!-- Run / Re-Evaluate Action Bar -->
+                    @if (currentCV != null && Model.JobCircular?.JobRequirement != null)
+                    {
+                        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 p-3 bg-light rounded-3 border mb-4">
+                            <div>
+                                <strong class="text-slate-900 d-block">Automated CV Screening</strong>
+                                <span class="text-muted small">Parse candidate credentials and match against requisition benchmark.</span>
+                            </div>
+
+                            <form asp-controller="HRApplications"
+                                  asp-action="AIMatch"
+                                  asp-route-id="@Model.Id"
+                                  method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-dark btn-sm px-3 shadow-sm">
+                                    <i class="bi bi-robot me-1"></i>@(aiResult == null ? "Run Screening" : "Re-evaluate Candidate")
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning border-0 rounded-3 mb-4 small">
+                            @if (currentCV == null)
+                            {
+                                <span><i class="bi bi-exclamation-triangle me-1"></i>Screening cannot be run because the candidate has not submitted a CV document.</span>
+                            }
+                            else
+                            {
+                                <span><i class="bi bi-exclamation-triangle me-1"></i>Screening cannot be run because requisition benchmark requirements have not been configured.</span>
+                            }
+                        </div>
+                    }
+
+                    <!-- AI Evaluation Results Section -->
+                    @if (aiResult != null)
+                    {
+                        <div class="mb-4">
+                            <!-- Score Gauge & Decision -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <div class="score-display-box h-100 d-flex flex-column justify-content-center">
+                                        <span class="text-muted small fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem;">Screening Match Score</span>
+                                        <div class="score-number @(aiResult.MatchingScore >= 80 ? "high" : aiResult.MatchingScore >= 60 ? "medium" : "low")">
+                                            @aiResult.MatchingScore.ToString("0.##")%
+                                        </div>
+                                        <span class="text-muted small mt-1">Benchmark Alignment</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="score-display-box h-100 d-flex flex-column justify-content-center">
+                                        <span class="text-muted small fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem;">Screening Decision</span>
+                                        <div class="mt-2">
+                                            @if (aiResult.Decision == "SHORTLISTED")
+                                            {
+                                                <span class="status-pill status-pill-success fs-6 px-3 py-2">
+                                                    <span class="status-dot"></span>SHORTLISTED
+                                                </span>
+                                            }
+                                            else if (aiResult.Decision == "MANUAL REVIEW")
+                                            {
+                                                <span class="status-pill status-pill-warning fs-6 px-3 py-2">
+                                                    <span class="status-dot"></span>MANUAL REVIEW
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-pill status-pill-danger fs-6 px-3 py-2">
+                                                    <span class="status-dot"></span>REJECTED
+                                                </span>
+                                            }
+                                        </div>
+                                        <span class="text-muted small mt-2">
+                                            Evaluated: @aiResult.EvaluatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Decision Threshold Guidelines -->
+                            <div class="p-3 bg-light rounded-3 border mb-3 small text-muted">
+                                <strong class="text-slate-800 d-block mb-1" style="font-size: 0.75rem;">Decision Threshold Scale:</strong>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">80% – 100%: Auto-Shortlist</span>
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">60% – 79%: Manual Review</span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">&lt; 60%: Rejected</span>
+                                </div>
+                            </div>
+
+                            <!-- Matched Skills Pills -->
+                            @if (!string.IsNullOrWhiteSpace(aiResult.MatchedSkills))
+                            {
+                                <div class="mb-3">
+                                    <label class="text-muted small fw-semibold text-uppercase d-block mb-2" style="font-size: 0.72rem;">
+                                        <i class="bi bi-tags me-1"></i>Extracted &amp; Matched Skills
+                                    </label>
+                                    <div class="p-3 bg-light rounded-3 border">
+                                        @foreach (var skill in aiResult.MatchedSkills.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+                                        {
+                                            <span class="skill-tag">
+                                                <i class="bi bi-check2"></i>@skill.Trim()
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Extracted CV Evidence & Notes -->
+                            @if (!string.IsNullOrWhiteSpace(aiResult.MatchingDetails))
+                            {
+                                <div class="mb-3">
+                                    <label class="text-muted small fw-semibold text-uppercase d-block mb-2" style="font-size: 0.72rem;">
+                                        <i class="bi bi-card-text me-1"></i>Extracted CV Evidence &amp; Assessment Notes
+                                    </label>
+                                    <div class="evidence-box">
+                                        @aiResult.MatchingDetails
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted border rounded-3 bg-light mb-4">
+                            <i class="bi bi-robot fs-1 text-slate-400 d-block mb-2"></i>
+                            <h6 class="fw-bold text-slate-800 mb-1">Candidate Not Yet Evaluated</h6>
+                            <p class="small text-muted mb-0">Click "Run Screening" above to process candidate CV against position requirements.</p>
+                        </div>
+                    }
+
+                    <!-- Exact Integration Notice Card -->
+                    <div class="alert alert-light border shadow-xs rounded-3 p-3 mb-0">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-info-circle text-primary fs-5 mt-1"></i>
+                            <div>
+                                <strong class="d-block text-slate-900 mb-1">Integration Notice</strong>
+                                <p class="text-slate-700 small mb-1">
+                                    This demonstration version has certain external API integrations disabled for deployment purposes.
+                                </p>
+                                <p class="text-slate-700 small mb-2">
+                                    For access to the full functionality, including payment processing and AI-powered CV matching, please contact me by email.
+                                </p>
+                                <span class="small fw-semibold text-primary">Contact: @contactEmail</span>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
+            </div>
 
-
-                <!-- Matched Skills -->
-                <div class="mt-4">
-
-                    <h6 class="fw-bold">
-                        Matched Skills
-                    </h6>
-
-                    @if (!string.IsNullOrWhiteSpace(
-                        aiResult.MatchedSkills))
-                    {
-                        <div class="border rounded p-3 bg-light">
-                            @aiResult.MatchedSkills
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-muted">
-                            No matched skills were identified.
-                        </div>
-                    }
-
-                </div>
-
-
-                <!-- Matching Details -->
-                <div class="mt-4">
-
-                    <h6 class="fw-bold">
-                        AI Matching Details
-                    </h6>
-
-                    @if (!string.IsNullOrWhiteSpace(
-                        aiResult.MatchingDetails))
-                    {
-                        <div class="border rounded p-3">
-                            @aiResult.MatchingDetails
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-muted">
-                            No additional matching details available.
-                        </div>
-                    }
-
-                </div>
-
-
-                <!-- Threshold Explanation -->
-                <div class="alert alert-light border mt-4 mb-0">
-
-                    <strong>Screening Rules:</strong>
-
-                    <span class="ms-2">
-                        80–100 = Shortlisted
-                    </span>
-
-                    <span class="ms-3">
-                        60–79 = Manual Review
-                    </span>
-
-                    <span class="ms-3">
-                        Below 60 = Rejected
-                    </span>
-
-                </div>
-            }
-
-        </div>
-
-    </div>
-
-
-    <!-- Payment -->
-    <div class="card shadow-sm border-0 mb-5">
-
-        <div class="card-header">
-            <h5 class="mb-0">Payment</h5>
-        </div>
-
-        <div class="card-body">
-
-            @if (Model.Payment != null)
+            <!-- 3. Next Steps / Offer Workflow Card -->
+            @if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobApplicationStatus.Shortlisted)
             {
-                <p>
-                    <strong>Status:</strong>
-                    @Model.Payment.Status
-                </p>
-
-                <p>
-                    <strong>Amount:</strong>
-                    @Model.Payment.Amount
-                </p>
-
-                @if (Model.Payment.PaidAt.HasValue)
-                {
-                    <p class="mb-0">
-                        <strong>Paid At:</strong>
-                        @Model.Payment.PaidAt.Value.ToLocalTime()
-                    </p>
-                }
-            }
-            else
-            {
-                <p class="text-muted mb-0">
-                    No payment required.
-                </p>
+                <div class="card border-0 shadow-sm rounded-3 bg-white p-4">
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                        <div>
+                            <h6 class="fw-bold text-slate-900 mb-1">Candidate Shortlisted for Appointment</h6>
+                            <p class="text-muted small mb-0">Proceed with formal offer letter generation and joining schedule coordination.</p>
+                        </div>
+                        <a asp-controller="Offers" asp-action="Index" class="btn btn-success px-4 shadow-sm text-nowrap">
+                            <i class="bi bi-award me-1"></i>Manage Offer
+                        </a>
+                    </div>
+                </div>
             }
 
         </div>

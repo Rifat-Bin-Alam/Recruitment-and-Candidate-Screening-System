@@ -1,4 +1,4 @@
-﻿using Google.GenAI;
+using Google.GenAI;
 using Google.GenAI.Types;
 
 namespace RecruitmentAndCandidateScreeningSystem.Services;
@@ -12,6 +12,12 @@ public class GeminiService
         _configuration = configuration;
     }
 
+    public bool IsAvailable()
+    {
+        var apiKey = _configuration["Gemini:ApiKey"];
+        return !string.IsNullOrWhiteSpace(apiKey);
+    }
+
     public async Task<string> TestAsync()
     {
         var apiKey = _configuration["Gemini:ApiKey"];
@@ -20,8 +26,7 @@ public class GeminiService
 
         if (string.IsNullOrWhiteSpace(apiKey))
         {
-            throw new InvalidOperationException(
-                "Gemini API key is not configured.");
+            return "Integration Notice: Gemini API integration is disabled in this demonstration deployment.";
         }
 
         var client = new Client(

@@ -1,157 +1,237 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.Models.Offer
+@model RecruitmentAndCandidateScreeningSystem.Models.Offer
 @using RecruitmentAndCandidateScreeningSystem.Models.Enums
 
 @{
-    ViewData["Title"] = "Offer Details";
-
+    ViewData["Title"] = "Offer Letter & Joining Schedule";
     var joiningSchedule = Model.JoiningSchedule;
-    var isPending =
-        Model.Status == OfferStatus.Pending &&
-        Model.CandidateDecision == CandidateDecision.Pending;
-
-    var deadlinePassed =
-        Model.ResponseDeadline.HasValue &&
-        Model.ResponseDeadline.Value < DateTime.UtcNow;
+    var isPending = Model.Status == OfferStatus.Pending && Model.CandidateDecision == CandidateDecision.Pending;
+    var deadlinePassed = Model.ResponseDeadline.HasValue && Model.ResponseDeadline.Value < DateTime.UtcNow;
 }
 
-<div class="container">
+<div class="container py-4">
 
     <!-- Header -->
-    <div class="mb-4">
-        <h2 class="fw-bold">Offer Details</h2>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                    <i class="bi bi-file-earmark-check me-1"></i>Formal Appointment Offer
+                </span>
+                <span class="text-muted small">&bull; Offer #@Model.Id</span>
+            </div>
+            <h2 class="fw-bold text-slate-900 mb-1">Employment Offer Details</h2>
+            <p class="text-muted small mb-0">Review compensation terms, joining date instructions, and record your official response.</p>
+        </div>
 
-        <p class="text-muted mb-0">
-            Review your employment offer and joining schedule.
-        </p>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-arrow-left me-1"></i>Back to Offers
+            </a>
+        </div>
     </div>
 
-
-    <!-- Messages -->
+    <!-- Alert Messages -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">
-            @TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <div>@TempData["Error"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
+    <div class="row g-4">
 
-    <!-- Job Information -->
-    <div class="card shadow-sm border-0 mb-4">
+        <!-- MAIN COLUMN: Letter terms & Schedule -->
+        <div class="col-lg-8">
 
-        <div class="card-header">
-            <h5 class="mb-0">Job Information</h5>
-        </div>
-
-        <div class="card-body">
-
-            <div class="row g-3">
-
-                <div class="col-md-6">
-                    <label class="text-muted">
-                        Job Title
-                    </label>
-
-                    <div class="fw-semibold">
-                        @Model.JobApplication?.JobCircular?.JobTitle
-                    </div>
+            <!-- Position Banner -->
+            <div class="card border-0 shadow-sm p-4 bg-white mb-4 rounded-3">
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                    <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.5px; font-size: 0.72rem;">Position Offered</span>
+                    <span class="badge bg-light border text-slate-700">
+                        Ref: @(Model.JobApplication?.ApplicationReferenceId ?? "N/A")
+                    </span>
                 </div>
-
-                <div class="col-md-6">
-                    <label class="text-muted">
-                        Application Reference
-                    </label>
-
-                    <div class="fw-semibold">
-                        @Model.JobApplication?.ApplicationReferenceId
-                    </div>
+                <h4 class="fw-bold text-slate-900 mb-1">
+                    @(Model.JobApplication?.JobCircular?.JobTitle ?? "Job Position")
+                </h4>
+                <div class="text-muted small">
+                    Department: <strong class="text-slate-800">@(Model.JobApplication?.JobCircular?.Department ?? "General")</strong> &bull; Location: <strong class="text-slate-800">@(Model.JobApplication?.JobCircular?.Location ?? "Corporate")</strong>
                 </div>
-
             </div>
 
-        </div>
+            <!-- Offer Terms Document -->
+            <div class="card border-0 shadow-sm p-4 p-md-5 bg-white mb-4 rounded-3">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <h5 class="fw-bold text-slate-900 mb-0">Offer Terms &amp; Specifications</h5>
+                    <span class="small text-muted">
+                        <i class="bi bi-calendar3 me-1"></i>Issued on @Model.OfferDate.ToLocalTime().ToString("dd MMM yyyy")
+                    </span>
+                </div>
 
-    </div>
-
-
-    <!-- Offer Information -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header">
-            <h5 class="mb-0">Offer Information</h5>
-        </div>
-
-        <div class="card-body">
-
-            <div class="mb-4">
-
-                <label class="text-muted">
-                    Offer Details
-                </label>
-
-                <div class="border rounded p-3 bg-light"
-                     style="white-space: pre-line;">
+                <div class="p-4 bg-light rounded-3 border mb-4 text-slate-800" style="white-space: pre-line; line-height: 1.8; font-size: 0.92rem;">
                     @Model.OfferDetails
                 </div>
 
-            </div>
-
-
-            <div class="row g-3">
-
-                <div class="col-md-4">
-
-                    <label class="text-muted">
-                        Offer Date
-                    </label>
-
-                    <div class="fw-semibold">
-                        @Model.OfferDate.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                <div class="row g-3 small text-muted">
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block text-uppercase fw-semibold" style="font-size: 0.72rem;">Formal Issue Timestamp:</span>
+                        <strong class="text-slate-900">@Model.OfferDate.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</strong>
                     </div>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label class="text-muted">
-                        Response Deadline
-                    </label>
-
-                    <div class="fw-semibold">
-
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block text-uppercase fw-semibold" style="font-size: 0.72rem;">Response Deadline:</span>
                         @if (Model.ResponseDeadline.HasValue)
                         {
-                            <span>
+                            <strong class="@(deadlinePassed ? "text-danger" : "text-slate-900")">
                                 @Model.ResponseDeadline.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
-                            </span>
+                                @(deadlinePassed ? " (Expired)" : "")
+                            </strong>
                         }
                         else
                         {
-                            <span>No deadline specified</span>
+                            <span class="text-muted">No explicit deadline set</span>
                         }
-
                     </div>
+                </div>
+            </div>
 
+            <!-- Joining Schedule -->
+            <div class="card border-0 shadow-sm p-4 bg-white mb-4 rounded-3">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <h5 class="fw-bold text-slate-900 mb-0">Joining Schedule</h5>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">HR Coordinated</span>
                 </div>
 
+                @if (joiningSchedule != null && joiningSchedule.SelectedJoiningDate.HasValue)
+                {
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light border">
+                        <div class="p-3 bg-primary-subtle text-primary rounded-circle flex-shrink-0">
+                            <i class="bi bi-calendar-check fs-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted small d-block text-uppercase fw-semibold" style="font-size: 0.72rem;">Proposed Joining Date by HR</span>
+                            <h5 class="fw-bold text-slate-900 mb-0">
+                                @joiningSchedule.SelectedJoiningDate.Value.ToLocalTime().ToString("dddd, dd MMMM yyyy &bull; hh:mm tt")
+                            </h5>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted small">
+                        Joining schedule details will be coordinated upon offer acceptance.
+                    </div>
+                }
+            </div>
 
-                <div class="col-md-4">
+        </div>
 
-                    <label class="text-muted">
-                        Offer Status
-                    </label>
+        <!-- SIDEBAR: Decision Action Panel -->
+        <div class="col-lg-4">
 
-                    <div class="fw-semibold">
-                        @Model.Status
+            <div class="card border-0 shadow-sm p-4 bg-white sticky-sidebar-lg rounded-3">
+                <h5 class="fw-bold text-slate-900 mb-3">Your Decision</h5>
+
+                @if (Model.CandidateDecision == CandidateDecision.Accepted)
+                {
+                    <div class="alert alert-success border-success-subtle bg-success-subtle p-3 mb-3 rounded-3">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                            <strong class="text-success-emphasis">Offer Accepted</strong>
+                        </div>
+                        <p class="small text-slate-700 mb-0">
+                            You officially accepted this position. The HR recruitment team has been notified and onboarding preparations are in progress.
+                        </p>
                     </div>
 
+                    @if (Model.DecisionDate.HasValue)
+                    {
+                        <div class="small text-muted mb-3">
+                            Recorded on @Model.DecisionDate.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+                    }
+                }
+                else if (Model.CandidateDecision == CandidateDecision.Rejected)
+                {
+                    <div class="alert alert-secondary border p-3 mb-3 rounded-3">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-x-circle text-danger fs-5"></i>
+                            <strong class="text-slate-900">Offer Declined</strong>
+                        </div>
+                        <p class="small text-muted mb-0">
+                            You declined this employment offer.
+                        </p>
+                    </div>
+
+                    @if (Model.DecisionDate.HasValue)
+                    {
+                        <div class="small text-muted mb-3">
+                            Recorded on @Model.DecisionDate.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+                    }
+                }
+                else if (deadlinePassed)
+                {
+                    <div class="alert alert-danger border-danger-subtle bg-danger-subtle p-3 mb-3 rounded-3">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-clock-history text-danger fs-5"></i>
+                            <strong class="text-danger-emphasis">Response Deadline Expired</strong>
+                        </div>
+                        <p class="small text-slate-700 mb-0">
+                            The deadline to respond to this employment offer has expired.
+                        </p>
+                    </div>
+                }
+                else if (isPending)
+                {
+                    <p class="text-muted small mb-3">
+                        Please review the compensation terms, position scope, and joining schedule carefully before recording your decision.
+                    </p>
+
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        <!-- Accept Form -->
+                        <form asp-action="Accept" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit"
+                                    class="btn btn-success w-100 py-2 fw-semibold shadow-sm"
+                                    onclick="return confirm('Confirm acceptance of this formal employment offer?');">
+                                <i class="bi bi-check2-circle me-1"></i>Accept Offer
+                            </button>
+                        </form>
+
+                        <!-- Reject Form -->
+                        <form asp-action="Reject" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit"
+                                    class="btn btn-outline-danger w-100 py-2"
+                                    onclick="return confirm('Are you sure you want to decline this employment offer?');">
+                                <i class="bi bi-x-circle me-1"></i>Decline Offer
+                            </button>
+                        </form>
+                    </div>
+                }
+
+                <div class="pt-3 border-top mt-auto small text-muted">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Current Status:</span>
+                        <span class="fw-semibold text-slate-800">@Model.Status</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Offer Reference:</span>
+                        <span class="fw-semibold text-slate-800">#@Model.Id</span>
+                    </div>
                 </div>
 
             </div>
@@ -159,206 +239,5 @@
         </div>
 
     </div>
-
-
-    <!-- Joining Schedule -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header">
-            <h5 class="mb-0">
-                Joining Schedule
-            </h5>
-        </div>
-
-        <div class="card-body">
-
-            @if (joiningSchedule != null &&
-                 joiningSchedule.SelectedJoiningDate.HasValue)
-            {
-                <div class="row g-3">
-
-                    <div class="col-md-6">
-
-                        <label class="text-muted">
-                            Joining Date Given by HR
-                        </label>
-
-                        <div class="fs-5 fw-bold">
-                            @joiningSchedule.SelectedJoiningDate
-                            .Value
-                            .ToLocalTime()
-                            .ToString("dd MMMM yyyy, hh:mm tt")
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-md-6">
-
-                        <label class="text-muted">
-                            Joining Status
-                        </label>
-
-                        <div>
-
-                            @if (Model.Status == OfferStatus.Accepted)
-                            {
-                                <span class="badge bg-success">
-                                    Confirmed
-                                </span>
-                            }
-                            else if (Model.Status == OfferStatus.Rejected)
-                            {
-                                <span class="badge bg-secondary">
-                                    Not Applicable
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    Awaiting Candidate Decision
-                                </span>
-                            }
-
-                        </div>
-
-                    </div>
-
-                </div>
-            }
-            else
-            {
-                <div class="text-muted">
-                    No joining schedule has been provided.
-                </div>
-            }
-
-        </div>
-
-    </div>
-
-
-    <!-- Candidate Decision -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header">
-            <h5 class="mb-0">
-                Your Decision
-            </h5>
-        </div>
-
-        <div class="card-body">
-
-            @if (Model.CandidateDecision == CandidateDecision.Accepted)
-            {
-                <div class="alert alert-success mb-0">
-
-                    <strong>Offer Accepted</strong>
-
-                    <br />
-
-                    You have accepted this employment offer.
-
-                </div>
-            }
-            else if (Model.CandidateDecision == CandidateDecision.Rejected)
-            {
-                <div class="alert alert-secondary mb-0">
-
-                    <strong>Offer Rejected</strong>
-
-                    <br />
-
-                    You have rejected this employment offer.
-
-                </div>
-            }
-            else if (deadlinePassed)
-            {
-                <div class="alert alert-danger mb-0">
-
-                    <strong>Response Deadline Passed</strong>
-
-                    <br />
-
-                    You can no longer accept or reject this offer.
-
-                </div>
-            }
-            else if (isPending)
-            {
-                <p class="text-muted">
-                    Please review the offer and joining schedule carefully
-                    before making your decision.
-                </p>
-
-                <div class="d-flex gap-2">
-
-                    <!-- Accept -->
-                    <form asp-action="Accept"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="id"
-                               value="@Model.Id" />
-
-                        <button type="submit"
-                                class="btn btn-success"
-                                onclick="return confirm('Are you sure you want to accept this offer?');">
-                            Accept Offer
-                        </button>
-
-                    </form>
-
-
-                    <!-- Reject -->
-                    <form asp-action="Reject"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="id"
-                               value="@Model.Id" />
-
-                        <button type="submit"
-                                class="btn btn-danger"
-                                onclick="return confirm('Are you sure you want to reject this offer?');">
-                            Reject Offer
-                        </button>
-
-                    </form>
-
-                </div>
-            }
-
-        </div>
-
-    </div>
-
-
-    <!-- Decision Date -->
-    @if (Model.DecisionDate.HasValue)
-    {
-        <div class="text-muted mb-4">
-
-            Decision made on:
-            <strong>
-                @Model.DecisionDate
-                .Value
-                .ToLocalTime()
-                .ToString("dd MMM yyyy, hh:mm tt")
-            </strong>
-
-        </div>
-    }
-
-
-    <a asp-action="Index"
-       class="btn btn-outline-secondary">
-        Back to Offers
-    </a>
 
 </div>

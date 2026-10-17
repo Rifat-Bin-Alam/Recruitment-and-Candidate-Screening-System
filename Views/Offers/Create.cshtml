@@ -1,196 +1,138 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.Models.Offer
+@model RecruitmentAndCandidateScreeningSystem.Models.Offer
 
 @{
-    ViewData["Title"] = "Create Offer";
+    ViewData["Title"] = "Generate Employment Offer";
 
-    var application =
-        ViewBag.Application
-        as RecruitmentAndCandidateScreeningSystem.Models.JobApplication;
+    var application = ViewBag.Application as RecruitmentAndCandidateScreeningSystem.Models.JobApplication;
 }
 
-<div class="container">
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
 
-    <div class="mb-4">
-        <h2 class="fw-bold">Create Offer</h2>
+            <!-- Breadcrumb / Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <a asp-action="Index" class="text-decoration-none text-muted small">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Offers Pipeline
+                    </a>
+                    <h2 class="fw-bold text-slate-900 mt-1 mb-1">Create Employment Offer</h2>
+                    <p class="text-muted small mb-0">Prepare formal appointment details, compensation terms, and initial joining schedule.</p>
+                </div>
+            </div>
 
-        <p class="text-muted mb-0">
-            Create an employment offer and provide the joining schedule
-            for the shortlisted candidate.
-        </p>
-    </div>
+            <!-- Validation Summary -->
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
+            <!-- Candidate Profile Context Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-person-check text-success me-2"></i>Target Candidate &amp; Requisition
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Candidate Name</label>
+                            <div class="fw-bold text-slate-900 fs-6">
+                                @application?.CandidateProfile?.FullName
+                            </div>
+                        </div>
 
-    <!-- Validation -->
-    <div asp-validation-summary="All"
-         class="text-danger mb-3">
-    </div>
+                        <div class="col-md-4">
+                            <label class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Target Position</label>
+                            <div class="text-slate-800 fw-medium">
+                                @application?.JobCircular?.JobTitle
+                            </div>
+                        </div>
 
-
-    <!-- Candidate Information -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-header">
-            <h5 class="mb-0">
-                Candidate Information
-            </h5>
-        </div>
-
-        <div class="card-body">
-
-            <div class="row g-3">
-
-                <div class="col-md-4">
-                    <label class="text-muted">
-                        Candidate
-                    </label>
-
-                    <div class="fw-semibold">
-                        @application?.CandidateProfile?.FullName
+                        <div class="col-md-4">
+                            <label class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Application Reference</label>
+                            <div>
+                                <code class="fw-semibold text-slate-800">
+                                    @(application?.ApplicationReferenceId ?? "—")
+                                </code>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-md-4">
-                    <label class="text-muted">
-                        Job
-                    </label>
-
-                    <div class="fw-semibold">
-                        @application?.JobCircular?.JobTitle
-                    </div>
+            <!-- Offer Information Form -->
+            <div class="card border-0 shadow-sm rounded-3 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-file-earmark-text text-primary me-2"></i>Terms of Employment &amp; Schedule
+                    </h6>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="text-muted">
-                        Application Reference
-                    </label>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="applicationId" value="@application?.Id" />
 
-                    <div class="fw-semibold">
-                        @application?.ApplicationReferenceId
-                    </div>
+                        <!-- Offer Details -->
+                        <div class="mb-4">
+                            <label asp-for="OfferDetails" class="form-label fw-semibold text-slate-800">
+                                Formal Offer Details &amp; Terms <span class="text-danger">*</span>
+                            </label>
+                            <textarea asp-for="OfferDetails"
+                                      class="form-control"
+                                      rows="8"
+                                      placeholder="Specify remuneration, role designation, department, benefits package, probationary duration, working hours, and any reporting requirements..."></textarea>
+                            <div class="form-text small text-muted">This full text will be rendered in the candidate's formal offer letter view.</div>
+                            <span asp-validation-for="OfferDetails" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <!-- Response Deadline -->
+                            <div class="col-md-6">
+                                <label asp-for="ResponseDeadline" class="form-label fw-semibold text-slate-800">
+                                    Candidate Response Deadline
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-alarm"></i></span>
+                                    <input asp-for="ResponseDeadline" type="datetime-local" class="form-control" />
+                                </div>
+                                <div class="form-text small text-muted">The offer will expire if not accepted by this timestamp.</div>
+                                <span asp-validation-for="ResponseDeadline" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Proposed Joining Date -->
+                            <div class="col-md-6">
+                                <label for="proposedJoiningDate" class="form-label fw-semibold text-slate-800">
+                                    Proposed Joining Date &amp; Time <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-calendar-check"></i></span>
+                                    <input type="datetime-local"
+                                           id="proposedJoiningDate"
+                                           name="proposedJoiningDate"
+                                           class="form-control"
+                                           required />
+                                </div>
+                                <div class="form-text small text-muted">Target start date that the candidate will confirm upon acceptance.</div>
+                                <span class="text-danger small" data-valmsg-for="proposedJoiningDate"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-3">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                <i class="bi bi-send-check me-1"></i>Issue Offer
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
             </div>
 
         </div>
-
     </div>
-
-
-    <!-- Offer Information -->
-    <div class="card shadow-sm border-0">
-
-        <div class="card-header">
-            <h5 class="mb-0">
-                Offer Information
-            </h5>
-        </div>
-
-        <div class="card-body">
-
-            <form asp-action="Create"
-                  method="post">
-
-                @Html.AntiForgeryToken()
-
-                <input type="hidden"
-                       name="applicationId"
-                       value="@application?.Id" />
-
-
-                <!-- Offer Details -->
-                <div class="mb-4">
-
-                    <label asp-for="OfferDetails"
-                           class="form-label fw-semibold">
-                        Offer Details
-                    </label>
-
-                    <textarea asp-for="OfferDetails"
-                              class="form-control"
-                              rows="7"
-                              placeholder="Enter salary, position, benefits, working hours, joining instructions, and other offer terms..."></textarea>
-
-                    <span asp-validation-for="OfferDetails"
-                          class="text-danger"></span>
-
-                </div>
-
-
-                <!-- Response Deadline -->
-                <div class="mb-4">
-
-                    <label asp-for="ResponseDeadline"
-                           class="form-label fw-semibold">
-                        Response Deadline
-                    </label>
-
-                    <input asp-for="ResponseDeadline"
-                           type="datetime-local"
-                           class="form-control" />
-
-                    <span asp-validation-for="ResponseDeadline"
-                          class="text-danger"></span>
-
-                    <div class="form-text">
-                        Candidate must respond before this deadline.
-                    </div>
-
-                </div>
-
-
-                <!-- Joining Schedule -->
-                <div class="mb-4">
-
-                    <label for="proposedJoiningDate"
-                           class="form-label fw-semibold">
-                        Joining Date
-                    </label>
-
-                    <input type="datetime-local"
-                           id="proposedJoiningDate"
-                           name="proposedJoiningDate"
-                           class="form-control"
-                           required />
-
-                    <div class="form-text">
-                        HR provides the joining date for this candidate.
-                        The candidate will see this date when reviewing
-                        the offer.
-                    </div>
-
-                    <span class="text-danger"
-                          data-valmsg-for="proposedJoiningDate">
-                    </span>
-
-                </div>
-
-
-                <!-- Buttons -->
-                <div class="d-flex gap-2">
-
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Create Offer
-                    </button>
-
-                    <a asp-action="Index"
-                       class="btn btn-outline-secondary">
-                        Cancel
-                    </a>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
 </div>
 
-
 @section Scripts {
-
     <partial name="_ValidationScriptsPartial" />
-
 }

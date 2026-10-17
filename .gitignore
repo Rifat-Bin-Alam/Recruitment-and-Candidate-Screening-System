@@ -1,16 +1,88 @@
+## =====================================================================
+## Visual Studio / IDE Files
+## =====================================================================
 .vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.slnx.docstates
+*.sln.ide
+*.csproj.user
+*.csproj.Backup.tmp
+*.vbproj.user
+*.fsproj.user
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+## =====================================================================
+## Build Output & Artifacts
+## =====================================================================
 bin/
 obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+artifacts/
+TestResults/
+[Tt]emp/
+*.tmp
+*.temp
+*.bak
+*.backup
 
+## =====================================================================
+## Databases (SQLite & EF Core local DBs)
+## =====================================================================
 *.db
 *.db-shm
 *.db-wal
+*.sqlite
+*.sqlite3
 
+## =====================================================================
+## Private Candidate Uploads & Files
+## =====================================================================
 SecureUploads/
+[Uu]ploads/
 
-*.csproj.user
-*.csproj.Backup.tmp
+## =====================================================================
+## Publishing & Deployment Secrets
+## =====================================================================
+*.pubxml.user
+Properties/PublishProfiles/*.pubxml.user
 
+## =====================================================================
+## Sensitive Configurations & Secrets
+## =====================================================================
+.env
+.env.*
+!.env.example
 appsettings.Development.json
+secrets.json
 
+## =====================================================================
+## Stale Nested Project Copies & Scratch Folders
+## =====================================================================
+RecruitmentAndCandidateScreeningSystem/
+scratch/
+
+## =====================================================================
+## Operating System & Logs
+## =====================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
 *.log
+logs/

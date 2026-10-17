@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RecruitmentAndCandidateScreeningSystem.ViewModels.CandidateApplicationViewModel>
+@model IEnumerable<RecruitmentAndCandidateScreeningSystem.ViewModels.CandidateApplicationViewModel>
 
 @{
     ViewData["Title"] = "My Applications";
@@ -6,208 +6,161 @@
 
 <div class="container py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
         <div>
-            <h2 class="fw-bold">My Applications</h2>
-            <p class="text-muted mb-0">
-                Track your applications, payment status, and submitted CV.
-            </p>
+            <div class="d-inline-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                    <i class="bi bi-clock-history me-1"></i>Application Tracker
+                </span>
+                <span class="text-muted small">&bull; Submission Audit Trail</span>
+            </div>
+            <h2 class="fw-bold text-slate-900 mb-1">My Submitted Applications</h2>
+            <p class="text-muted small mb-0">Track application status, payment verification, and review submitted CV versions.</p>
         </div>
 
-        <a asp-controller="CandidateJobs"
-           asp-action="Index"
-           class="btn btn-primary">
-            Browse Jobs
-        </a>
+        <div>
+            <a asp-controller="CandidateJobs"
+               asp-action="Index"
+               class="btn btn-primary btn-sm px-3 shadow-sm d-inline-flex align-items-center gap-1">
+                <i class="bi bi-search"></i>
+                Browse More Jobs
+            </a>
+        </div>
     </div>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-light border">
-            You have not applied for any jobs yet.
+        <div class="card border-0 shadow-sm p-5 text-center bg-white rounded-3">
+            <div class="text-slate-400 mb-3">
+                <i class="bi bi-file-earmark-person fs-1"></i>
+            </div>
+            <h5 class="fw-bold text-slate-800 mb-1">No Applications Submitted Yet</h5>
+            <p class="text-muted small mb-3">You have not submitted an application for any open positions.</p>
+            <div>
+                <a asp-controller="CandidateJobs" asp-action="Index" class="btn btn-primary btn-sm px-3 shadow-sm">
+                    Browse Available Jobs
+                </a>
+            </div>
         </div>
     }
     else
     {
-        <div class="row g-4">
-
+        <div class="d-flex flex-column gap-3">
             @foreach (var application in Model)
             {
-                <div class="col-12">
-
-                    <div class="card border-0 shadow-sm">
-
-                        <div class="card-body">
-
-                            <div class="row g-4">
-
-                                <!-- JOB INFORMATION -->
-                                <div class="col-md-4">
-
-                                    <h5 class="fw-bold mb-1">
-                                        @application.JobTitle
-                                    </h5>
-
-                                    <small class="text-muted d-block mb-3">
-                                        Applied:
-                                        @application.AppliedAt.ToLocalTime()
-                                    </small>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        application.ApplicationReferenceId))
+                <div class="card border-0 shadow-sm bg-white rounded-3">
+                    <div class="card-body p-4">
+                        
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-3 pb-3 border-bottom">
+                            <div>
+                                <h5 class="fw-bold text-slate-900 mb-1">@application.JobTitle</h5>
+                                <div class="d-flex flex-wrap align-items-center gap-2 small text-muted">
+                                    <span>Applied on <strong class="text-slate-800">@application.AppliedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</strong></span>
+                                    @if (!string.IsNullOrWhiteSpace(application.ApplicationReferenceId))
                                     {
-                                        <div class="small">
-                                            <span class="text-muted">
-                                                Application Reference:
-                                            </span>
-
-                                            <div class="fw-semibold">
-                                                @application.ApplicationReferenceId
-                                            </div>
-                                        </div>
+                                        <span>&bull;</span>
+                                        <span>Reference: <code class="text-slate-900 fw-bold">@application.ApplicationReferenceId</code></span>
                                     }
-
                                 </div>
-
-
-                                <!-- APPLICATION STATUS -->
-                                <div class="col-md-2">
-
-                                    <small class="text-muted d-block">
-                                        Application Status
-                                    </small>
-
-                                    <strong>
-                                        @application.ApplicationStatus
-                                    </strong>
-
-                                </div>
-
-
-                                <!-- PAYMENT -->
-                                <div class="col-md-3">
-
-                                    <small class="text-muted d-block mb-1">
-                                        Payment
-                                    </small>
-
-                                    @if (application.PaymentStatus == "Paid")
-                                    {
-                                        <span class="badge bg-success">
-                                            Paid ✓
-                                        </span>
-                                    }
-                                    else if (application.PaymentStatus == "Pending")
-                                    {
-                                        <span class="badge bg-warning text-dark">
-                                            Pending
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">
-                                            Not Required
-                                        </span>
-                                    }
-
-                                    @if (application.PaymentAmount.HasValue)
-                                    {
-                                        <div class="small mt-1">
-                                            Amount:
-                                            @application.PaymentAmount.Value
-                                            .ToString("0.00")
-                                        </div>
-                                    }
-
-                                </div>
-
-
-                                <!-- CV -->
-                                <div class="col-md-3">
-
-                                    <small class="text-muted d-block mb-1">
-                                        CV Submitted
-                                    </small>
-
-                                    @if (!string.IsNullOrWhiteSpace(
-                                        application.CVFileName))
-                                    {
-                                        <div class="small fw-semibold text-truncate"
-                                             title="@application.CVFileName">
-                                            @application.CVFileName
-                                        </div>
-
-                                        <a asp-controller="CandidateJobs"
-                                           asp-action="DownloadCV"
-                                           asp-route-id="@application.CVId"
-                                           class="btn btn-outline-primary btn-sm mt-2">
-                                            View CV
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">
-                                            CV not available
-                                        </span>
-                                    }
-
-                                </div>
-
                             </div>
 
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                <!-- Application Status Badge -->
+                                @if (application.ApplicationStatus == "Shortlisted")
+                                {
+                                    <span class="status-pill status-pill-success">
+                                        <span class="status-dot"></span>Shortlisted
+                                    </span>
+                                }
+                                else if (application.ApplicationStatus == "ManualReview")
+                                {
+                                    <span class="status-pill status-pill-warning">
+                                        <span class="status-dot"></span>Under Manual Review
+                                    </span>
+                                }
+                                else if (application.ApplicationStatus == "Rejected")
+                                {
+                                    <span class="status-pill status-pill-danger">
+                                        <span class="status-dot"></span>Not Shortlisted
+                                    </span>
+                                }
+                                else if (application.ApplicationStatus == "Payment Pending")
+                                {
+                                    <span class="status-pill status-pill-warning">
+                                        <span class="status-dot"></span>Payment Pending
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-pill status-pill-info">
+                                        <span class="status-dot"></span>@application.ApplicationStatus
+                                    </span>
+                                }
 
-                            <!-- ACTIONS -->
-                            <hr class="my-4" />
+                                <!-- Payment Badge -->
+                                @if (application.PaymentStatus == "Paid")
+                                {
+                                    <span class="status-pill status-pill-success">
+                                        <span class="status-dot"></span>Paid &check;
+                                    </span>
+                                }
+                                else if (application.PaymentStatus == "Pending")
+                                {
+                                    <span class="status-pill status-pill-warning">
+                                        <span class="status-dot"></span>Fee Pending
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-pill status-pill-neutral">
+                                        <span class="status-dot"></span>No Fee
+                                    </span>
+                                }
+                            </div>
+                        </div>
 
-                            <div class="d-flex justify-content-between align-items-center">
-
-                                <div>
-
-                                    @if (application.CanPay)
-                                    {
-                                        <span class="text-warning fw-semibold">
-                                            Payment required to complete application.
-                                        </span>
-                                    }
-                                    else if (application.PaymentStatus == "Paid")
-                                    {
-                                        <span class="text-success fw-semibold">
-                                            Application submitted ✓
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">
-                                            Application submitted.
-                                        </span>
-                                    }
-
+                        <div class="row g-3 align-items-center">
+                            <!-- CV Information -->
+                            <div class="col-md-7 col-lg-8">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="p-2 bg-light border rounded text-slate-600 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                                        <i class="bi bi-file-earmark-pdf fs-5"></i>
+                                    </div>
+                                    <div class="small text-truncate">
+                                        <span class="text-muted d-block text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.04em;">Submitted CV Document</span>
+                                        <strong class="text-slate-900">@(application.CVFileName ?? "Archived CV Document")</strong>
+                                    </div>
                                 </div>
-
-
-                                <div>
-
-                                    @if (application.CanPay)
-                                    {
-                                        <a asp-controller="CandidateJobs"
-                                           asp-action="PayNow"
-                                           asp-route-id="@application.Id"
-                                           class="btn btn-warning">
-                                            Pay Now
-                                        </a>
-                                    }
-
-                                </div>
-
                             </div>
 
+                            <!-- Actions -->
+                            <div class="col-md-5 col-lg-4 text-md-end d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
+                                @if (application.CVId > 0)
+                                {
+                                    <a asp-controller="CandidateJobs"
+                                       asp-action="DownloadCV"
+                                       asp-route-id="@application.CVId"
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-download me-1"></i>Download Submitted CV
+                                    </a>
+                                }
+
+                                @if (application.CanPay)
+                                {
+                                    <a asp-controller="CandidateJobs"
+                                       asp-action="PayNow"
+                                       asp-route-id="@application.Id"
+                                       class="btn btn-warning btn-sm fw-semibold shadow-sm">
+                                        Complete Payment &rarr;
+                                    </a>
+                                }
+                            </div>
                         </div>
 
                     </div>
-
                 </div>
             }
-
         </div>
     }
 

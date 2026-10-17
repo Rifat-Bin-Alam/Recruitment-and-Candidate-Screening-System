@@ -1,25 +1,52 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
+@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
 
 @{
     ViewData["Title"] = "Create Job Circular";
 }
 
-<h2 class="mb-4">Create Job Circular</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
 
-<form asp-action="Create" method="post">
+            <!-- Breadcrumb / Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <a asp-action="Index" class="text-decoration-none text-muted small">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Circulars
+                    </a>
+                    <h2 class="fw-bold text-slate-900 mt-1 mb-0">Create Job Circular</h2>
+                    <p class="text-muted small mb-0">Define position parameters and schedule. You will be able to add matching requirements next.</p>
+                </div>
+            </div>
 
-    @Html.AntiForgeryToken()
+            <div class="card border-0 shadow-sm rounded-3 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-file-earmark-plus text-primary me-2"></i>Position Specification
+                    </h6>
+                </div>
 
-    <partial name="_Form" model="Model" />
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
 
-    <button type="submit" class="btn btn-primary">
-        Save Draft
-    </button>
+                        <partial name="_Form" model="Model" />
 
-    <a asp-action="Index" class="btn btn-secondary">
-        Cancel
-    </a>
-</form>
+                        <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-3">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i>Save Draft &amp; Continue
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

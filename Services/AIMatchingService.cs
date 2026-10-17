@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Google.GenAI;
 using RecruitmentAndCandidateScreeningSystem.Models;
 
@@ -11,6 +11,12 @@ public class AIMatchingService
     public AIMatchingService(IConfiguration configuration)
     {
         _configuration = configuration;
+    }
+
+    public bool IsAvailable()
+    {
+        var apiKey = _configuration["Gemini:ApiKey"];
+        return !string.IsNullOrWhiteSpace(apiKey);
     }
 
     public async Task<AIMatchingEvaluation> EvaluateAsync(

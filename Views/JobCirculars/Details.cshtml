@@ -1,104 +1,182 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
+@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
 
 @{
-    ViewData["Title"] = "Job Details";
+    ViewData["Title"] = $"{Model.JobTitle} - Requisition Details";
 }
 
-<h2 class="mb-4">@Model.JobTitle</h2>
+<div class="container py-4">
 
-<div class="card">
-    <div class="card-body">
-
-        <p>
-            <strong>Department:</strong>
-            @Model.Department
-        </p>
-
-        <p>
-            <strong>Location:</strong>
-            @Model.Location
-        </p>
-
-        <p>
-            <strong>Application Fee:</strong>
-            @(Model.ApplicationFee?.ToString("0.00") ?? "Free")
-        </p>
-
-        <p>
-            <strong>Deadline:</strong>
-            @Model.ApplicationDeadline.ToLocalTime()
-        </p>
-
-        <p>
-            <strong>Status:</strong>
-            @Model.Status
-        </p>
-
-        <hr />
-
-        <h5>Description</h5>
-        <p>@Model.JobDescription</p>
-
-        <hr />
-
-        <h5>Job Requirements</h5>
-
-        <form asp-action="SaveRequirements" method="post">
-
-            @Html.AntiForgeryToken()
-
-            <input type="hidden"
-                   name="jobCircularId"
-                   value="@Model.Id" />
-
-            <div class="mb-3">
-                <label class="form-label">Required Qualifications</label>
-                <textarea name="requiredQualifications"
-                          class="form-control"
-                          rows="3">@Model.JobRequirement?.RequiredQualifications</textarea>
+    <!-- Breadcrumb & Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <a asp-action="Index" class="text-decoration-none text-muted small">
+                <i class="bi bi-arrow-left me-1"></i>Back to All Circulars
+            </a>
+            <h2 class="fw-bold text-slate-900 mt-1 mb-1">@Model.JobTitle</h2>
+            <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
+                <span><i class="bi bi-building me-1"></i>@(string.IsNullOrWhiteSpace(Model.Department) ? "General Department" : Model.Department)</span>
+                <span>•</span>
+                <span><i class="bi bi-geo-alt me-1"></i>@(string.IsNullOrWhiteSpace(Model.Location) ? "Not Specified" : Model.Location)</span>
+                <span>•</span>
+                <span><i class="bi bi-cash-stack me-1"></i>@(Model.ApplicationFee.HasValue && Model.ApplicationFee.Value > 0 ? $"Fee: ${Model.ApplicationFee.Value:F2} USD" : "No Application Fee")</span>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label class="form-label">Required Skills</label>
-                <textarea name="requiredSkills"
-                          class="form-control"
-                          rows="3">@Model.JobRequirement?.RequiredSkills</textarea>
-            </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm px-3">
+                <i class="bi bi-pencil me-1"></i>Edit Position
+            </a>
 
-            <div class="mb-3">
-                <label class="form-label">Required Experience</label>
-                <textarea name="requiredExperience"
-                          class="form-control"
-                          rows="3">@Model.JobRequirement?.RequiredExperience</textarea>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Additional Requirements</label>
-                <textarea name="additionalRequirements"
-                          class="form-control"
-                          rows="3">@Model.JobRequirement?.AdditionalRequirements</textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-                Save Requirements
-            </button>
-
-        </form>
-
+            @if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobCircularStatus.Draft)
+            {
+                <form asp-action="Publish" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success btn-sm px-3 shadow-sm">
+                        <i class="bi bi-send me-1"></i>Publish Circular
+                    </button>
+                </form>
+            }
+            else if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobCircularStatus.Published)
+            {
+                <form asp-action="Close" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('Are you sure you want to close this job circular? Candidates will no longer be able to apply.');">
+                        <i class="bi bi-lock me-1"></i>Close Circular
+                    </button>
+                </form>
+            }
+        </div>
     </div>
-</div>
 
-<div class="mt-3">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill fs-5 me-2"></i>
+                <div>@TempData["Success"]</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-    <a asp-action="Edit"
-       asp-route-id="@Model.Id"
-       class="btn btn-warning">
-        Edit Job
-    </a>
+    <div class="row g-4">
+        <!-- Left Column: Position Overview & Description -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="fw-bold mb-0 text-slate-900">
+                        <i class="bi bi-info-circle text-primary me-2"></i>Requisition Parameters
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Publication Status</label>
+                        <div>
+                            @if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobCircularStatus.Published)
+                            {
+                                <span class="status-pill status-pill-success">
+                                    <span class="status-dot"></span>Published
+                                </span>
+                            }
+                            else if (Model.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobCircularStatus.Draft)
+                            {
+                                <span class="status-pill status-pill-neutral">
+                                    <span class="status-dot"></span>Draft
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-pill status-pill-danger">
+                                    <span class="status-dot"></span>Closed
+                                </span>
+                            }
+                        </div>
+                    </div>
 
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Back
-    </a>
+                    <div class="mb-3">
+                        <label class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Application Deadline</label>
+                        <div class="fw-medium text-slate-900">
+                            <i class="bi bi-calendar-event me-1 text-muted"></i>@Model.ApplicationDeadline.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Application Fee</label>
+                        <div class="fw-medium text-slate-900">
+                            @(Model.ApplicationFee.HasValue && Model.ApplicationFee.Value > 0 ? $"${Model.ApplicationFee.Value:F2} USD" : "Free (No fee)")
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div>
+                        <label class="text-muted small fw-semibold text-uppercase mb-2" style="font-size: 0.72rem;">Job Description</label>
+                        <div class="text-slate-800 small" style="white-space: pre-line; line-height: 1.7; font-size: 0.9rem;">
+                            @Model.JobDescription
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Job Screening Requirements Form -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-3 bg-white">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="fw-bold mb-0 text-slate-900">
+                            <i class="bi bi-sliders text-primary me-2"></i>Screening Requirements
+                        </h6>
+                        <small class="text-muted">Criteria utilized during automated candidate profile evaluation and CV matching</small>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="SaveRequirements" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="jobCircularId" value="@Model.Id" />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-slate-800">
+                                Required Academic Qualifications <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="requiredQualifications" class="form-control" rows="3" placeholder="e.g. Bachelor's or Master's degree in Computer Science, Software Engineering, or related technical field...">@Model.JobRequirement?.RequiredQualifications</textarea>
+                            <div class="form-text small text-muted">Minimum academic degree, certification, or credential requirements.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-slate-800">
+                                Required Technical Skills
+                            </label>
+                            <textarea name="requiredSkills" class="form-control" rows="3" placeholder="e.g. C#, ASP.NET Core, Entity Framework Core, SQL, REST APIs, Git, Unit Testing...">@Model.JobRequirement?.RequiredSkills</textarea>
+                            <div class="form-text small text-muted">Core technical, functional, and domain skills required for the role.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-slate-800">
+                                Required Experience
+                            </label>
+                            <textarea name="requiredExperience" class="form-control" rows="3" placeholder="e.g. Minimum 3+ years of professional backend software development experience...">@Model.JobRequirement?.RequiredExperience</textarea>
+                            <div class="form-text small text-muted">Years of experience and background requirements.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-slate-800">
+                                Additional Requirements
+                            </label>
+                            <textarea name="additionalRequirements" class="form-control" rows="3" placeholder="e.g. Strong problem solving, collaborative mindset, experience with cloud hosting...">@Model.JobRequirement?.AdditionalRequirements</textarea>
+                            <div class="form-text small text-muted">Soft skills, work authorization, or specialized criteria.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end pt-3 border-top">
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                <i class="bi bi-save me-1"></i>Save Screening Requirements
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>

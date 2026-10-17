@@ -1,71 +1,167 @@
-﻿@{
-    ViewData["Title"] = "Home";
+@using Microsoft.AspNetCore.Identity
+@using RecruitmentAndCandidateScreeningSystem.Models
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "TalentScreen - Modern Recruitment & Candidate Screening Platform";
 }
 
-<section class="hero-section py-5">
-    <div class="container">
-        <div class="row align-items-center min-vh-75">
+<div class="container py-3 py-lg-4">
+    
+    <!-- 1. COMPACT HERO SECTION -->
+    <div class="landing-hero border-bottom pb-4 pb-lg-5 mb-4 mb-lg-5">
+        <div class="row align-items-center g-4 g-lg-5">
+            
+            <div class="col-lg-7">
+                <!-- Eyebrow Badge -->
+                <div class="d-inline-flex align-items-center gap-2 px-2.5 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle small fw-semibold mb-3">
+                    <span class="badge bg-primary text-white rounded-pill px-2" style="font-size: 0.68rem;">.NET 10 MVC</span>
+                    <span style="font-size: 0.78rem;">Automated Candidate Screening Platform</span>
+                </div>
 
-            <div class="col-lg-7 text-center text-lg-start">
-                <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2">
-                    Smart Recruitment Platform
-                </span>
-
-                <h1 class="display-4 fw-bold mb-3">
-                    Find Your Next
-                    <span class="text-primary">Career Opportunity</span>
+                <!-- Main Heading -->
+                <h1 class="display-6 display-lg-5 fw-bold text-slate-900 tracking-tight lh-tight mb-3">
+                    Intelligent Hiring, Automated Candidate Screening
                 </h1>
 
-                <p class="lead text-muted mb-4">
-                    Discover job opportunities, submit your application,
-                    and let our smart screening system connect your skills
-                    with the right career.
+                <!-- Concise 2-line Description -->
+                <p class="text-slate-600 mb-4" style="line-height: 1.6; font-size: 1rem;">
+                    A modern recruitment system built for structured job requisitions, verified candidate dossiers, automated CV matching, and formal appointment offers.
                 </p>
 
-                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
-                    <a asp-controller="JobCirculars"
-                       asp-action="Index"
-                       class="btn btn-primary btn-lg px-4">
-                        Browse Jobs
-                    </a>
+                <!-- Two Clear Calls to Action (Role-Aware) -->
+                <div class="d-flex flex-wrap align-items-center gap-2.5 mb-4">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        @if (User.IsInRole(RoleNames.Candidate))
+                        {
+                            <a asp-controller="Candidate"
+                               asp-action="Dashboard"
+                               class="btn btn-primary px-4 py-2 shadow-sm">
+                                <i class="bi bi-speedometer2 me-1.5"></i>Candidate Dashboard
+                            </a>
 
-                    <a asp-area="Identity"
-                       asp-page="/Account/Register"
-                       class="btn btn-outline-primary btn-lg px-4">
-                        Register as Candidate
-                    </a>
+                            <a asp-controller="CandidateJobs"
+                               asp-action="Index"
+                               class="btn btn-outline-secondary px-4 py-2">
+                                <i class="bi bi-search me-1.5"></i>Browse Open Jobs
+                            </a>
+                        }
+                        else if (User.IsInRole(RoleNames.HRManager))
+                        {
+                            <a asp-controller="HRDashboard"
+                               asp-action="Index"
+                               class="btn btn-primary px-4 py-2 shadow-sm">
+                                <i class="bi bi-shield-lock me-1.5"></i>HR Command Center
+                            </a>
+
+                            <a asp-controller="HRApplications"
+                               asp-action="Index"
+                               class="btn btn-outline-secondary px-4 py-2">
+                                <i class="bi bi-people me-1.5"></i>Review Applications
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <a asp-controller="CandidateJobs"
+                           asp-action="Index"
+                           class="btn btn-primary px-4 py-2 shadow-sm">
+                            <i class="bi bi-search me-1.5"></i>Explore Open Positions
+                        </a>
+
+                        <a asp-area="Identity"
+                           asp-page="/Account/Login"
+                           class="btn btn-outline-secondary px-4 py-2">
+                            <i class="bi bi-box-arrow-in-right me-1.5"></i>Sign In
+                        </a>
+
+                        <a asp-area="Identity"
+                           asp-page="/Account/Register"
+                           class="btn btn-link text-slate-600 text-decoration-none px-2 d-none d-sm-inline-flex align-items-center">
+                            Register as Candidate <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    }
                 </div>
+
+                <!-- Trust / Capability Micro Badges -->
+                <div class="d-flex flex-wrap align-items-center gap-3 pt-3 border-top text-slate-600 small">
+                    <div class="d-flex align-items-center gap-1.5">
+                        <i class="bi bi-shield-check text-success"></i>
+                        <span>Verified Dossiers</span>
+                    </div>
+                    <span class="text-slate-300 d-none d-sm-inline">&bull;</span>
+                    <div class="d-flex align-items-center gap-1.5">
+                        <i class="bi bi-cpu text-primary"></i>
+                        <span>Automated Screening</span>
+                    </div>
+                    <span class="text-slate-300 d-none d-sm-inline">&bull;</span>
+                    <div class="d-flex align-items-center gap-1.5">
+                        <i class="bi bi-file-earmark-check text-info"></i>
+                        <span>Formal Offer Letters</span>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="col-lg-5 mt-5 mt-lg-0">
-                <div class="hero-card shadow-sm">
-                    <div class="hero-icon">
-                        <span>💼</span>
+            <!-- Visual Micro-Preview Card -->
+            <div class="col-lg-5">
+                <div class="landing-preview-card p-3 p-md-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="rcss-brand-icon" style="width: 26px; height: 26px;">
+                                <i class="bi bi-cpu" style="font-size: 13px;"></i>
+                            </span>
+                            <span class="fw-bold text-slate-900 small">CV Screening Engine</span>
+                        </div>
+                        <span class="status-pill status-pill-success" style="font-size: 0.7rem; padding: 2px 7px;">
+                            <span class="status-dot"></span>Evaluated
+                        </span>
                     </div>
 
-                    <h3 class="fw-bold mt-3">
-                        Your Career Starts Here
-                    </h3>
-
-                    <p class="text-muted">
-                        Apply for suitable positions and manage your
-                        recruitment journey from one place.
-                    </p>
-
-                    <div class="row text-center mt-4">
-                        <div class="col-4">
-                            <h4 class="fw-bold text-primary">01</h4>
-                            <small class="text-muted">Apply</small>
+                    <!-- Simulated Match Card -->
+                    <div class="p-3 rounded-3 bg-light border mb-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold text-slate-900 mb-0">Senior Software Engineer</h6>
+                                <span class="text-slate-500 small" style="font-size: 0.75rem;">Requisition #REQ-2026-04</span>
+                            </div>
+                            <span class="badge bg-success text-white px-2 py-1 fw-bold" style="font-size: 0.8rem;">
+                                92% Match
+                            </span>
                         </div>
 
-                        <div class="col-4">
-                            <h4 class="fw-bold text-primary">02</h4>
-                            <small class="text-muted">Screen</small>
+                        <!-- Matched Skills Chips -->
+                        <div class="d-flex flex-wrap gap-1 mt-2">
+                            <span class="skill-tag" style="font-size: 0.7rem; padding: 2px 6px;">.NET 10</span>
+                            <span class="skill-tag" style="font-size: 0.7rem; padding: 2px 6px;">C# MVC</span>
+                            <span class="skill-tag" style="font-size: 0.7rem; padding: 2px 6px;">Entity Framework</span>
+                            <span class="skill-tag" style="font-size: 0.7rem; padding: 2px 6px;">SQLite</span>
                         </div>
+                    </div>
 
+                    <!-- Pipeline Mini Steps -->
+                    <div class="row g-2 text-center small">
                         <div class="col-4">
-                            <h4 class="fw-bold text-primary">03</h4>
-                            <small class="text-muted">Get Hired</small>
+                            <div class="p-2 rounded border bg-white">
+                                <i class="bi bi-file-earmark-pdf text-danger d-block mb-1"></i>
+                                <span class="fw-semibold text-slate-800 d-block" style="font-size: 0.72rem;">Resume PDF</span>
+                                <span class="text-success" style="font-size: 0.68rem;">Verified</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded border bg-white">
+                                <i class="bi bi-robot text-primary d-block mb-1"></i>
+                                <span class="fw-semibold text-slate-800 d-block" style="font-size: 0.72rem;">Benchmark</span>
+                                <span class="text-success" style="font-size: 0.68rem;">Passed</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded border bg-white">
+                                <i class="bi bi-award text-success d-block mb-1"></i>
+                                <span class="fw-semibold text-slate-800 d-block" style="font-size: 0.72rem;">Decision</span>
+                                <span class="text-primary" style="font-size: 0.68rem;">Shortlisted</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -73,53 +169,132 @@
 
         </div>
     </div>
-</section>
 
-<section class="py-5 bg-light">
-    <div class="container">
-
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">A Smarter Way to Recruit</h2>
-            <p class="text-muted">
-                Everything you need for a simple and efficient recruitment process.
-            </p>
+    <!-- 2. CONCISE FEATURE SECTION (4 CARDS) -->
+    <div class="mb-5">
+        <div class="text-center max-w-xl mx-auto mb-4">
+            <h3 class="fw-bold text-slate-900 tracking-tight mb-2">Core Platform Capabilities</h3>
+            <p class="text-slate-500 small mb-0">Built specifically for reliable recruitment operations and candidate screening workflows.</p>
         </div>
 
-        <div class="row g-4">
-
-            <div class="col-md-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon">📄</div>
-                    <h4 class="fw-bold">Easy Application</h4>
-                    <p class="text-muted mb-0">
-                        Create your profile, upload your CV and apply
-                        for available job opportunities easily.
+        <div class="row g-3 g-lg-4">
+            <!-- Feature 1 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="landing-feature-card">
+                    <div class="icon-box icon-box-primary mb-3">
+                        <i class="bi bi-briefcase fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold text-slate-900 fs-6 mb-2">Smart Requisitions</h5>
+                    <p class="text-slate-600 small mb-0">
+                        Publish positions with customizable qualification benchmarks, technical skills, and application deadlines.
                     </p>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon">🤖</div>
-                    <h4 class="fw-bold">AI-Powered Screening</h4>
-                    <p class="text-muted mb-0">
-                        Applications are intelligently evaluated based
-                        on skills, qualifications and job requirements.
+            <!-- Feature 2 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="landing-feature-card">
+                    <div class="icon-box icon-box-warning mb-3">
+                        <i class="bi bi-robot fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold text-slate-900 fs-6 mb-2">Automated CV Matching</h5>
+                    <p class="text-slate-600 small mb-0">
+                        Evaluates candidate qualifications directly against job requirements with transparent scoring and recommendations.
                     </p>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon">📊</div>
-                    <h4 class="fw-bold">Track Your Application</h4>
-                    <p class="text-muted mb-0">
-                        Keep track of your application status throughout
-                        the recruitment process.
+            <!-- Feature 3 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="landing-feature-card">
+                    <div class="icon-box icon-box-success mb-3">
+                        <i class="bi bi-shield-lock fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold text-slate-900 fs-6 mb-2">Secure Document Vault</h5>
+                    <p class="text-slate-600 small mb-0">
+                        Isolated storage for candidate resumes, verified photo IDs, and signatures with path traversal guards.
                     </p>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="landing-feature-card">
+                    <div class="icon-box icon-box-neutral mb-3">
+                        <i class="bi bi-award fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold text-slate-900 fs-6 mb-2">Offer Coordination</h5>
+                    <p class="text-slate-600 small mb-0">
+                        Generate formal employment offers, set candidate response deadlines, and coordinate joining dates.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. COMPACT HOW IT WORKS SECTION (3 STEPS) -->
+    <div class="card border shadow-sm p-4 p-md-5 bg-white mb-5">
+        <div class="row align-items-center g-4">
+            
+            <div class="col-lg-4">
+                <span class="status-pill status-pill-info mb-2">Hiring Workflow</span>
+                <h4 class="fw-bold text-slate-900 tracking-tight mb-2">How TalentScreen Works</h4>
+                <p class="text-slate-600 small mb-0">
+                    A streamlined three-step workflow ensuring fair, transparent, and structured candidate evaluation from application to appointment.
+                </p>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-light border h-100">
+                            <div class="step-number-badge mb-2">1</div>
+                            <h6 class="fw-bold text-slate-900 mb-1">Create Dossier &amp; Apply</h6>
+                            <p class="text-slate-600 small mb-0">Candidates build a verified profile with education, CV, and credentials once.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-light border h-100">
+                            <div class="step-number-badge mb-2">2</div>
+                            <h6 class="fw-bold text-slate-900 mb-1">Automated Screening</h6>
+                            <p class="text-slate-600 small mb-0">CVs are evaluated against position benchmark requirements and scored.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-light border h-100">
+                            <div class="step-number-badge mb-2">3</div>
+                            <h6 class="fw-bold text-slate-900 mb-1">Review &amp; Formal Offer</h6>
+                            <p class="text-slate-600 small mb-0">HR reviews shortlisted applicants and extends formalized appointment letters.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
-</section>
+
+    <!-- 4. BOTTOM CALL TO ACTION BANNER -->
+    <div class="card border shadow-sm p-4 bg-white text-center text-md-start">
+        <div class="row align-items-center g-3">
+            <div class="col-md-8">
+                <h6 class="fw-bold text-slate-900 mb-1">
+                    <i class="bi bi-briefcase text-primary me-2"></i>Explore Current Career Opportunities
+                </h6>
+                <p class="text-slate-600 small mb-0">
+                    Browse active job circulars or sign in to your dashboard to manage existing applications and offers.
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end d-flex flex-wrap justify-content-center justify-content-md-end gap-2">
+                <a asp-controller="CandidateJobs" asp-action="Index" class="btn btn-primary btn-sm px-3 shadow-sm">
+                    View Open Positions &rarr;
+                </a>
+                <a asp-controller="Home" asp-action="Privacy" class="btn btn-outline-secondary btn-sm px-3">
+                    Security Policy
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>

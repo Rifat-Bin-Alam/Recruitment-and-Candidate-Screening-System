@@ -1,162 +1,253 @@
-﻿@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
+@model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
 
 @{
-    ViewData["Title"] = "Job Details";
+    ViewData["Title"] = Model.JobTitle;
+    var existingApp = ViewBag.ExistingApplication as RecruitmentAndCandidateScreeningSystem.Models.JobApplication;
 }
 
-<div class="container">
+<div class="container py-4">
 
-    <div class="mb-4">
-        <a asp-action="Index"
-           class="btn btn-outline-secondary mb-3">
-            ← Back to Jobs
+    <!-- Breadcrumb & Back -->
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Back to Open Positions
         </a>
-
-        <h2 class="fw-bold">
-            @Model.JobTitle
-        </h2>
-
-        <p class="text-muted">
-            @Model.Department
-        </p>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
+    <!-- Alert Messages -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <div>@TempData["Error"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-            <div class="row mb-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-                <div class="col-md-4">
-                    <strong>Location</strong>
-                    <p class="text-muted">
-                        @(Model.Location ?? "Not specified")
-                    </p>
-                </div>
+    <div class="row g-4">
 
-                <div class="col-md-4">
-                    <strong>Application Fee</strong>
-                    <p class="text-muted">
-                        @(Model.ApplicationFee?.ToString("0.00") ?? "Free")
-                    </p>
-                </div>
+        <!-- MAIN COLUMN: Details & Requirements -->
+        <div class="col-lg-8">
 
-                <div class="col-md-4">
-                    <strong>Application Deadline</strong>
-                    <p class="text-muted">
-                        @Model.ApplicationDeadline.ToLocalTime()
-                    </p>
-                </div>
-
-            </div>
-
-            <hr />
-
-            <h4 class="fw-bold mb-3">
-                Job Description
-            </h4>
-
-            <p>
-                @Model.JobDescription
-            </p>
-
-            <hr />
-
-            <h4 class="fw-bold mb-3">
-                Job Requirements
-            </h4>
-
-            @if (Model.JobRequirement != null)
-            {
-                <div class="mb-3">
-                    <strong>Required Qualifications</strong>
-                    <p class="text-muted">
-                        @Model.JobRequirement.RequiredQualifications
-                    </p>
-                </div>
-
-                <div class="mb-3">
-                    <strong>Required Skills</strong>
-                    <p class="text-muted">
-                        @(Model.JobRequirement.RequiredSkills ?? "Not specified")
-                    </p>
-                </div>
-
-                <div class="mb-3">
-                    <strong>Required Experience</strong>
-                    <p class="text-muted">
-                        @(Model.JobRequirement.RequiredExperience ?? "Not specified")
-                    </p>
-                </div>
-
-                @if (!string.IsNullOrWhiteSpace(
-                    Model.JobRequirement.AdditionalRequirements))
-                {
-                    <div class="mb-3">
-                        <strong>Additional Requirements</strong>
-                        <p class="text-muted">
-                            @Model.JobRequirement.AdditionalRequirements
-                        </p>
+            <div class="card border-0 shadow-sm p-4 p-md-5 bg-white mb-4">
+                
+                <!-- Title & Meta -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        @if (!string.IsNullOrWhiteSpace(Model.Department))
+                        {
+                            <span class="badge bg-light text-slate-700 border">
+                                <i class="bi bi-building me-1"></i>@Model.Department
+                            </span>
+                        }
+                        @if (Model.ApplicationFee.HasValue && Model.ApplicationFee.Value > 0)
+                        {
+                            <span class="badge bg-warning-subtle text-dark border border-warning-subtle">
+                                <i class="bi bi-cash-stack me-1"></i>Application Fee: $@Model.ApplicationFee.Value.ToString("0.00") USD
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                <i class="bi bi-check2-circle me-1"></i>Free Application
+                            </span>
+                        }
                     </div>
-                }
-            }
-            else
-            {
-                <p class="text-muted">
-                    No additional requirements specified.
-                </p>
-            }
 
-            <hr />
-
-            <div class="mt-4">
-
-                <a asp-controller="CandidateProfiles"
-                   asp-action="Index"
-                   class="btn btn-outline-primary me-2">
-                    Check My Profile
-                </a>
-
-                @if (TempData["Error"] != null)
-                {
-                    <div class="alert alert-danger mt-4">
-                        @TempData["Error"]
+                    <h2 class="fw-bold text-slate-900 mb-2">@Model.JobTitle</h2>
+                    
+                    <div class="d-flex flex-wrap gap-3 text-muted small mt-2">
+                        @if (!string.IsNullOrWhiteSpace(Model.Location))
+                        {
+                            <span class="d-flex align-items-center gap-1">
+                                <i class="bi bi-geo-alt text-slate-400"></i>
+                                @Model.Location
+                            </span>
+                        }
+                        <span class="d-flex align-items-center gap-1">
+                            <i class="bi bi-calendar-event text-slate-400"></i>
+                            Application Deadline: <strong class="text-slate-800 ms-1">@Model.ApplicationDeadline.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</strong>
+                        </span>
                     </div>
-                }
+                </div>
 
-                @if (TempData["Success"] != null)
-                {
-                    <div class="alert alert-success mt-4">
-                        @TempData["Success"]
+                <!-- Job Description -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <h5 class="fw-bold text-slate-900 mb-3">Position Description</h5>
+                    <div class="text-slate-800" style="white-space: pre-line; line-height: 1.75; font-size: 0.92rem;">
+                        @Model.JobDescription
                     </div>
-                }
+                </div>
 
-                <div class="mt-4">
+                <!-- Job Requirements Breakdown -->
+                <div>
+                    <h5 class="fw-bold text-slate-900 mb-3">Requirements &amp; Qualifications</h5>
 
-                    <a asp-controller="CandidateProfiles"
-                       asp-action="Index"
-                       class="btn btn-outline-primary me-2">
-                        Check My Profile
-                    </a>
+                    @if (Model.JobRequirement != null)
+                    {
+                        <div class="d-flex flex-column gap-3">
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <i class="bi bi-mortarboard text-primary"></i>
+                                    <h6 class="fw-bold text-slate-900 small text-uppercase tracking-wider mb-0">Required Academic Qualifications</h6>
+                                </div>
+                                <p class="text-slate-700 small mb-0 mt-2">@Model.JobRequirement.RequiredQualifications</p>
+                            </div>
 
-                    <form asp-action="Apply"
-                          asp-route-id="@Model.Id"
-                          method="post"
-                          class="d-inline">
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <i class="bi bi-code-square text-primary"></i>
+                                    <h6 class="fw-bold text-slate-900 small text-uppercase tracking-wider mb-0">Required Technical Skills</h6>
+                                </div>
+                                <p class="text-slate-700 small mb-0 mt-2">@(Model.JobRequirement.RequiredSkills ?? "General aptitude in position domain.")</p>
+                            </div>
 
-                        @Html.AntiForgeryToken()
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <i class="bi bi-briefcase text-primary"></i>
+                                    <h6 class="fw-bold text-slate-900 small text-uppercase tracking-wider mb-0">Professional Experience</h6>
+                                </div>
+                                <p class="text-slate-700 small mb-0 mt-2">@(Model.JobRequirement.RequiredExperience ?? "Open to suitable candidates.")</p>
+                            </div>
 
-                        <button type="submit"
-                                class="btn btn-primary">
-                            Apply for This Job
-                        </button>
-
-                    </form>
-
+                            @if (!string.IsNullOrWhiteSpace(Model.JobRequirement.AdditionalRequirements))
+                            {
+                                <div class="p-3 rounded-3 bg-light border">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <i class="bi bi-info-circle text-primary"></i>
+                                        <h6 class="fw-bold text-slate-900 small text-uppercase tracking-wider mb-0">Additional Requirements</h6>
+                                    </div>
+                                    <p class="text-slate-700 small mb-0 mt-2">@Model.JobRequirement.AdditionalRequirements</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border small text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Standard departmental qualifications apply for this position.
+                        </div>
+                    }
                 </div>
 
             </div>
 
         </div>
+
+        <!-- SIDEBAR: Application Action Box -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm p-4 bg-white sticky-sidebar-lg">
+                <h5 class="fw-bold text-slate-900 mb-3">Application Status</h5>
+
+                @if (existingApp != null)
+                {
+                    <div class="alert alert-success border-success-subtle bg-success-subtle mb-3 p-3 rounded-3">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                            <strong class="text-success-emphasis">Application Submitted</strong>
+                        </div>
+                        <div class="small text-muted mb-2">
+                            Ref: <code class="fw-bold text-slate-900">@existingApp.ApplicationReferenceId</code>
+                        </div>
+                        <div class="small text-muted">
+                            Review Status: 
+                            @if (existingApp.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobApplicationStatus.Shortlisted)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">Shortlisted</span>
+                            }
+                            else if (existingApp.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobApplicationStatus.ManualReview)
+                            {
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Manual Review</span>
+                            }
+                            else if (existingApp.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.JobApplicationStatus.Rejected)
+                            {
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rejected</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">@existingApp.Status</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (existingApp.Payment != null && existingApp.Payment.Status == RecruitmentAndCandidateScreeningSystem.Models.Enums.PaymentStatus.Pending)
+                    {
+                        <div class="p-3 rounded-3 bg-warning-subtle border border-warning-subtle mb-3 small text-warning-emphasis">
+                            <div class="d-flex align-items-center gap-1 mb-1 fw-bold">
+                                <i class="bi bi-clock-history"></i> Payment Pending
+                            </div>
+                            Payment verification is required to finalize application screening.
+                            <div class="mt-2">
+                                <a asp-controller="CandidateJobs" asp-action="PayNow" asp-route-id="@existingApp.Id" class="btn btn-warning btn-sm w-100 fw-semibold">
+                                    Proceed to Payment <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+
+                    <a asp-action="MyApplications" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                        <i class="bi bi-file-earmark-text me-1"></i>View in My Applications
+                    </a>
+                }
+                else
+                {
+                    <div class="p-3 rounded-3 bg-light border mb-3 small text-muted">
+                        <i class="bi bi-shield-check text-primary me-1"></i>
+                        Applying will submit your current profile credentials, uploaded documents, and active CV to the HR recruitment team.
+                    </div>
+
+                    <form asp-action="Apply"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 fw-semibold shadow-sm">
+                            <i class="bi bi-send me-1"></i>Apply for This Position
+                        </button>
+                    </form>
+
+                    <div class="small text-muted text-center mb-2">
+                        Need to update your documents first?
+                    </div>
+
+                    <a asp-controller="CandidateProfiles"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="bi bi-person-gear me-1"></i>Check / Update My Profile
+                    </a>
+                }
+
+                <div class="pt-3 border-top mt-3 small text-muted">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Position ID:</span>
+                        <span class="fw-semibold text-slate-800">#@Model.Id</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Application Fee:</span>
+                        <span class="fw-semibold text-slate-800">
+                            @(Model.ApplicationFee.HasValue && Model.ApplicationFee.Value > 0 ? $"${Model.ApplicationFee.Value:0.00} USD" : "Free")
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Deadline:</span>
+                        <span class="fw-semibold text-slate-800">@Model.ApplicationDeadline.ToLocalTime().ToString("dd MMM yyyy")</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>

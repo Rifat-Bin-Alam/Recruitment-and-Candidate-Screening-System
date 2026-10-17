@@ -1,10 +1,31 @@
 @page
 @model AccessDeniedModel
 @{
-    ViewData["Title"] = "Access denied";
+    ViewData["Title"] = "Access Restricted";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border shadow-sm p-4 p-md-5 text-center bg-white">
+                <div class="rcss-icon-box bg-warning-subtle text-warning-emphasis mx-auto mb-3" style="width: 52px; height: 52px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
+                    </svg>
+                </div>
+                <h3 class="fw-bold text-dark mb-2">Access Restricted</h3>
+                <p class="text-secondary small mb-4">
+                    Your authenticated account does not possess the required permissions to view this resource. This section is restricted by role-based authorization policies.
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">
+                        Return to Homepage
+                    </a>
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-secondary px-3">
+                        Switch Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
