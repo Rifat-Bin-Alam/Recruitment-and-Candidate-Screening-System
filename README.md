@@ -34,7 +34,7 @@ A web-based recruitment platform built with ASP.NET Core MVC, C#, Entity Framewo
 
 ### HR Manager
 - **Email:** `rifat@gmail.com`
-- **Password:** `Hr@123456` (or `Hr@0123456`)
+- **Password:** `Hr@123456` 
 
 ### Candidate
 - **Email:** `rifatcandidate@gmail.com`
