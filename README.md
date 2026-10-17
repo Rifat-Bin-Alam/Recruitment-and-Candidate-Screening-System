@@ -409,7 +409,7 @@ Or run the project from Visual Studio with **F5**.
 The development environment seeds:
 
 ``` text
-Email:    hr@recruitment.local
+Email:    rifat@gmail.com
 Password: Hr@123456
 ```
 
