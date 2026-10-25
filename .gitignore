@@ -36,6 +36,7 @@ x64/
 x86/
 artifacts/
 TestResults/
+coverage/
 [Tt]emp/
 *.tmp
 *.temp
@@ -52,7 +53,7 @@ TestResults/
 *.sqlite3
 
 ## =====================================================================
-## Private Candidate Uploads & Files
+## Private Candidate Uploads & Runtime User Files
 ## =====================================================================
 SecureUploads/
 [Uu]ploads/
@@ -62,6 +63,7 @@ SecureUploads/
 ## =====================================================================
 *.pubxml.user
 Properties/PublishProfiles/*.pubxml.user
+*.PublishSettings
 
 ## =====================================================================
 ## Sensitive Configurations & Secrets
@@ -69,14 +71,26 @@ Properties/PublishProfiles/*.pubxml.user
 .env
 .env.*
 !.env.example
-appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
 secrets.json
 
+# Certificates & Private Keys
+*.pfx
+*.p12
+*.key
+*.pem
+*.cer
+*.crt
+
 ## =====================================================================
-## Stale Nested Project Copies & Scratch Folders
+## Frontend Tooling (if present)
 ## =====================================================================
-RecruitmentAndCandidateScreeningSystem/
-scratch/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
 ## =====================================================================
 ## Operating System & Logs
@@ -86,3 +100,5 @@ Thumbs.db
 desktop.ini
 *.log
 logs/
+scratch/
+test_*.txt

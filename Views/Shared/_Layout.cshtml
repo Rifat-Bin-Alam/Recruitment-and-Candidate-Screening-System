@@ -15,6 +15,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Custom RCSS Favicon -->
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" asp-append-version="true" />
+    <link rel="alternate icon" type="image/x-icon" href="~/favicon.ico" asp-append-version="true" />
+
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet"
@@ -196,20 +200,31 @@
 
 <!-- Footer -->
 <footer class="rcss-footer">
-    <div class="container-fluid px-lg-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-center text-md-start">
-        <div>
-            &copy; 2026 <strong>TalentScreen</strong> &mdash; Developed by <strong>Rifat Bin Alam</strong>. All rights reserved.
+    <div class="container-fluid px-lg-4">
+        <!-- Row 1: Existing footer content -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-center text-md-start py-2">
+            <div>
+                &copy; 2026 <strong>TalentScreen</strong> &mdash; Developed by <strong>Rifat Bin Alam</strong>. All rights reserved.
+            </div>
+            <div class="d-flex align-items-center justify-content-center gap-3 small flex-wrap">
+                <a href="mailto:rifat5566123@gmail.com" class="text-secondary text-decoration-none d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-envelope"></i> rifat5566123@gmail.com
+                </a>
+                <span class="text-secondary d-none d-sm-inline">&bull;</span>
+                <a href="https://github.com/Rifat-Bin-Alam" target="_blank" rel="noopener noreferrer" class="text-secondary text-decoration-none d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-github"></i> GitHub
+                </a>
+                <span class="text-secondary d-none d-sm-inline">&bull;</span>
+                <a asp-controller="Home" asp-action="Privacy" class="text-secondary text-decoration-none">Privacy Policy</a>
+            </div>
         </div>
-        <div class="d-flex align-items-center justify-content-center gap-3 small flex-wrap">
-            <a href="mailto:rifat5566123@gmail.com" class="text-secondary text-decoration-none d-inline-flex align-items-center gap-1">
-                <i class="bi bi-envelope"></i> rifat5566123@gmail.com
-            </a>
-            <span class="text-secondary d-none d-sm-inline">&bull;</span>
-            <a href="https://github.com/Rifat-Bin-Alam" target="_blank" rel="noopener noreferrer" class="text-secondary text-decoration-none d-inline-flex align-items-center gap-1">
-                <i class="bi bi-github"></i> GitHub
-            </a>
-            <span class="text-secondary d-none d-sm-inline">&bull;</span>
-            <a asp-controller="Home" asp-action="Privacy" class="text-secondary text-decoration-none">Privacy Policy</a>
+
+        <!-- Subtle horizontal divider -->
+        <hr class="rcss-footer-divider my-1" />
+
+        <!-- Row 2: Team Mild Bots Credit -->
+        <div class="text-center py-1.5 small rcss-footer-team">
+            <strong>Team Mild Bots</strong> &mdash; Rifat Bin Alam, Farhana Karim Labonno, Tahsin Akter Roza, Farhana Ahamed Shethe
         </div>
     </div>
 </footer>
@@ -220,6 +235,15 @@
 <script src="~/js/site.js" asp-append-version="true"></script>
 
 @await RenderSectionAsync("Scripts", required: false)
+
+<!-- Sticky Go to Top Button -->
+<button type="button"
+        id="rcssBackToTop"
+        class="rcss-back-to-top"
+        aria-label="Back to top"
+        title="Back to top">
+    <i class="bi bi-chevron-up"></i>
+</button>
 
 </body>
 </html>

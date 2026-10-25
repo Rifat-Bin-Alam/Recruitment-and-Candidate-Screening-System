@@ -1,7 +1,6 @@
-﻿using System.Text;
+using System.Text;
 using DocumentFormat.OpenXml.Packaging;
 using UglyToad.PdfPig;
-using NPOI.XWPF.UserModel;
 
 namespace RecruitmentAndCandidateScreeningSystem.Services;
 
@@ -68,15 +67,15 @@ public class CVTextExtractionService
 
             _ =>
                 throw new NotSupportedException(
-                    $"CV format '{extension}' is not supported for AI processing.")
+                    $"CV format '{extension}' is not supported for text screening. Supported formats: .pdf, .docx")
         };
 
         await Task.CompletedTask;
 
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrWhiteSpace(text) || text.Trim().Length < 30)
         {
             throw new InvalidOperationException(
-                "The CV file was found, but no readable text could be extracted.");
+                "The CV file was found, but no readable text could be extracted. Please ensure the uploaded file contains selectable text rather than a scanned image.");
         }
 
         return text;
@@ -87,12 +86,19 @@ public class CVTextExtractionService
     {
         var text = new StringBuilder();
 
-        using var document =
-            PdfDocument.Open(filePath);
-
-        foreach (var page in document.GetPages())
+        try
         {
-            text.AppendLine(page.Text);
+            using var document = PdfDocument.Open(filePath);
+
+            foreach (var page in document.GetPages())
+            {
+                text.AppendLine(page.Text);
+            }
+        }
+        catch (Exception ex) when (ex is not InvalidOperationException)
+        {
+            throw new InvalidOperationException(
+                $"Unable to parse PDF document: {ex.Message}", ex);
         }
 
         return CleanText(text.ToString());
@@ -103,29 +109,37 @@ public class CVTextExtractionService
     {
         var text = new StringBuilder();
 
-        using var stream = new FileStream(
-            filePath,
-            FileMode.Open,
-            FileAccess.Read,
-            FileShare.Read);
-
-        using var document =
-            WordprocessingDocument.Open(
-                stream,
-                false);
-
-        var body =
-            document.MainDocumentPart?
-                .Document
-                .Body;
-
-        if (body != null)
+        try
         {
-            foreach (var paragraph in body.Descendants<
-                         DocumentFormat.OpenXml.Wordprocessing.Text>())
+            using var stream = new FileStream(
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read);
+
+            using var document =
+                WordprocessingDocument.Open(
+                    stream,
+                    false);
+
+            var body =
+                document.MainDocumentPart?
+                    .Document?
+                    .Body;
+
+            if (body != null)
             {
-                text.AppendLine(paragraph.Text);
+                foreach (var paragraph in body.Descendants<
+                             DocumentFormat.OpenXml.Wordprocessing.Text>())
+                {
+                    text.AppendLine(paragraph.Text);
+                }
             }
+        }
+        catch (Exception ex) when (ex is not InvalidOperationException)
+        {
+            throw new InvalidOperationException(
+                $"Unable to parse Word document: {ex.Message}", ex);
         }
 
         return CleanText(text.ToString());

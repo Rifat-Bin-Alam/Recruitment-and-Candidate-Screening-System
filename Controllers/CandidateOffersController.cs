@@ -42,9 +42,10 @@ public class CandidateOffersController : Controller
         var offers = await _context.Offers
             .AsNoTracking()
             .Include(o => o.JobApplication)
-                .ThenInclude(a => a.JobCircular)
+                .ThenInclude(a => a!.JobCircular)
             .Include(o => o.JoiningSchedule)
             .Where(o =>
+                o.JobApplication != null &&
                 o.JobApplication.CandidateProfileId == profile.Id)
             .OrderByDescending(o => o.OfferDate)
             .ToListAsync();
@@ -71,10 +72,11 @@ public class CandidateOffersController : Controller
 
         var offer = await _context.Offers
             .Include(o => o.JobApplication)
-                .ThenInclude(a => a.JobCircular)
+                .ThenInclude(a => a!.JobCircular)
             .Include(o => o.JoiningSchedule)
             .FirstOrDefaultAsync(o =>
                 o.Id == id &&
+                o.JobApplication != null &&
                 o.JobApplication.CandidateProfileId == profile.Id);
 
         if (offer == null)
@@ -107,6 +109,7 @@ public class CandidateOffersController : Controller
             .Include(o => o.JoiningSchedule)
             .FirstOrDefaultAsync(o =>
                 o.Id == id &&
+                o.JobApplication != null &&
                 o.JobApplication.CandidateProfileId == profile.Id);
 
         if (offer == null)
@@ -177,6 +180,7 @@ public class CandidateOffersController : Controller
             .Include(o => o.JobApplication)
             .FirstOrDefaultAsync(o =>
                 o.Id == id &&
+                o.JobApplication != null &&
                 o.JobApplication.CandidateProfileId == profile.Id);
 
         if (offer == null)

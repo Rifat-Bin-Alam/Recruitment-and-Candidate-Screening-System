@@ -62,6 +62,14 @@
     --rcss-shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
 }
 
+/* Accessible Slate Text Utility Tokens (WCAG AA & AAA compliant on light backgrounds) */
+.text-slate-950 { color: var(--rcss-slate-950) !important; }
+.text-slate-900 { color: var(--rcss-slate-900) !important; }
+.text-slate-800 { color: var(--rcss-slate-800) !important; }
+.text-slate-700 { color: var(--rcss-slate-700) !important; }
+.text-slate-600 { color: var(--rcss-slate-600) !important; }
+.text-slate-500 { color: var(--rcss-slate-500) !important; }
+
 /* Base Document Setup */
 html {
     font-size: 15px;
@@ -75,7 +83,13 @@ body {
     margin: 0;
     font-family: var(--rcss-font);
     color: var(--rcss-slate-700);
-    background-color: var(--rcss-slate-50);
+    background-color: #f1f5f9; /* Refined soft blue-tinted cool gray canvas */
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.07) 0px, transparent 48%),
+        radial-gradient(at 100% 0%, rgba(30, 58, 138, 0.05) 0px, transparent 45%),
+        radial-gradient(at 50% 32%, rgba(224, 242, 254, 0.5) 0px, transparent 55%),
+        radial-gradient(at 85% 95%, rgba(226, 232, 240, 0.75) 0px, transparent 50%);
+    background-attachment: fixed;
     line-height: 1.55;
     display: flex;
     flex-direction: column;
@@ -473,7 +487,8 @@ main {
 }
 
 .form-control::placeholder {
-    color: var(--rcss-slate-400);
+    color: #64748b; /* WCAG AA 4.6:1 */
+    opacity: 1;
 }
 
 .form-control:focus,
@@ -507,6 +522,7 @@ main {
     border-radius: var(--rcss-radius-sm);
     letter-spacing: 0.02em;
     white-space: nowrap;
+    user-select: none;
 }
 
 .status-dot {
@@ -588,6 +604,30 @@ main {
     background-color: var(--rcss-slate-100);
     color: var(--rcss-slate-700);
     border: 1px solid var(--rcss-slate-300);
+}
+
+/* Requisition Form Badge & Intentional Metadata Indicator */
+.badge-requisition {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--rcss-radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.badge-requisition:hover {
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+    color: #1e3a8a;
 }
 
 /* Enterprise Data Tables */
@@ -751,14 +791,34 @@ main {
     border: 1px solid var(--rcss-slate-200);
 }
 
-/* Footer */
+/* Footer (Two-Row Enterprise Layout) */
 .rcss-footer {
     background: var(--rcss-white);
     border-top: 1px solid var(--rcss-slate-200);
-    padding: 1.25rem 0;
-    color: var(--rcss-slate-500);
+    padding: 0.85rem 0 0.95rem 0;
+    color: var(--rcss-slate-600);
     font-size: 0.85rem;
     margin-top: auto;
+    position: relative;
+    z-index: 10;
+}
+
+.rcss-footer-divider {
+    border: 0;
+    border-top: 1px solid var(--rcss-slate-200);
+    opacity: 0.85;
+}
+
+.rcss-footer-team {
+    color: var(--rcss-slate-600);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+}
+
+.rcss-footer-team strong {
+    color: var(--rcss-slate-800);
+    font-weight: 600;
 }
 
 /* Utility Helpers */
@@ -872,6 +932,25 @@ main {
     position: relative;
     padding-top: 1.5rem;
     padding-bottom: 2rem;
+}
+
+.landing-hero::before {
+    content: "";
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 820px;
+    max-width: 100%;
+    height: 380px;
+    background: radial-gradient(ellipse at 50% 25%, rgba(37, 99, 235, 0.08) 0%, rgba(99, 102, 241, 0.04) 48%, transparent 72%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.landing-hero > * {
+    position: relative;
+    z-index: 1;
 }
 
 @media (min-width: 992px) {
@@ -1011,7 +1090,7 @@ img {
     }
 }
 
-/* Form Controls & Interactions in Auth Card */
+/* Form Controls & Interactions in Auth Card (Accessible Contrast & Visual Feedback) */
 .auth-card .form-label {
     font-size: 0.82rem;
     font-weight: 600;
@@ -1019,23 +1098,78 @@ img {
     margin-bottom: 0.3rem;
 }
 
+.auth-card .form-label .required-dot {
+    color: var(--rcss-danger-solid);
+    font-weight: 700;
+}
+
 .auth-card .form-control {
-    border: 1px solid var(--rcss-slate-300);
+    border: 1px solid #94a3b8;
+    color: var(--rcss-slate-900);
+    background-color: #ffffff;
+    font-size: 0.92rem;
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.auth-card .form-control:hover {
+    border-color: #64748b;
 }
 
 .auth-card .form-control:focus {
     border-color: var(--rcss-brand);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.auth-card .form-control::placeholder {
+    color: #64748b;
+    opacity: 1;
+}
+
+.auth-card .input-group-text {
+    border: 1px solid #94a3b8;
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.9rem;
+    transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
+}
+
+.auth-card .input-group:focus-within .input-group-text {
+    border-color: var(--rcss-brand);
+    color: var(--rcss-brand);
+    background-color: #eff6ff;
+}
+
+.auth-card .input-group:focus-within .form-control {
+    border-color: var(--rcss-brand);
+}
+
+.auth-card .form-check-input {
+    border: 1.5px solid #94a3b8;
+    cursor: pointer;
+}
+
+.auth-card .form-check-input:checked {
+    background-color: var(--rcss-brand);
+    border-color: var(--rcss-brand);
+}
+
+.auth-card .form-check-label {
+    cursor: pointer;
+    font-weight: 500;
 }
 
 .auth-card .btn-primary {
+    background-color: var(--rcss-brand);
+    border-color: var(--rcss-brand);
+    color: #ffffff;
+    font-weight: 600;
     transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
 }
 
 .auth-card .btn-primary:hover {
     background-color: var(--rcss-brand-hover);
     border-color: var(--rcss-brand-hover);
+    color: #ffffff;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
@@ -1045,8 +1179,34 @@ img {
     box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
 }
 
+.auth-card .btn:disabled,
+.btn-primary:disabled,
+.btn-outline-primary:disabled,
+.btn-outline-success:disabled {
+    background-color: #94a3b8 !important;
+    border-color: #94a3b8 !important;
+    color: #ffffff !important;
+    opacity: 0.9 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
 .auth-card a {
-    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+    color: var(--rcss-brand);
+    transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.auth-card a:hover {
+    color: var(--rcss-brand-hover);
+    text-decoration: underline;
+}
+
+.auth-card a:focus-visible,
+.auth-card button:focus-visible,
+.auth-card input:focus-visible {
+    outline: 2px solid var(--rcss-brand);
+    outline-offset: 2px;
 }
 
 /* Mobile Responsiveness for Auth Card */
@@ -1093,5 +1253,535 @@ img {
     .auth-card a {
         transition: none !important;
         transform: none !important;
+    }
+}
+
+
+/* ==========================================================================
+   GLOBAL UTILITIES, ANIMATION & DEMO CONTROLS
+   ========================================================================== */
+
+@keyframes rcssFadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-enter {
+    animation: rcssFadeSlideIn 0.22s ease-out forwards;
+}
+
+.card-interactive {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--rcss-shadow-md);
+}
+
+/* One-Click Demo Quick Pill Button */
+.btn-demo-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.28rem 0.62rem;
+    border-radius: var(--rcss-radius-sm);
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #93c5fd;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+}
+
+.btn-demo-pill:hover {
+    background-color: #dbeafe;
+    color: #1e3a8a;
+    border-color: #3b82f6;
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-demo-pill:focus-visible {
+    outline: 2px solid var(--rcss-brand);
+    outline-offset: 2px;
+}
+
+.btn-demo-pill:active {
+    transform: translateY(0);
+    background-color: #bfdbfe;
+    box-shadow: none;
+}
+
+/* Secondary Autofill Action Buttons */
+.btn-demo-autofill {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.5rem 0.85rem;
+    border-radius: var(--rcss-radius-sm);
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    cursor: pointer;
+    border-width: 1px;
+}
+
+.btn-demo-autofill.btn-outline-primary {
+    color: #1d4ed8;
+    border-color: #93c5fd;
+    background-color: #ffffff;
+}
+
+.btn-demo-autofill.btn-outline-primary:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.btn-demo-autofill.btn-outline-primary:hover .status-pill-info {
+    background-color: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-demo-autofill.btn-outline-success {
+    color: #15803d;
+    border-color: #86efac;
+    background-color: #ffffff;
+}
+
+.btn-demo-autofill.btn-outline-success:hover {
+    background-color: #16a34a;
+    border-color: #16a34a;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+}
+
+.btn-demo-autofill.btn-outline-success:hover .status-pill-success {
+    background-color: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-demo-autofill:hover {
+    transform: translateY(-1px);
+}
+
+.btn-demo-autofill:active {
+    transform: translateY(0);
+}
+
+.demo-autofill-hint {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 0.74rem;
+    font-weight: 500;
+}
+
+/* Subtle focus indicators for keyboard navigation */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--rcss-brand);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   STICKY GO TO TOP BUTTON & STRUCTURED FORM SECTIONS
+   ========================================================================== */
+
+.rcss-back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: var(--rcss-slate-900);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease, background-color 0.15s ease;
+}
+
+.rcss-back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.rcss-back-to-top:hover {
+    background-color: var(--rcss-brand);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+.rcss-back-to-top:focus-visible {
+    outline: 2px solid var(--rcss-brand);
+    outline-offset: 3px;
+}
+
+@media (max-width: 575.98px) {
+    .rcss-back-to-top {
+        bottom: 18px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rcss-back-to-top {
+        transition: none !important;
+        transform: none !important;
+    }
+    .rcss-back-to-top:hover {
+        transform: none !important;
+    }
+}
+
+/* Structured Form Sections */
+.form-section {
+    background: #ffffff;
+    border: 1px solid var(--rcss-slate-200);
+    border-radius: var(--rcss-radius-md);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--rcss-shadow-xs);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-section:hover {
+    border-color: var(--rcss-slate-300);
+    box-shadow: var(--rcss-shadow-sm);
+}
+
+.form-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.85rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rcss-slate-100);
+}
+
+.form-section-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--rcss-radius-xs);
+    background: var(--rcss-brand-light);
+    color: var(--rcss-brand);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--rcss-brand-border);
+    flex-shrink: 0;
+}
+
+.form-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--rcss-slate-900);
+    margin-bottom: 0;
+}
+
+.form-section-subtitle {
+    font-size: 0.78rem;
+    color: var(--rcss-slate-500);
+    margin-bottom: 0;
+}
+
+/* Accessible Form Validation States */
+.input-validation-error {
+    border-color: var(--rcss-danger-solid) !important;
+}
+
+.input-validation-error:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+.field-validation-error {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--rcss-danger-solid);
+    margin-top: 0.35rem;
+}
+
+.field-validation-error::before {
+    content: "!";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: var(--rcss-danger-solid);
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    line-height: 1;
+    flex-shrink: 0;
+}
+/* ==========================================================================
+   FULL RESPONSIVE DESIGN SUITE (320px to 1440px+)
+   ========================================================================== */
+
+/* 1. Global Viewport Overflow Prevention */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+main {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Text and content containment */
+.text-break-word {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Ensure images, svgs, and embeds scale gracefully */
+img, svg, canvas, audio, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 2. Small Mobile Telephones (320px - 375px) */
+@media (max-width: 375px) {
+    /* Compress container horizontal gutter */
+    .container, .container-fluid {
+        padding-left: 0.65rem !important;
+        padding-right: 0.65rem !important;
+    }
+
+    /* Navbar brand compaction */
+    .rcss-brand {
+        font-size: 1rem !important;
+        gap: 6px !important;
+    }
+
+    .rcss-brand-icon {
+        width: 26px !important;
+        height: 26px !important;
+    }
+
+    .rcss-portal-badge {
+        font-size: 0.58rem !important;
+        padding: 2px 4px !important;
+        letter-spacing: 0.02em !important;
+    }
+
+    /* Headings scaling */
+    h1, .display-6 {
+        font-size: 1.45rem !important;
+    }
+
+    h2, .display-5 {
+        font-size: 1.3rem !important;
+    }
+
+    h3 {
+        font-size: 1.15rem !important;
+    }
+
+    /* Metric / Stat Card compaction */
+    .stat-card {
+        padding: 0.75rem 0.65rem !important;
+    }
+
+    .stat-value {
+        font-size: 1.35rem !important;
+    }
+
+    .stat-label {
+        font-size: 0.65rem !important;
+    }
+
+    /* Status pills in tight spots */
+    .status-pill {
+        font-size: 0.68rem !important;
+        padding: 0.2rem 0.45rem !important;
+    }
+
+    /* Auth card on 320px */
+    .auth-card {
+        padding: 1.15rem 0.85rem !important;
+    }
+
+    .btn-demo-autofill {
+        font-size: 0.72rem !important;
+        padding: 0.4rem 0.5rem !important;
+    }
+
+    .btn-demo-autofill span {
+        font-size: 0.72rem !important;
+    }
+}
+
+/* 3. Standard Mobile Phones (376px - 430px) */
+@media (min-width: 376px) and (max-width: 430px) {
+    .container, .container-fluid {
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
+    }
+
+    .stat-card {
+        padding: 0.85rem 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* 4. Touch Devices & Narrow Viewports (< 768px) */
+@media (max-width: 767.98px) {
+    /* Touch Target Sizing (min 44px for primary interactive elements) */
+    .form-control,
+    .form-select,
+    .input-group-text {
+        font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
+        min-height: 44px;
+    }
+
+    .btn:not(.btn-sm) {
+        min-height: 44px;
+        padding: 0.6rem 1rem;
+    }
+
+    .btn-sm {
+        min-height: 36px;
+        padding: 0.4rem 0.75rem;
+    }
+
+    /* Table containment & touch scrolling */
+    .table-container {
+        border-radius: var(--rcss-radius);
+        margin-left: -0.15rem;
+        margin-right: -0.15rem;
+    }
+
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-saas th,
+    .table-saas td {
+        padding: 0.65rem 0.65rem;
+    }
+
+    /* Action buttons in tables: prevent wrapping or clipping */
+    .table-saas td .d-inline-flex {
+        white-space: nowrap;
+        flex-wrap: nowrap;
+    }
+
+    /* Form section padding */
+    .form-section {
+        padding: 1.15rem 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-section-header {
+        margin-bottom: 1rem;
+    }
+
+    /* Candidate Profile photo & signature previews */
+    .preview-box {
+        max-width: 100% !important;
+    }
+
+    /* Floating Back to Top Button positioning on mobile */
+    .rcss-back-to-top {
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        right: calc(14px + env(safe-area-inset-right, 0px));
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        z-index: 1030;
+    }
+
+    /* Provide comfortable bottom clearance so Back to Top does not cover footer content */
+    .rcss-footer {
+        padding-bottom: 2.75rem !important;
+    }
+
+    /* Modals & Dialogs on small screens */
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+
+    .modal-content {
+        padding: 0.5rem;
+        border-radius: var(--rcss-radius-md);
+    }
+}
+
+/* 5. Tablets (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+    .container {
+        max-width: 100%;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+}
+
+/* 6. Laptops (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439.98px) {
+    .container {
+        max-width: 1200px;
+    }
+}
+
+/* 7. Large Desktop Screens (1440px and above) */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1360px;
+    }
+
+    .container-fluid {
+        padding-left: 2.5rem !important;
+        padding-right: 2.5rem !important;
     }
 }

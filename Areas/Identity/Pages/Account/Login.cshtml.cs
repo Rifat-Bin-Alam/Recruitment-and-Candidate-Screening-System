@@ -44,12 +44,14 @@ public class LoginModel : PageModel
 
     public class InputModel
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Please enter your email address.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        [Display(Name = "Email Address")]
         public string Email { get; set; } = default!;
 
-        [Required]
+        [Required(ErrorMessage = "Please enter your password.")]
         [DataType(DataType.Password)]
+        [Display(Name = "Password")]
         public string Password { get; set; } = default!;
 
         [Display(Name = "Remember me?")]
@@ -112,20 +114,20 @@ public class LoginModel : PageModel
                 var roles =
                     await _userManager.GetRolesAsync(user);
 
+                // HR Manager → HR Portal (HR Dashboard Overview)
+                if (roles.Contains(RoleNames.HRManager))
+                {
+                    return RedirectToAction(
+                        "Index",
+                        "HRDashboard");
+                }
+
                 // Candidate → Candidate Dashboard
                 if (roles.Contains(RoleNames.Candidate))
                 {
                     return RedirectToAction(
                         "Dashboard",
                         "Candidate");
-                }
-
-                // HR Manager → Job Circular Management
-                if (roles.Contains(RoleNames.HRManager))
-                {
-                    return RedirectToAction(
-                        "Index",
-                        "JobCirculars");
                 }
             }
 
@@ -160,7 +162,7 @@ public class LoginModel : PageModel
 
         ModelState.AddModelError(
             string.Empty,
-            "Invalid login attempt.");
+            "Invalid login attempt. Please check your credentials and try again.");
 
         return Page();
     }

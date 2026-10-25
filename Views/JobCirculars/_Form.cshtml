@@ -1,59 +1,142 @@
 @model RecruitmentAndCandidateScreeningSystem.Models.JobCircular
 
-<div class="mb-4">
-    <label asp-for="JobTitle" class="form-label fw-semibold text-slate-800">Job Title <span class="text-danger">*</span></label>
-    <div class="input-group">
-        <span class="input-group-text bg-light text-muted"><i class="bi bi-briefcase"></i></span>
-        <input asp-for="JobTitle" class="form-control" placeholder="e.g. Senior Software Engineer" />
+<!-- Section 1: Position Core Details -->
+<div class="form-section">
+    <div class="form-section-header">
+        <span class="form-section-badge">01</span>
+        <div>
+            <h6 class="form-section-title">Position Core Details</h6>
+            <p class="form-section-subtitle">Basic title, organizational department, and workplace location</p>
+        </div>
     </div>
-    <span asp-validation-for="JobTitle" class="text-danger small"></span>
+
+    <div class="row g-3">
+        <!-- Job Title -->
+        <div class="col-12">
+            <label asp-for="JobTitle" class="form-label fw-semibold text-slate-800">
+                Job Title <span class="required-dot text-danger">*</span>
+            </label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                    <i class="bi bi-briefcase"></i>
+                </span>
+                <input asp-for="JobTitle"
+                       class="form-control border-start-0 ps-1"
+                       placeholder="e.g. Senior Full-Stack Software Engineer"
+                       required />
+            </div>
+            <span asp-validation-for="JobTitle" class="text-danger small mt-1 d-block" role="alert"></span>
+        </div>
+
+        <!-- Department -->
+        <div class="col-md-6">
+            <label asp-for="Department" class="form-label fw-semibold text-slate-800">
+                Department / Team
+            </label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                    <i class="bi bi-building"></i>
+                </span>
+                <input asp-for="Department"
+                       class="form-control border-start-0 ps-1"
+                       placeholder="e.g. Information Technology, Engineering, Human Resources" />
+            </div>
+            <span asp-validation-for="Department" class="text-danger small mt-1 d-block" role="alert"></span>
+        </div>
+
+        <!-- Location -->
+        <div class="col-md-6">
+            <label asp-for="Location" class="form-label fw-semibold text-slate-800">
+                Workplace Location
+            </label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                    <i class="bi bi-geo-alt"></i>
+                </span>
+                <input asp-for="Location"
+                       class="form-control border-start-0 ps-1"
+                       placeholder="e.g. Dhaka (Hybrid), Remote, On-site Corporate Office" />
+            </div>
+            <span asp-validation-for="Location" class="text-danger small mt-1 d-block" role="alert"></span>
+        </div>
+    </div>
 </div>
 
-<div class="mb-4">
-    <label asp-for="JobDescription" class="form-label fw-semibold text-slate-800">Job Description <span class="text-danger">*</span></label>
-    <textarea asp-for="JobDescription" class="form-control" rows="6" placeholder="Provide a comprehensive description of the role, responsibilities, reporting structure, and day-to-day duties..."></textarea>
-    <div class="form-text small text-muted">A clear, well-structured description helps prospective candidates self-select accurately.</div>
-    <span asp-validation-for="JobDescription" class="text-danger small"></span>
+<!-- Section 2: Role Responsibilities & Scope -->
+<div class="form-section">
+    <div class="form-section-header">
+        <span class="form-section-badge">02</span>
+        <div>
+            <h6 class="form-section-title">Job Scope &amp; Responsibilities</h6>
+            <p class="form-section-subtitle">Comprehensive overview of key deliverables, daily tasks, and role expectations</p>
+        </div>
+    </div>
+
+    <div class="mb-0">
+        <label asp-for="JobDescription" class="form-label fw-semibold text-slate-800">
+            Job Description <span class="required-dot text-danger">*</span>
+        </label>
+        <textarea asp-for="JobDescription"
+                  class="form-control"
+                  rows="6"
+                  placeholder="Outline the mission, primary duties, team composition, technology stacks, and growth opportunities for this requisition..."
+                  required></textarea>
+        <div class="form-text text-muted small mt-1">
+            <i class="bi bi-info-circle me-1 text-primary"></i>A well-structured description helps prospective talent self-assess suitability before applying.
+        </div>
+        <span asp-validation-for="JobDescription" class="text-danger small mt-1 d-block" role="alert"></span>
+    </div>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-6">
-        <label asp-for="Department" class="form-label fw-semibold text-slate-800">Department</label>
-        <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="bi bi-building"></i></span>
-            <input asp-for="Department" class="form-control" placeholder="e.g. Engineering, Finance, Operations" />
+<!-- Section 3: Schedule & Terms -->
+<div class="form-section mb-0">
+    <div class="form-section-header">
+        <span class="form-section-badge">03</span>
+        <div>
+            <h6 class="form-section-title">Application Window &amp; Terms</h6>
+            <p class="form-section-subtitle">Candidate application fee structure and scheduled deadline</p>
         </div>
-        <span asp-validation-for="Department" class="text-danger small"></span>
     </div>
 
-    <div class="col-md-6">
-        <label asp-for="Location" class="form-label fw-semibold text-slate-800">Location</label>
-        <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="bi bi-geo-alt"></i></span>
-            <input asp-for="Location" class="form-control" placeholder="e.g. Dhaka (Hybrid), Remote, On-site" />
+    <div class="row g-3">
+        <!-- Application Fee -->
+        <div class="col-md-6">
+            <label asp-for="ApplicationFee" class="form-label fw-semibold text-slate-800">
+                Application Fee (USD)
+            </label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted fw-bold">$</span>
+                <input asp-for="ApplicationFee"
+                       type="number"
+                       step="0.01"
+                       min="0"
+                       class="form-control"
+                       placeholder="0.00" />
+            </div>
+            <div class="form-text text-muted small mt-1">
+                Enter 0.00 or leave blank for complimentary (free) candidate applications.
+            </div>
+            <span asp-validation-for="ApplicationFee" class="text-danger small mt-1 d-block" role="alert"></span>
         </div>
-        <span asp-validation-for="Location" class="text-danger small"></span>
-    </div>
-</div>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-6">
-        <label asp-for="ApplicationFee" class="form-label fw-semibold text-slate-800">Application Fee (USD)</label>
-        <div class="input-group">
-            <span class="input-group-text bg-light text-muted">$</span>
-            <input asp-for="ApplicationFee" type="number" step="0.01" class="form-control" placeholder="0.00" />
+        <!-- Application Deadline -->
+        <div class="col-md-6">
+            <label asp-for="ApplicationDeadline" class="form-label fw-semibold text-slate-800">
+                Application Deadline <span class="required-dot text-danger">*</span>
+            </label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                    <i class="bi bi-calendar-event"></i>
+                </span>
+                <input asp-for="ApplicationDeadline"
+                       type="datetime-local"
+                       class="form-control border-start-0 ps-1"
+                       required />
+            </div>
+            <div class="form-text text-muted small mt-1">
+                Submissions automatically close and lock after this date and time.
+            </div>
+            <span asp-validation-for="ApplicationDeadline" class="text-danger small mt-1 d-block" role="alert"></span>
         </div>
-        <div class="form-text small text-muted">Leave empty or set to 0.00 for free applications.</div>
-        <span asp-validation-for="ApplicationFee" class="text-danger small"></span>
-    </div>
-
-    <div class="col-md-6">
-        <label asp-for="ApplicationDeadline" class="form-label fw-semibold text-slate-800">Application Deadline <span class="text-danger">*</span></label>
-        <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="bi bi-calendar-event"></i></span>
-            <input asp-for="ApplicationDeadline" type="datetime-local" class="form-control" />
-        </div>
-        <div class="form-text small text-muted">Applications will automatically lock after this date &amp; time.</div>
-        <span asp-validation-for="ApplicationDeadline" class="text-danger small"></span>
     </div>
 </div>

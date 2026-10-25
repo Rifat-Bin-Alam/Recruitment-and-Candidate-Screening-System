@@ -162,6 +162,14 @@
             <!-- RIGHT COLUMN: Secure Document Assets (Photo, Signature, CV) -->
             <div class="col-lg-5">
 
+                <!-- Upload Size Policy Notice -->
+                <div class="alert alert-light border shadow-xs rounded-3 p-3 mb-4 small text-muted">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-info-circle text-primary fs-6 flex-shrink-0"></i>
+                        <span>To keep the system responsive within our available server storage and memory limits, uploads are restricted to the sizes shown.</span>
+                    </div>
+                </div>
+
                 <!-- 4. Profile Photo & Signature -->
                 <div class="card border-0 shadow-sm mb-4 rounded-3 bg-white">
                     <div class="card-header bg-white border-bottom py-3">
@@ -170,7 +178,7 @@
                                 <span class="badge bg-light border text-slate-700">04</span>
                                 <h6 class="fw-bold mb-0 text-slate-900">Identity Assets</h6>
                             </div>
-                            <span class="size-limit-badge">Max 500 KB Each</span>
+                            <span class="size-limit-badge">Max 50 KB Each</span>
                         </div>
                     </div>
                     <div class="card-body p-4">
@@ -179,7 +187,7 @@
                         <div class="mb-4 pb-4 border-bottom">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label asp-for="Photo" class="form-label fw-bold mb-0">Candidate Photo</label>
-                                <span class="badge bg-light border text-slate-600" style="font-size: 0.72rem;">500 KB Limit</span>
+                                <span class="badge bg-light border text-slate-600" style="font-size: 0.72rem;">50 KB Limit</span>
                             </div>
 
                             <div class="text-center mb-3">
@@ -197,7 +205,7 @@
                                    id="candidatePhotoInput"
                                    class="form-control form-control-sm"
                                    accept=".jpg,.jpeg,.png" />
-                            <div class="form-text">Accepted: JPG, JPEG or PNG &mdash; maximum 500 KB.</div>
+                            <div class="form-text">Accepted: JPG, JPEG or PNG &mdash; maximum 50 KB.</div>
                             <div id="photoSizeAlert" class="text-danger small mt-1" style="display: none;"></div>
                             <span asp-validation-for="Photo" class="text-danger small"></span>
                         </div>
@@ -206,7 +214,7 @@
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label asp-for="Signature" class="form-label fw-bold mb-0">Official Signature</label>
-                                <span class="badge bg-light border text-slate-600" style="font-size: 0.72rem;">500 KB Limit</span>
+                                <span class="badge bg-light border text-slate-600" style="font-size: 0.72rem;">50 KB Limit</span>
                             </div>
 
                             <div class="text-center mb-3">
@@ -224,7 +232,7 @@
                                    id="candidateSignatureInput"
                                    class="form-control form-control-sm"
                                    accept=".jpg,.jpeg,.png" />
-                            <div class="form-text">Accepted: JPG, JPEG or PNG &mdash; maximum 500 KB.</div>
+                            <div class="form-text">Accepted: JPG, JPEG or PNG &mdash; maximum 50 KB.</div>
                             <div id="signatureSizeAlert" class="text-danger small mt-1" style="display: none;"></div>
                             <span asp-validation-for="Signature" class="text-danger small"></span>
                         </div>
@@ -240,7 +248,7 @@
                                 <span class="badge bg-light border text-slate-700">05</span>
                                 <h6 class="fw-bold mb-0 text-slate-900">Curriculum Vitae (CV)</h6>
                             </div>
-                            <span class="size-limit-badge">Max 4 MB</span>
+                            <span class="size-limit-badge">Max 400 KB</span>
                         </div>
                     </div>
                     <div class="card-body p-4">
@@ -256,7 +264,7 @@
                                id="candidateCVInput"
                                class="form-control"
                                accept=".pdf,.docx" />
-                        <div class="form-text">Accepted: PDF or DOCX &mdash; maximum 4 MB.</div>
+                        <div class="form-text">Accepted: PDF or DOCX &mdash; maximum 400 KB.</div>
                         <div id="cvSizeAlert" class="text-danger small mt-1" style="display: none;"></div>
                         <span asp-validation-for="CV" class="text-danger small"></span>
                     </div>
@@ -286,9 +294,9 @@
     <script>
         (function () {
             // Client-side instant size verification
-            const MAX_PHOTO_BYTES = 500 * 1024;      // 500 KB
-            const MAX_SIGNATURE_BYTES = 500 * 1024;  // 500 KB
-            const MAX_CV_BYTES = 4 * 1024 * 1024;    // 4 MB
+            const MAX_PHOTO_BYTES = 50 * 1024;       // 50 KB
+            const MAX_SIGNATURE_BYTES = 50 * 1024;   // 50 KB
+            const MAX_CV_BYTES = 400 * 1024;       // 400 KB
 
             function checkFileSize(inputEl, alertEl, maxBytes, friendlyName) {
                 if (!inputEl || !alertEl) return;
@@ -309,21 +317,21 @@
                 document.getElementById('candidatePhotoInput'),
                 document.getElementById('photoSizeAlert'),
                 MAX_PHOTO_BYTES,
-                '500 KB'
+                '50 KB'
             );
 
             checkFileSize(
                 document.getElementById('candidateSignatureInput'),
                 document.getElementById('signatureSizeAlert'),
                 MAX_SIGNATURE_BYTES,
-                '500 KB'
+                '50 KB'
             );
 
             checkFileSize(
                 document.getElementById('candidateCVInput'),
                 document.getElementById('cvSizeAlert'),
                 MAX_CV_BYTES,
-                '4 MB'
+                '400 KB'
             );
         })();
     </script>

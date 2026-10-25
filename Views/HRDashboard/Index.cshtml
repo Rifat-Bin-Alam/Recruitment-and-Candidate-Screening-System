@@ -33,7 +33,7 @@
     <!-- KPI Summary Grid -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
-            <div class="stat-card">
+            <div class="stat-card card-interactive">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="stat-label">Total Applications</span>
                     <span class="badge bg-light text-primary rounded-circle p-2"><i class="bi bi-people fs-6"></i></span>
@@ -44,9 +44,9 @@
         </div>
 
         <div class="col-6 col-md-3">
-            <div class="stat-card">
+            <div class="stat-card card-interactive">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="stat-label">AI Evaluated</span>
+                    <span class="stat-label">CV Screened</span>
                     <span class="badge bg-light text-info rounded-circle p-2"><i class="bi bi-cpu fs-6"></i></span>
                 </div>
                 <div class="stat-value text-slate-900">@Model.AIEvaluated</div>
@@ -55,7 +55,7 @@
         </div>
 
         <div class="col-6 col-md-3">
-            <div class="stat-card">
+            <div class="stat-card card-interactive">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="stat-label">Shortlisted</span>
                     <span class="badge bg-success-subtle text-success rounded-circle p-2"><i class="bi bi-check-circle fs-6"></i></span>
@@ -66,7 +66,7 @@
         </div>
 
         <div class="col-6 col-md-3">
-            <div class="stat-card">
+            <div class="stat-card card-interactive">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="stat-label">Manual Review</span>
                     <span class="badge bg-warning-subtle text-warning-emphasis rounded-circle p-2"><i class="bi bi-person-exclamation fs-6"></i></span>
@@ -80,7 +80,7 @@
     <!-- Secondary Row -->
     <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+            <div class="card card-interactive border-0 shadow-sm rounded-3 p-3 bg-white h-100">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Disqualified / Rejected</span>
                     <span class="badge bg-danger-subtle text-danger"><i class="bi bi-x-circle me-1"></i>Rejected</span>
@@ -91,7 +91,7 @@
         </div>
 
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+            <div class="card card-interactive border-0 shadow-sm rounded-3 p-3 bg-white h-100">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Payment Pending</span>
                     <span class="badge bg-warning-subtle text-dark"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
@@ -102,7 +102,7 @@
         </div>
 
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+            <div class="card card-interactive border-0 shadow-sm rounded-3 p-3 bg-white h-100">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem;">Published Circulars</span>
                     <span class="badge bg-primary-subtle text-primary"><i class="bi bi-briefcase me-1"></i>Active</span>
@@ -140,7 +140,7 @@
                     <div class="p-3 border rounded-3 bg-light">
                         <div class="text-muted small text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Stage 2: Intelligence Screen</div>
                         <div class="h3 fw-bold text-slate-900 mb-1">@Model.AIEvaluated</div>
-                        <div class="text-muted small">Evaluated via AI Matching</div>
+                        <div class="text-muted small">Evaluated via Screening Engine</div>
                     </div>
                 </div>
 
@@ -181,7 +181,7 @@
                                 <th>Applied Date</th>
                                 <th>Review Status</th>
                                 <th>Match Score</th>
-                                <th>AI Decision</th>
+                                <th>Screening Decision</th>
                                 <th class="text-end pe-3">Action</th>
                             </tr>
                         </thead>
@@ -289,7 +289,7 @@
     <!-- Quick Management Hub -->
     <div class="row g-3">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+            <div class="card card-interactive border-0 shadow-sm rounded-3 p-3 bg-white h-100">
                 <div class="d-flex gap-3 align-items-center">
                     <div class="rounded-circle bg-primary-subtle text-primary p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                         <i class="bi bi-briefcase fs-5"></i>
@@ -306,7 +306,7 @@
         </div>
 
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+            <div class="card card-interactive border-0 shadow-sm rounded-3 p-3 bg-white h-100">
                 <div class="d-flex gap-3 align-items-center">
                     <div class="rounded-circle bg-success-subtle text-success p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                         <i class="bi bi-award fs-5"></i>
@@ -323,7 +323,7 @@
         </div>
 
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+            <div class="card card-interactive border-0 shadow-sm rounded-3 p-3 bg-white h-100">
                 <div class="d-flex gap-3 align-items-center">
                     <div class="rounded-circle bg-info-subtle text-info p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                         <i class="bi bi-file-earmark-bar-graph fs-5"></i>

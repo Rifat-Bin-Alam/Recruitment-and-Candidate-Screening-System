@@ -1,0 +1,755 @@
+================================================================================
+RECRUITMENT AND CANDIDATE SCREENING SYSTEM (RCSS)
+UI/UX REDESIGN AND DETERMINISTIC RULE-BASED CV MATCHING IMPLEMENTATION PLAN
+================================================================================
+Target Architecture: ASP.NET Core 10.0 MVC + Entity Framework Core 10 (SQLite)
+Frontend Stack: Razor Views (.cshtml), Bootstrap 5.3, Bootstrap Icons, CSS3, ES6 JS
+Document Storage: Local SecureUploads/ (Private, authorization-guarded)
+Target Audience: HR Managers & Candidates (Commercial SaaS / Recruitment Portal)
+Author: Senior Full-Stack Architect & UI/UX Designer
+Status: APPROVED IMPLEMENTATION SPECIFICATION
+================================================================================
+
+--------------------------------------------------------------------------------
+1. PROJECT OVERVIEW AND EXISTING ARCHITECTURE
+--------------------------------------------------------------------------------
+1.1 Framework & Runtime:
+    - Framework: ASP.NET Core MVC on .NET 10.0 (net10.0 target framework).
+    - Language: C# 13 / C# nullable reference types enabled.
+    - Runtime Host: Kestrel + IIS reverse proxy compatibility (MonsterASP.NET ready).
+    - Configuration: appsettings.json, launchSettings.json, environment variables.
+
+1.2 Persistence & Database:
+    - ORM: Entity Framework Core 10.0.11 with SQLite provider (Microsoft.EntityFrameworkCore.Sqlite).
+    - Connection String: "Data Source=RecruitmentAndCandidateScreeningSystem.db" resolved dynamically to ContentRootPath.
+    - Auto-Migration & Seeding: Applied during Program.cs application bootstrap via dbContext.Database.MigrateAsync() and IdentitySeeder.SeedRolesAsync().
+
+1.3 Authentication & Authorization:
+    - Framework: ASP.NET Core Identity with ApplicationUser : IdentityUser and IdentityRole.
+    - Role Names: "HRManager" and "Candidate" (defined in Models/RoleNames.cs).
+    - Authentication UI: Scaffolding in Areas/Identity/Pages/Account/ (Login, Register, Logout, etc.).
+    - Demo Accounts (Seeded automatically in Data/IdentitySeeder.cs):
+        * HR Manager: rifat@gmail.com / Hr@123456
+        * Candidate:  rifatcandidate@gmail.com / Cd@1234
+
+1.4 Frontend Architecture:
+    - View Engine: Server-rendered ASP.NET Core Razor Views (.cshtml).
+    - CSS Framework: Bootstrap 5.3.x located in wwwroot/lib/bootstrap/dist/.
+    - Icons: Bootstrap Icons 1.11.3 loaded via CDN in Views/Shared/_Layout.cshtml.
+    - Typography: "Plus Jakarta Sans" imported from Google Fonts.
+    - Styling: Centralized wwwroot/css/site.css (1,098 lines of existing CSS variables and custom classes).
+    - Client Scripting: Vanilla ES6 in wwwroot/js/site.js alongside jQuery 3.x for unobtrusive validation.
+
+1.5 Document & Upload Architecture:
+    - Upload Roots: ContentRootPath/SecureUploads/{Photos, Signatures, CVs}.
+    - Storage Policy: Completely outside wwwroot; files are inaccessible via public URLs.
+    - Serving Mechanism: Controller endpoints (CandidateProfilesController.Photo, Signature; HRApplicationsController.CandidateFile; CandidateJobsController.DownloadCV) with strict Path.GetFullPath traversal validation.
+
+--------------------------------------------------------------------------------
+2. CURRENT IMPLEMENTATION FINDINGS
+--------------------------------------------------------------------------------
+2.1 Confirmed Route & Controller Mapping:
+    - HomeController:
+        * GET / -> If authenticated as HRManager, redirects to /HRDashboard; if Candidate, redirects to /Candidate/Dashboard; if anonymous, displays public landing page (Views/Home/Index.cshtml).
+        * GET /Home/Privacy -> Displays privacy policy.
+    - Identity UI:
+        * GET & POST /Identity/Account/Login -> Login page with static credential text boxes.
+        * GET & POST /Identity/Account/Register -> Candidate registration page.
+    - Candidate Portal:
+        * GET /Candidate/Dashboard -> Renders Views/Candidate/Dashboard.cshtml via CandidateDashboardViewModel.
+        * GET /CandidateJobs (Index) -> Lists published jobs with search/sort (Views/Candidate/Jobs.cshtml).
+        * GET /CandidateJobs/Details/{id} -> Position description and requirements (Views/Candidate/JobDetails.cshtml).
+        * POST /CandidateJobs/Apply/{id} -> Creates JobApplication record, initiates payment if required.
+        * GET /CandidateJobs/MyApplications -> Application tracker (Views/Candidate/MyApplications.cshtml).
+        * GET /CandidateJobs/DownloadCV/{id} -> Downloads exact CV version submitted with application.
+        * GET & POST /CandidateProfiles (Index) -> Dossier editor (Views/CandidateProfiles/Index.cshtml).
+        * GET /CandidateOffers (Index) -> List of received job offers (Views/CandidateOffers/Index.cshtml).
+        * GET /CandidateOffers/Details/{id} -> Offer review and acceptance (Views/CandidateOffers/Details.cshtml).
+        * POST /CandidateOffers/Accept/{id} & Reject/{id} -> Final candidate decision actions.
+    - HR Portal:
+        * GET /HRDashboard (Index) -> Executive dashboard metrics and funnel (Views/HRDashboard/Index.cshtml).
+        * GET /HRApplications (Index) -> Filterable application pipeline (Views/HRApplications/Index.cshtml).
+        * GET /HRApplications/Details/{id} -> Comprehensive candidate screening dossier (Views/HRApplications/Details.cshtml).
+        * POST /HRApplications/AIMatch/{id} -> Triggers CV extraction and screening evaluation.
+        * GET /JobCirculars (Index, Create, Details, Edit) -> Requisition management.
+        * POST /JobCirculars/SaveRequirements -> Saves qualifications, skills, and experience criteria.
+        * GET /Offers (Index, Create, Details) -> Offer generation and joining schedule issuance.
+        * GET /HRReports (Index) -> Aggregate pipeline analytics report with print view.
+
+2.2 Current CV Screening & AI Implementation:
+    - Document Parser: Services/CVTextExtractionService.cs extracts text from .pdf (via UglyToad.PdfPig) and .docx (via DocumentFormat.OpenXml).
+    - AI Evaluator: Services/AIMatchingService.cs constructs a prompt sent to Google Gemini (gemini-3.7-flash) via Google.GenAI SDK.
+    - Flaws of Current Screening:
+        * Requires an active, paid Google Gemini API key; without it, screening throws an exception or shows an integration notice.
+        * Non-deterministic: LLM responses can vary for identical inputs and can fail on unexpected JSON formatting.
+        * Privacy / Compliance risk: Transmits raw candidate CV text to an external cloud API.
+        * Latency: Network roundtrips of 3-8 seconds per candidate.
+    - Database Storage: AIMatchingResult table stores MatchingScore (decimal 5,2), Decision ("SHORTLISTED", "MANUAL REVIEW", "REJECTED"), MatchedSkills (text), and MatchingDetails (text).
+    - Thresholds: Score >= 80% -> Shortlisted; 60% <= Score < 80% -> Manual Review; Score < 60% -> Rejected.
+
+2.3 Redundant Files & Minor Build Issues:
+    - Views/Index.cshtml in the root Views folder is an orphaned duplicate of Views/JobCirculars/Index.cshtml.
+    - Nullable warning CS8602 in Services/CVTextExtractionService.cs at line 119: document.MainDocumentPart?.Document.Body (needs null-conditional ?. operator).
+
+--------------------------------------------------------------------------------
+3. TARGET VISUAL DESIGN AND DESIGN TOKENS
+--------------------------------------------------------------------------------
+3.1 Brand Identity:
+    - Platform Name: "TalentScreen"
+    - Character: Enterprise Recruitment & Talent Screening System. Dignified, high-trust, engineered, crisp.
+    - Avoid: Gimmicky AI gradients, purple/neon glow, floating 3D elements, cartoon emojis, and bloated decorative sections.
+
+3.2 Color System (Design Tokens in CSS):
+    - Base Surface:
+        * --rcss-bg-app:        #f8fafc (Slate 50 - clean, calm neutral background)
+        * --rcss-bg-surface:    #ffffff (Pure white cards and containers)
+        * --rcss-bg-subtle:     #f1f5f9 (Slate 100 - input groups, secondary table headers)
+        * --rcss-bg-muted:      #e2e8f0 (Slate 200 - divider lines, disabled fills)
+    - Typography & Contrast:
+        * --rcss-text-primary:  #0f172a (Slate 900 - high contrast, dark graphite headings)
+        * --rcss-text-body:     #334155 (Slate 700 - readable body text, WCAG AAA compliant)
+        * --rcss-text-muted:    #64748b (Slate 500 - meta captions, timestamps, secondary labels)
+        * --rcss-text-subtle:   #94a3b8 (Slate 400 - placeholders, icons)
+    - Borders & Outlines:
+        * --rcss-border-light:  #e2e8f0 (Slate 200 - structural card and divider borders)
+        * --rcss-border-focus:  #2563eb (Blue 600 - focused interactive elements)
+    - Primary Brand & Interactive Accent:
+        * --rcss-accent-navy:   #0f172a (Deep navy for brand icons, navbar, and primary badges)
+        * --rcss-accent-blue:   #2563eb (Royal Blue 600 - primary buttons, active links, key highlights)
+        * --rcss-accent-hover:  #1d4ed8 (Blue 700 - button hover state)
+        * --rcss-accent-light:  #eff6ff (Blue 50 - pill badges, active nav backgrounds)
+    - Semantic Status System (Solid & Subtle):
+        * Shortlisted / Success: Text #15803d | Background #f0fdf4 | Border #bbf7d0 | Dot #16a34a
+        * Manual Review / Warning: Text #b45309 | Background #fffbeb | Border #fde68a | Dot #d97706
+        * Rejected / Danger:     Text #b91c1c | Background #fef2f2 | Border #fecaca | Dot #dc2626
+        * Neutral / Info:        Text #0369a1 | Background #f0f9ff | Border #bae6fd | Dot #0284c7
+
+3.3 Typography Hierarchy:
+    - Font Family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif.
+    - Headings:
+        * Display / Hero: 2.25rem (36px), font-weight 800, line-height 1.2, letter-spacing -0.025em.
+        * H1 / Page Titles: 1.75rem (28px), font-weight 700, letter-spacing -0.02em.
+        * H2 / Section Titles: 1.35rem (21.6px), font-weight 700, letter-spacing -0.015em.
+        * H3 / Card Titles: 1.1rem (17.6px), font-weight 600, letter-spacing -0.01em.
+    - Body Text:
+        * Regular: 0.9375rem (15px), line-height 1.55.
+        * Small / Meta: 0.8125rem (13px), line-height 1.45.
+        * Micro / Badge: 0.725rem (11.6px), font-weight 600, text-transform uppercase, tracking 0.04em.
+
+3.4 Elevation, Corners & Layout Spacing:
+    - Radius: xs: 4px, sm: 6px, md: 8px, lg: 12px (strictly avoiding oversized pill cards).
+    - Shadows:
+        * shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05)
+        * shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04)
+        * shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04)
+        * Hover Lift: 0 6px 12px -2px rgba(15, 23, 42, 0.1) with translateY(-2px)
+    - Grid & Container: Max container width 1280px with 24px responsive horizontal gutters.
+
+--------------------------------------------------------------------------------
+4. HOMEPAGE REDESIGN (Views/Home/Index.cshtml)
+--------------------------------------------------------------------------------
+4.1 Structure & Visual Strategy:
+    - Clean, authoritative public presentation for corporate HR leaders and prospective candidates.
+    - Remove distracting elements and replace with a structured, high-value corporate presentation.
+
+4.2 Section 1: Hero & Strategic Value Proposition:
+    - Eyebrow: Crisp badge "[.NET 10 Enterprise MVC] Verified Talent Screening System".
+    - Headline: "Structured Recruitment, Objective Screening & Verified Hiring"
+    - Subtitle: "TalentScreen automates qualification benchmarking, deterministic CV scoring, and candidate workflow from application to appointment offer."
+    - Dynamic Role-Aware Actions:
+        * If Anonymous:
+            - Primary Button: "Explore Open Requisitions" (link to /CandidateJobs).
+            - Secondary Button: "Portal Sign In" (link to /Identity/Account/Login).
+            - Tertiary Action: "Candidate Registration" link.
+        * If HR Manager:
+            - Primary Button: "Open HR Command Center" (link to /HRDashboard).
+            - Secondary Button: "Review Candidate Pipeline" (link to /HRApplications).
+        * If Candidate:
+            - Primary Button: "View Candidate Dashboard" (link to /Candidate/Dashboard).
+            - Secondary Button: "Explore Vacancies" (link to /CandidateJobs).
+    - Hero Visual Sidecar (Right Column):
+        * A live mock evaluation card illustrating the deterministic screening engine.
+        * Displays: Position Title ("Senior Software Engineer"), Overall Benchmark Score ("88% Shortlisted"), Breakdown chips (Qualifications: 25/25, Skills: 38/45, Experience: 15/20, Preferred: 10/10), and Matched Skills tags (C#, ASP.NET Core, EF Core, SQLite, REST API).
+
+4.3 Section 2: Platform Architecture & Workflow (3 Steps):
+    - Step 1: "Verified Candidate Dossier"
+        * Description: Candidates maintain academic credentials, employment record, ID photo, signature, and encrypted CV documents in a unified vault.
+    - Step 2: "Deterministic Rule-Based Screening"
+        * Description: Resumes are extracted and benchmarked against required qualifications, technical skill sets, and verified years of experience with zero external API dependencies.
+    - Step 3: "Formal Appointment & Joining Coordination"
+        * Description: Shortlisted candidates receive formal offer letters with deadline tracking, proposed joining schedules, and candidate acceptance workflows.
+
+4.4 Section 3: Core Enterprise Capabilities (4 Focused Cards):
+    - Card 1 (Icon: bi-briefcase): "Requisition Management" — Draft, configure qualification weights, set application deadlines, and publish vacancies.
+    - Card 2 (Icon: bi-cpu): "Explainable CV Scoring" — Fully transparent scoring algorithms with transparent point breakdowns and missing-skill alerts.
+    - Card 3 (Icon: bi-shield-check): "Protected Document Vault" — Private candidate storage outside web root with authorization checks and path traversal protection.
+    - Card 4 (Icon: bi-award): "Offer & Joining Lifecycle" — Formal offer generation, response deadlines, and candidate acceptance audit trails.
+
+4.5 Section 4: Public Vacancies CTA & Security Assurance:
+    - Direct CTA link to browse open circulars.
+    - Trust indicators: "Role-Based Access Control", "Data Privacy Compliant", "Zero External Data Transmission".
+
+--------------------------------------------------------------------------------
+5. HR DASHBOARD REDESIGN (Views/HRDashboard/Index.cshtml)
+--------------------------------------------------------------------------------
+5.1 Executive Summary Header:
+    - Title: "HR Executive Command Center"
+    - Subtitle: "Live applicant tracking, deterministic screening pipeline, and requisition metrics."
+    - Quick Actions:
+        * Button 1 (Primary): "Post New Job Circular" (link to /JobCirculars/Create).
+        * Button 2 (Secondary): "Recruitment Analytics Report" (link to /HRReports).
+        * Button 3 (Outline): "View All Circulars" (link to /JobCirculars).
+
+5.2 Metric KPI Grid (6 Cohesive Cards):
+    - Card 1: Total Applications (Icon: bi-people, Color: Slate)
+    - Card 2: Deterministic Screened (Icon: bi-cpu, Color: Blue)
+    - Card 3: Shortlisted Candidates (Icon: bi-check2-circle, Color: Green)
+    - Card 4: Manual Review Needed (Icon: bi-exclamation-circle, Color: Amber)
+    - Card 5: Disqualified / Rejected (Icon: bi-x-circle, Color: Red)
+    - Card 6: Active Published Circulars (Icon: bi-briefcase, Color: Indigo)
+
+5.3 Visual Screening Funnel Progress:
+    - 3-Stage Progress Tracker:
+        * Stage 1: Applications Received (@Model.TotalApplications)
+        * Stage 2: Evaluated by Screening Engine (@Model.AIEvaluated)
+        * Stage 3: Shortlisted for Offer / Interview (@Model.Shortlisted)
+    - Visual bar indicating conversion percentage with clean percentage badges.
+
+5.4 Recent Candidate Pipeline Table:
+    - Clean table header with subtle background (--rcss-bg-subtle).
+    - Columns:
+        * Reference ID (monospace styling)
+        * Candidate Name & Email
+        * Target Requisition
+        * Applied Date (formatted: dd MMM yyyy)
+        * Application Status (Shortlisted, Manual Review, Rejected, Payment Pending)
+        * Match Score (percentage with color-coded badge: >=80% green, 60-79% amber, <60% red)
+        * Screening Decision (SHORTLISTED / MANUAL REVIEW / REJECTED)
+        * Actions ("Inspect Dossier" button linking to /HRApplications/Details/{id})
+    - High-quality empty state when no applications exist (clean icon, polite message, link to view jobs).
+
+5.5 Quick Navigation Panels (3 Equal Width Cards at Bottom):
+    - Circulars Hub (Drafts, Published, Closed counts)
+    - Formal Offers Hub (Pending responses, accepted hires)
+    - Executive Reports Hub (Exportable print report link)
+
+--------------------------------------------------------------------------------
+6. CANDIDATE DASHBOARD REDESIGN (Views/Candidate/Dashboard.cshtml)
+--------------------------------------------------------------------------------
+6.1 Candidate Welcome & Verification Banner:
+    - Warm, professional greeting: "Welcome back, {ProfileName}"
+    - Profile Status indicator: "Dossier Active" (Green) or "Profile Incomplete - Action Required" (Amber).
+    - Quick actions: "Explore Vacancies" (/CandidateJobs) and "Edit Profile Dossier" (/CandidateProfiles).
+
+6.2 Three Structured Management Cards:
+    - Card 1: Candidate Dossier & Qualifications
+        * Summary of education records, technical skills, contact telephone, and address.
+        * Action button: "Update Profile & Qualifications".
+    - Card 2: Document Vault Status
+        * Identity Photo status: Uploaded (Green check) or Missing (Amber alert).
+        * Official Signature status: Uploaded (Green check) or Missing (Amber alert).
+        * Active Curriculum Vitae: Stored file name, file size (max 4 MB), Upload timestamp.
+        * Action button: "Manage Document Vault".
+    - Card 3: Application & Offer Tracker
+        * Metric 1: Total Positions Applied (@Model.ApplicationCount).
+        * Metric 2: Received Employment Offers.
+        * Action button: "Track Application Status" (links to /CandidateJobs/MyApplications) and "View Offers" (/CandidateOffers).
+
+6.3 Clean Empty & Progress States:
+    - If profile is incomplete, display an actionable checklist of remaining requirements:
+        [ ] Personal Details & Contact
+        [ ] Academic History & Technical Skills
+        [ ] Photograph (Max 500 KB) & Signature (Max 500 KB)
+        [ ] Curriculum Vitae (.pdf or .docx, Max 4 MB)
+
+--------------------------------------------------------------------------------
+7. LOGIN FORMS AND DEMO CREDENTIAL AUTOFILL
+--------------------------------------------------------------------------------
+7.1 View Location & Architecture:
+    - Primary View: Areas/Identity/Pages/Account/Login.cshtml
+    - Layout: Uses main _Layout.cshtml with full stylesheet and site.js scripts.
+
+7.2 Demo Autofill Requirements:
+    - Position: Directly beneath the password field and above the "Sign In" button, or in a dedicated "Quick Demo Access" card within the form.
+    - Two Explicit Buttons:
+        1. [Fill HR Demo Credentials]
+           * Role: HR Administrator
+           * Email: rifat@gmail.com
+           * Password: Hr@123456
+        2. [Fill Candidate Demo Credentials]
+           * Role: Verified Candidate
+           * Email: rifatcandidate@gmail.com
+           * Password: Cd@1234
+    - Security & Operational Controls:
+        * Buttons MUST be type="button" to prevent premature form submission.
+        * Action strictly populates document.getElementById("Input_Email").value and document.getElementById("Input_Password").value.
+        * Form submission is NEVER triggered automatically; user explicitly clicks "Sign In".
+        * Visual feedback: A brief 2-second flash or badge indicating "Credentials populated. Click Sign In to continue."
+        * All existing password hashing (PBKDF2/ASP.NET Core Identity), session cookies, and antiforgery tokens remain untouched.
+        * If deployed to production, these accounts are restricted to seeded test data with non-administrative server capabilities.
+
+7.3 JavaScript Implementation (in wwwroot/js/site.js):
+    - Event listener function setup:
+        function setupDemoLoginAutofill() {
+            const hrBtn = document.getElementById("btn-autofill-hr");
+            const candBtn = document.getElementById("btn-autofill-candidate");
+            const emailInput = document.getElementById("Input_Email");
+            const passInput = document.getElementById("Input_Password");
+            const notice = document.getElementById("demo-autofill-feedback");
+
+            if (!emailInput || !passInput) return;
+
+            if (hrBtn) {
+                hrBtn.addEventListener("click", function () {
+                    emailInput.value = "rifat@gmail.com";
+                    passInput.value = "Hr@123456";
+                    emailInput.dispatchEvent(new Event("change", { bubbles: true }));
+                    passInput.dispatchEvent(new Event("change", { bubbles: true }));
+                    if (notice) {
+                        notice.textContent = "HR Manager credentials populated. Click 'Sign In' below.";
+                        notice.classList.remove("d-none");
+                    }
+                });
+            }
+
+            if (candBtn) {
+                candBtn.addEventListener("click", function () {
+                    emailInput.value = "rifatcandidate@gmail.com";
+                    passInput.value = "Cd@1234";
+                    emailInput.dispatchEvent(new Event("change", { bubbles: true }));
+                    passInput.dispatchEvent(new Event("change", { bubbles: true }));
+                    if (notice) {
+                        notice.textContent = "Candidate credentials populated. Click 'Sign In' below.";
+                        notice.classList.remove("d-none");
+                    }
+                });
+            }
+        }
+
+--------------------------------------------------------------------------------
+8. RULE-BASED CV MATCHING ARCHITECTURE AND SCORING FORMULA
+--------------------------------------------------------------------------------
+8.1 Elimination of External AI APIs:
+    - Fully replace Services/AIMatchingService.cs runtime calls to Google Gemini with a deterministic, local, rule-based screening engine: RuleBasedMatchingEngine (or refactored AIMatchingService).
+    - Preserves exact database models: AIMatchingResult (MatchingScore, Decision, MatchedSkills, MatchingDetails, EvaluatedAt) and JobApplication.Status remain unchanged.
+    - Zero external network requests, zero API key configuration needed, 100% reproducible results, zero ongoing cloud inference cost.
+
+8.2 Normalized 100-Point Scoring Breakdown:
+    The final score is composed of 4 transparent, auditable weighted categories:
+
+    CATEGORY 1: REQUIRED TECHNICAL SKILLS (Weight: 45 Points)
+    ----------------------------------------------------------
+    - Input: JobRequirement.RequiredSkills (comma, semicolon, or newline separated keywords).
+    - Processing:
+        * Parse job required skills into a list of normalized skill tokens.
+        * Normalize aliases (e.g. "C#", "csharp", "c sharp"; "ASP.NET", "aspnet", "asp.net core"; "JS", "JavaScript", "ECMAScript"; "Postgres", "PostgreSQL").
+        * Perform word-boundary regular expression matching against extracted CV text:
+          \b(?:c#|csharp)\b (case-insensitive).
+    - Formula:
+        SkillMatchRatio = MatchedRequiredSkills.Count / TotalRequiredSkills.Count
+        Score_Skills = Math.Round(SkillMatchRatio * 45, 2)
+    - Edge Case: If no required skills specified in job circular, award full 45 points.
+
+    CATEGORY 2: REQUIRED QUALIFICATIONS & ACADEMIC LEVEL (Weight: 25 Points)
+    ------------------------------------------------------------------------
+    - Input: JobRequirement.RequiredQualifications.
+    - Hierarchy of Academic Credentials:
+        * Level 5: Doctorate / PhD
+        * Level 4: Master's Degree (MSc, MBA, MS, M.Tech, M.A.)
+        * Level 3: Bachelor's Degree (BSc, B.Tech, BBA, B.E., B.A., Undergraduate)
+        * Level 2: Diploma / Associate Degree
+        * Level 1: Higher Secondary / High School
+    - Processing:
+        * Identify the minimum required level from JobRequirement.RequiredQualifications.
+        * Scan CV text for highest degree mentions and field of study keywords (e.g. "Computer Science", "Engineering", "Business").
+    - Formula:
+        * If CV degree level >= Job required level: Award 20 points (Base Degree Met).
+        * If relevant field of study keyword also matches: Award additional 5 points (Total 25 points).
+        * If degree level is 1 tier below required: Award 10 points.
+        * If degree level is 2+ tiers below: Award 0 points.
+    - Edge Case: If no specific qualification required, award full 25 points.
+
+    CATEGORY 3: EXPERIENCE DURATION & SENIORITY (Weight: 20 Points)
+    ---------------------------------------------------------------
+    - Input: JobRequirement.RequiredExperience (e.g. "3 years", "5+ years", "Senior").
+    - Processing:
+        * Extract target required years using regex: (\d+)\+?\s*(?:year|yr)s?.
+        * Scan CV text for employment durations:
+          a) Explicit duration phrases (e.g. "4 years of experience", "5 yrs experience").
+          b) Work history date ranges (e.g. "2021 - 2025" -> 4 years, "2019 to Present" -> calculated years).
+          c) Sum total verified experience across identified roles.
+    - Formula:
+        * If DetectedYears >= RequiredYears: Award full 20 points.
+        * If DetectedYears < RequiredYears and RequiredYears > 0:
+          Score_Experience = Math.Round((DetectedYears / RequiredYears) * 20, 2).
+    - Edge Case: If no experience required (Entry Level / Fresh Graduate), award full 20 points.
+
+    CATEGORY 4: PREFERRED SKILLS & ADDITIONAL CRITERIA (Weight: 10 Points)
+    ----------------------------------------------------------------------
+    - Input: JobRequirement.AdditionalRequirements.
+    - Processing:
+        * Extract non-mandatory skill keywords and bonus certifications (e.g. "AWS certified", "Docker", "Agile", "Scrum", "Git").
+        * Match against CV text.
+    - Formula:
+        * Proportional match of preferred criteria:
+          Score_Preferred = Math.Round((MatchedPreferred.Count / TotalPreferred.Count) * 10, 2).
+    - Edge Case: If no additional requirements specified, award 10 points.
+
+8.3 Final Composite Score & Decision Formula:
+    TotalScore = Math.Clamp(Score_Skills + Score_Qualifications + Score_Experience + Score_Preferred, 0, 100)
+
+    Decision Rules (matching existing recruitment workflow):
+    - TotalScore >= 80.00% -> Decision: "SHORTLISTED"
+      * Application Status updated to: JobApplicationStatus.Shortlisted
+      * Eligible for formal Offer generation in OffersController.
+    - 60.00% <= TotalScore < 80.00% -> Decision: "MANUAL REVIEW"
+      * Application Status updated to: JobApplicationStatus.ManualReview
+      * Candidate flagged for human HR screening; can be manually upgraded to Offer.
+    - TotalScore < 60.00% -> Decision: "REJECTED"
+      * Application Status updated to: JobApplicationStatus.Rejected
+
+8.4 Explainable Audit Details Structure:
+    The AIMatchingResult.MatchingDetails text column will store structured, transparent explanations formatted as:
+    -----------------------------------------------------------------------------
+    MATCHING BREAKDOWN (Score: {TotalScore}% — {Decision})
+    • Technical Skills ({Score_Skills}/45 pts):
+      - Matched ({MatchedSkillsList}): {List}
+      - Missing Required Skills: {MissingList}
+    • Qualifications & Education ({Score_Qualifications}/25 pts):
+      - Target Level: {RequiredLevel} | Detected CV Level: {DetectedLevel}
+      - Discipline Match: {DisciplineDetails}
+    • Professional Experience ({Score_Experience}/20 pts):
+      - Required: {RequiredYears} yrs | Detected: {DetectedYears} yrs
+    • Preferred Criteria ({Score_Preferred}/10 pts):
+      - Matched: {MatchedPreferredList}
+    -----------------------------------------------------------------------------
+    Recruiter Guidance: Score represents deterministic rule compliance based on extracted document text. Final hiring authority resides with the recruitment panel.
+
+--------------------------------------------------------------------------------
+9. CV PARSING AND ERROR HANDLING
+--------------------------------------------------------------------------------
+9.1 Supported CV File Types:
+    - PDF (.pdf) via UglyToad.PdfPig library (already installed, version 0.1.16).
+    - Microsoft Word OpenXML (.docx) via DocumentFormat.OpenXml (already installed, version 3.5.1).
+    - Rejection of legacy binary Word formats (.doc) with user-friendly guidance to save as .docx or .pdf.
+
+9.2 Fix for Existing Code Defect:
+    - File: Services/CVTextExtractionService.cs line 118-120:
+      CURRENT CODE (Causes warning and potential NullReferenceException):
+          var body = document.MainDocumentPart?.Document.Body;
+      CORRECTED CODE:
+          var body = document.MainDocumentPart?.Document?.Body;
+
+9.3 Parsing Failure Modes & Defensive Strategies:
+    - Failure Mode 1: Scanned image PDF without selectable text (OCR-less PDF).
+      * Handling: Check if extracted text length < 50 characters.
+      * Action: Throw descriptive UserFriendlyExtractionException("The uploaded PDF appears to be a scanned image or empty. Please upload a PDF containing selectable text or a Word document (.docx).").
+      * UI Impact: Catches exception in HRApplicationsController.AIMatch, displays informative TempData["Error"] banner without crashing.
+    - Failure Mode 2: Password-protected or encrypted document.
+      * Handling: Catch PdfDocumentException / OpenXmlPackageException.
+      * Action: Log warning and inform HR that document is encrypted.
+    - Failure Mode 3: Malformed or corrupted file header.
+      * Handling: Catch IOException / InvalidDataException gracefully.
+    - Failure Mode 4: Path traversal attempt.
+      * Handling: Preserve existing check:
+        if (!fullPath.StartsWith(secureRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            throw new UnauthorizedAccessException("Access denied.");
+
+--------------------------------------------------------------------------------
+10. RESPONSIVE DESIGN, ACCESSIBILITY, AND ANIMATION
+--------------------------------------------------------------------------------
+10.1 Lightweight CSS-Only Transitions:
+    - Zero heavy external JavaScript animation libraries (no GSAP, no Framer, no Lottie).
+    - Global interactive element transitions:
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, transform 0.15s ease-in-out;
+    - Subtle button micro-feedback:
+        .btn:active { transform: scale(0.985); }
+    - Clean card hover elevation:
+        .card-interactive:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--rcss-shadow-md);
+        }
+    - Keyframe entrance for alert messages & KPI cards:
+        @keyframes rcssFadeSlideIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-enter { animation: rcssFadeSlideIn 0.25s ease-out forwards; }
+
+10.2 Accessibility Standards (WCAG 2.1 AA Compliance):
+    - Accessibility Mode (prefers-reduced-motion):
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    - Color Contrast: Minimum 4.5:1 ratio for normal text against backgrounds.
+    - Focus Rings: Visible 2px outline with 2px offset on all inputs and buttons when navigated via keyboard (:focus-visible).
+    - Form Labels: Explicit for and aria-required attributes on all inputs.
+    - Color-Blindness Safeguard: All status badges use both color and semantic icons/text (never color alone).
+
+10.3 Mobile & Responsive Breakpoints:
+    - Breakpoints: Desktop (>=992px), Tablet (768px - 991px), Mobile (<768px).
+    - Tables: Encapsulated in .table-responsive wrappers; mobile view displays condensed cards or horizontal scrolling without breaking layout.
+    - Navigation: Collapsible hamburger menu with automatic collapse upon link navigation (handled in site.js).
+
+--------------------------------------------------------------------------------
+11. SECURITY AND PRIVACY CONSIDERATIONS
+--------------------------------------------------------------------------------
+11.1 Document Security & Isolation:
+    - Candidate documents (Photos, Signatures, CVs) are stored in ContentRootPath/SecureUploads/.
+    - No direct static file mapping via app.UseStaticFiles() for this folder.
+    - All downloads require authenticated sessions:
+        * Candidate can only access their own documents (enforced by UserManager.GetUserId(User)).
+        * HR Managers can only access candidate files during application review.
+    - Path traversal guards verify canonicalized full paths against secureRoot.
+
+11.2 Demographic & Fairness Safeguards:
+    - The rule-based screening engine explicitly ignores:
+        * Candidate Name, Age, Gender, Religion, Nationality, Race.
+        * Photographs and Signatures.
+        * National ID numbers and Residential Addresses.
+    - Scoring is strictly bounded to qualifications, technical skill keywords, and verified duration of experience.
+
+11.3 Antiforgery & State Integrity:
+    - All HTTP POST actions enforce [ValidateAntiForgeryToken].
+    - Offer creation prevents duplicate offers via database queries.
+    - Expired deadlines automatically block offer acceptance.
+
+--------------------------------------------------------------------------------
+12. EXACT FILES TO MODIFY AND THEIR RESPONSIBILITIES
+--------------------------------------------------------------------------------
+12.1 Core Services (CV Screening):
+    - Services/AIMatchingService.cs:
+        * Remove Google Gemini API dependency.
+        * Implement deterministic, explainable, rule-based screening algorithm using skills, qualifications, and experience heuristics.
+        * Maintain the AIMatchingEvaluation return signature (Score, MatchedSkills, MatchingDetails).
+    - Services/CVTextExtractionService.cs:
+        * Fix nullable warning CS8602 (MainDocumentPart?.Document?.Body).
+        * Add minimum extracted length validation and descriptive error handling.
+    - Program.cs:
+        * Update service registrations if necessary (remove or retain GeminiService as optional test service).
+
+12.2 Controllers:
+    - Controllers/HRApplicationsController.cs:
+        * Update AIMatch action to call the rule-based screening engine.
+        * Provide clear feedback messages based on deterministic scores.
+    - Controllers/OffersController.cs:
+        * Fix nullable CS8629 and CS8602 warnings (proposedJoiningDate!.Value, Include navigation expressions).
+    - Controllers/CandidateOffersController.cs:
+        * Fix nullability navigation property warnings CS8602.
+
+12.3 Stylesheets & Client Scripts:
+    - wwwroot/css/site.css:
+        * Refine design variables (--rcss-* tokens).
+        * Add subtle animation classes (.animate-enter, hover lifts, reduced-motion rules).
+        * Polish card, button, table, badge, and form styles.
+    - wwwroot/js/site.js:
+        * Implement setupDemoLoginAutofill() for HR and Candidate credentials.
+        * Preserve mobile navbar auto-closing logic.
+
+12.4 Views & Templates:
+    - Views/Shared/_Layout.cshtml:
+        * Polished navbar with corporate styling, role badges, and responsive navigation.
+        * Clean enterprise footer with developer contact info.
+    - Views/Shared/_LoginPartial.cshtml:
+        * Streamlined user profile pill and logout button styling.
+    - Areas/Identity/Pages/Account/Login.cshtml:
+        * Redesigned authentication card.
+        * Add the two interactive demo autofill buttons: [Fill HR Demo Credentials] and [Fill Candidate Demo Credentials].
+    - Views/Home/Index.cshtml:
+        * Complete visual redesign: professional hero, workflow steps, feature grid, and role-aware CTAs.
+    - Views/HRDashboard/Index.cshtml:
+        * Redesigned KPI cards, 3-stage screening funnel, recent applications table, and quick hub panels.
+    - Views/HRApplications/Details.cshtml:
+        * Enhanced two-column screening workspace.
+        * Display deterministic score breakdown and transparent scoring rules.
+    - Views/Candidate/Dashboard.cshtml:
+        * Redesigned candidate portal: welcome banner, profile completion card, document vault card, and applications tracker.
+    - Views/Index.cshtml:
+        * Safe cleanup/removal or redirection of orphaned duplicate file.
+
+--------------------------------------------------------------------------------
+13. ORDERED IMPLEMENTATION PHASES
+--------------------------------------------------------------------------------
+
+================================================================================
+PHASE 1: FOUNDATIONAL DESIGN TOKENS, CORE STYLING & SCRIPT ENHANCEMENTS
+================================================================================
+- Purpose: Establish the visual design system, color palette, typography, elevation, animation rules, and client-side autofill scripts.
+- Files Involved:
+    * wwwroot/css/site.css
+    * wwwroot/js/site.js
+    * Views/Shared/_Layout.cshtml
+    * Views/Shared/_LoginPartial.cshtml
+- Dependencies: None. Must be executed first so all subsequent views inherit unified styling.
+- Expected Result:
+    * Clean, production-ready corporate design system loaded across the entire application.
+    * No layout shifts, responsive mobile navigation, and reduced-motion support.
+- Verification Steps:
+    1. Inspect browser rendering on desktop and mobile viewports.
+    2. Verify font loading for "Plus Jakarta Sans" and Bootstrap Icons.
+    3. Confirm CSS compiles cleanly with no syntax errors.
+
+================================================================================
+PHASE 2: AUTHENTICATION REDESIGN & DEMO-LOGIN AUTOFILL
+================================================================================
+- Purpose: Provide a seamless, dignified login experience with one-click autofill for HR and Candidate test accounts.
+- Files Involved:
+    * Areas/Identity/Pages/Account/Login.cshtml
+    * wwwroot/js/site.js (autofill handlers)
+- Dependencies: Phase 1 (Design tokens).
+- Expected Result:
+    * Beautifully styled login card.
+    * Two prominent buttons: "Fill HR Demo Credentials" and "Fill Candidate Demo Credentials".
+    * Clicking either button instantly populates the email and password fields without submitting the form.
+    * Form submits successfully when user clicks "Sign In".
+- Verification Steps:
+    1. Navigate to /Identity/Account/Login.
+    2. Click "Fill HR Demo Credentials" -> Verify rifat@gmail.com and Hr@123456 are filled.
+    3. Click "Sign In" -> Verify successful login and redirect to /HRDashboard.
+    4. Log out and click "Fill Candidate Demo Credentials" -> Verify rifatcandidate@gmail.com and Cd@1234 are filled.
+    5. Click "Sign In" -> Verify successful login and redirect to /Candidate/Dashboard.
+
+================================================================================
+PHASE 3: PUBLIC HOMEPAGE REDESIGN
+================================================================================
+- Purpose: Transform the landing page into a professional recruitment platform showcase.
+- Files Involved:
+    * Views/Home/Index.cshtml
+    * Views/Home/Privacy.cshtml
+- Dependencies: Phase 1 (Design tokens).
+- Expected Result:
+    * Compelling, restrained hero section with live screening simulation card.
+    * 3-step recruitment workflow preview.
+    * 4-card core capabilities grid.
+    * Role-aware CTA buttons that adapt based on authenticated user session.
+- Verification Steps:
+    1. Navigate to / as an anonymous visitor -> verify public CTAs (Browse Jobs, Sign In, Register).
+    2. Log in as HR -> visit / -> verify "HR Command Center" CTA.
+    3. Log in as Candidate -> visit / -> verify "Candidate Dashboard" CTA.
+    4. Test responsiveness across mobile (375px), tablet (768px), and desktop (1280px).
+
+================================================================================
+PHASE 4: DETERMINISTIC RULE-BASED CV MATCHING ENGINE
+================================================================================
+- Purpose: Eliminate paid external AI API calls by implementing a 100% deterministic, explainable, local CV screening system.
+- Files Involved:
+    * Services/CVTextExtractionService.cs (fix nullability warning and empty text checks)
+    * Services/AIMatchingService.cs (replace Gemini API with rule-based scoring engine)
+    * Controllers/HRApplicationsController.cs (update AIMatch endpoint feedback)
+    * Views/HRApplications/Details.cshtml (display score breakdown audit card)
+- Dependencies: None (can be developed in parallel, but connects to UI in Phase 5).
+- Expected Result:
+    * Screening operates in milliseconds with zero external API calls.
+    * Identical CV text and requirements produce the exact same score every time.
+    * Scores are categorized into Shortlisted (>=80%), Manual Review (60-79%), or Rejected (<60%).
+    * Detailed, auditable explanation text generated for recruiter review.
+- Verification Steps:
+    1. Log in as HR and navigate to an application with a candidate CV at /HRApplications/Details/{id}.
+    2. Click "Run Screening Evaluation".
+    3. Verify evaluation completes instantly without network calls or API keys.
+    4. Confirm AIMatchingResult record is saved to SQLite with correct score and detailed breakdown.
+    5. Check that application status updates appropriately.
+
+================================================================================
+PHASE 5: HR DASHBOARD & SCREENING WORKSPACE REDESIGN
+================================================================================
+- Purpose: Deliver an executive recruitment management interface for HR personnel.
+- Files Involved:
+    * Views/HRDashboard/Index.cshtml
+    * Views/HRApplications/Index.cshtml
+    * Views/HRApplications/Details.cshtml
+    * Views/JobCirculars/Index.cshtml
+    * Views/Offers/Index.cshtml
+    * Views/HRReports/Index.cshtml
+    * Orphan cleanup: Delete or resolve Views/Index.cshtml
+- Dependencies: Phase 1, Phase 4.
+- Expected Result:
+    * Clear KPI summary grid and screening funnel progression.
+    * Sortable, filterable applicant pipeline table with color-coded score indicators.
+    * Two-column dossier inspection workspace with side-by-side CV download, candidate credentials, position requirements, and explainable score audit.
+- Verification Steps:
+    1. Access /HRDashboard as HR Manager.
+    2. Check KPI counts reflect actual database counts.
+    3. Filter applicants by status and text search at /HRApplications.
+    4. Inspect candidate dossier at /HRApplications/Details/{id} and verify layout.
+
+================================================================================
+PHASE 6: CANDIDATE PORTAL REDESIGN
+================================================================================
+- Purpose: Create a welcoming, clear, and reassuring candidate experience.
+- Files Involved:
+    * Views/Candidate/Dashboard.cshtml
+    * Views/Candidate/Jobs.cshtml
+    * Views/Candidate/JobDetails.cshtml
+    * Views/Candidate/MyApplications.cshtml
+    * Views/CandidateProfiles/Index.cshtml
+    * Views/CandidateOffers/Index.cshtml
+    * Views/CandidateOffers/Details.cshtml
+- Dependencies: Phase 1.
+- Expected Result:
+    * Structured candidate dashboard with profile readiness indicators.
+    * Clean job vacancy listings with search and deadline sorting.
+    * Application submission tracker with clear lifecycle states (Submitted, Shortlisted, Review, Offered).
+    * Formal offer review interface with clear Accept and Reject workflows.
+- Verification Steps:
+    1. Log in as Candidate and visit /Candidate/Dashboard.
+    2. Check profile completion banner and document vault indicators.
+    3. Browse vacancies at /CandidateJobs, filter by title/location.
+    4. View application tracker at /CandidateJobs/MyApplications.
+    5. Review offer details at /CandidateOffers/Details/{id} (if offer exists).
+
+--------------------------------------------------------------------------------
+14. TESTING AND ACCEPTANCE CRITERIA
+--------------------------------------------------------------------------------
+14.1 Functional Acceptance Criteria:
+    [ ] Authentication & Autofill:
+        * Both "Fill HR Demo Credentials" and "Fill Candidate Demo Credentials" populate respective credentials without form submit.
+        * Standard credential submission logs into the correct role dashboard.
+    [ ] Rule-Based CV Screening:
+        * Triggers without requiring Google Gemini API key or external network connection.
+        * Produces deterministic score between 0 and 100 based on the 4-part formula.
+        * Assigns "SHORTLISTED" for scores >= 80, "MANUAL REVIEW" for 60-79, and "REJECTED" for < 60.
+        * Accurately updates JobApplication.Status in SQLite database.
+        * Generates human-readable, transparent explanation in MatchingDetails.
+    [ ] Candidate Dossier & Document Handling:
+        * Extracts text accurately from both .pdf and .docx files.
+        * Returns clean, friendly error message if an unreadable scanned PDF is uploaded.
+        * Prevents path traversal and forbids unauthorized document access.
+    [ ] Visual Redesign:
+        * Homepage presents professional corporate identity with responsive layout.
+        * HR Dashboard displays accurate KPIs, screening funnel, and pipeline table.
+        * Candidate Dashboard displays dossier status, document vault badges, and application counts.
+        * All pages look polished on mobile, tablet, and desktop screens.
+    [ ] Animations & Accessibility:
+        * All animations are CSS-driven and respect prefers-reduced-motion: reduce.
+        * High contrast text meeting WCAG AA requirements throughout.
+
+14.2 Build & Code Quality Criteria:
+    [ ] Application compiles cleanly with 0 build errors.
+    [ ] Nullable reference warnings in CVTextExtractionService and Controllers resolved.
+    [ ] Database schema remains 100% compatible; no broken foreign keys or missing columns.
+
+--------------------------------------------------------------------------------
+15. FINAL VERIFICATION CHECKLIST
+--------------------------------------------------------------------------------
+Before completing the project implementation, the executing model (Gemini) must verify:
+- [ ] dotnet build succeeds with 0 errors and minimal/no warnings.
+- [ ] Database migrations execute cleanly on application startup without schema errors.
+- [ ] Home page (/) renders correctly for anonymous, HR, and Candidate users.
+- [ ] Demo credentials autofill buttons populate inputs accurately on /Identity/Account/Login.
+- [ ] Candidate profile creation, photo/signature upload, and CV upload work under size limits.
+- [ ] Job application submission correctly links CandidateProfile, JobCircular, and CV.
+- [ ] HR screening evaluation runs locally and deterministically, writing scores to SQLite.
+- [ ] Candidate application tracker reflects updated screening decisions.
+- [ ] Formal offer issuance, candidate acceptance, and joining date confirmation flow works end-to-end.
+- [ ] Mobile navigation bar toggles and collapses properly on small viewports.
+- [ ] Private candidate documents remain securely isolated within SecureUploads/.
+
+================================================================================
+END OF IMPLEMENTATION PLAN — READY FOR GEMINI CODING EXECUTION
+================================================================================
