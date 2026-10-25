@@ -163,7 +163,7 @@
 
                         <!-- Candidate Signature -->
                         <div class="col-sm-8">
-                            <div class="fw-bold text-slate-900 fs-5 mb-1">@candidate?.FullName</div>
+                            <div class="fw-bold text-slate-900 fs-5 mb-1 text-break">@candidate?.FullName</div>
                             <div class="text-muted small mb-2">
                                 <i class="bi bi-envelope me-1 text-slate-400"></i>@candidate?.ApplicationUser?.Email
                             </div>
@@ -424,8 +424,8 @@
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-cpu text-info fs-5"></i>
                         <div>
-                            <h6 class="fw-bold mb-0 text-white">AI Screening &amp; CV Matching Intelligence</h6>
-                            <small class="text-slate-400" style="font-size: 0.75rem;">Powered by Gemini Screening Engine</small>
+                            <h6 class="fw-bold mb-0 text-white">CV Screening &amp; Benchmark Evaluation</h6>
+                            <small class="text-slate-400" style="font-size: 0.75rem;">Powered by Deterministic CV Screening Engine</small>
                         </div>
                     </div>
                     <span class="badge bg-info-subtle text-info border border-info-subtle small">Automated Audit</span>
@@ -448,7 +448,7 @@
                                   method="post">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-dark btn-sm px-3 shadow-sm">
-                                    <i class="bi bi-robot me-1"></i>@(aiResult == null ? "Run Screening" : "Re-evaluate Candidate")
+                                    <i class="bi bi-gear-wide-connected me-1"></i>@(aiResult == null ? "Run Screening Evaluation" : "Re-evaluate Candidate")
                                 </button>
                             </form>
                         </div>
@@ -558,25 +558,22 @@
                     else
                     {
                         <div class="p-4 text-center text-muted border rounded-3 bg-light mb-4">
-                            <i class="bi bi-robot fs-1 text-slate-400 d-block mb-2"></i>
+                            <i class="bi bi-cpu fs-1 text-slate-400 d-block mb-2"></i>
                             <h6 class="fw-bold text-slate-800 mb-1">Candidate Not Yet Evaluated</h6>
-                            <p class="small text-muted mb-0">Click "Run Screening" above to process candidate CV against position requirements.</p>
+                            <p class="small text-muted mb-0">Click "Run Screening Evaluation" above to process candidate CV against position requirements.</p>
                         </div>
                     }
 
-                    <!-- Exact Integration Notice Card -->
+                    <!-- Deterministic Screening Engine Notice Card -->
                     <div class="alert alert-light border shadow-xs rounded-3 p-3 mb-0">
                         <div class="d-flex align-items-start gap-2">
-                            <i class="bi bi-info-circle text-primary fs-5 mt-1"></i>
+                            <i class="bi bi-shield-check text-success fs-5 mt-1"></i>
                             <div>
-                                <strong class="d-block text-slate-900 mb-1">Integration Notice</strong>
+                                <strong class="d-block text-slate-900 mb-1">Deterministic Screening Architecture</strong>
                                 <p class="text-slate-700 small mb-1">
-                                    This demonstration version has certain external API integrations disabled for deployment purposes.
+                                    Candidate screening runs entirely within the local host environment using structured rule evaluation against position benchmarks. No external AI inference APIs or cloud third parties are contacted.
                                 </p>
-                                <p class="text-slate-700 small mb-2">
-                                    For access to the full functionality, including payment processing and AI-powered CV matching, please contact me by email.
-                                </p>
-                                <span class="small fw-semibold text-primary">Contact: @contactEmail</span>
+                                <span class="small fw-semibold text-muted">Audited Criteria: Technical Skills (45%), Academic Qualifications (25%), Work Experience (20%), Preferred Criteria (10%)</span>
                             </div>
                         </div>
                     </div>

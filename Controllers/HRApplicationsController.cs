@@ -269,13 +269,13 @@ public class HRApplicationsController : Controller
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                $"AI screening completed. " +
+                $"Screening evaluation completed. " +
                 $"Score: {evaluation.Score:0.##}% — {decision}";
         }
         catch (Exception ex)
         {
             TempData["Error"] =
-                $"AI screening failed: {ex.Message}";
+                $"Screening evaluation failed: {ex.Message}";
         }
 
         return RedirectToAction(

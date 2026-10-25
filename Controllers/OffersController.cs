@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecruitmentAndCandidateScreeningSystem.Data;
@@ -161,7 +161,7 @@ public class OffersController : Controller
                 OfferId = model.Id,
 
                 // HR-provided joining date
-                SelectedJoiningDate = proposedJoiningDate.Value,
+                SelectedJoiningDate = proposedJoiningDate!.Value,
 
                 // Will be confirmed when candidate accepts
                 ConfirmedJoiningDate = null,
@@ -201,9 +201,9 @@ public class OffersController : Controller
         var offer = await _context.Offers
             .AsNoTracking()
             .Include(o => o.JobApplication)
-                .ThenInclude(a => a.CandidateProfile)
+                .ThenInclude(a => a!.CandidateProfile)
             .Include(o => o.JobApplication)
-                .ThenInclude(a => a.JobCircular)
+                .ThenInclude(a => a!.JobCircular)
             .Include(o => o.JoiningSchedule)
             .FirstOrDefaultAsync(o => o.Id == id);
 

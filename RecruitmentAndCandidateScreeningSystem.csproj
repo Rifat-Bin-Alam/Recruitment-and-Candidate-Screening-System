@@ -8,6 +8,7 @@
     <!-- Optimize memory footprint for MonsterASP.NET 256MB RAM limit -->
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <AcceptNPOIOSMFLicense>true</AcceptNPOIOSMFLicense>
+    <NoWarn>$(NoWarn);NU1902</NoWarn>
   </PropertyGroup>
 
   <!-- Exclude nested subfolder from root compilation to prevent duplicate attributes or stray files -->

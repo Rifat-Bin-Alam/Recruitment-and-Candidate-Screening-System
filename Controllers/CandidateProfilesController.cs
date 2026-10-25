@@ -15,9 +15,9 @@ public class CandidateProfilesController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _environment;
 
-    private const long MaxPhotoSize = 500 * 1024; // 500 KB
-    private const long MaxSignatureSize = 500 * 1024; // 500 KB
-    private const long MaxCVSize = 4 * 1024 * 1024; // 4 MB
+    private const long MaxPhotoSize = 50 * 1024; // 50 KB
+    private const long MaxSignatureSize = 50 * 1024; // 50 KB
+    private const long MaxCVSize = 400 * 1024; // 400 KB
 
     private static readonly string[] ImageExtensions =
     {
@@ -472,11 +472,9 @@ public class CandidateProfilesController : Controller
 
         if (!allowedExtensions.Contains(extension))
         {
-            ModelState.AddModelError(
-                string.Empty,
-                $"Invalid file type for {folder}. " +
-                $"Allowed types: " +
-                $"{string.Join(", ", allowedExtensions)}.");
+            var errorMsg = $"Invalid file type for {folder}. Allowed types: {string.Join(", ", allowedExtensions)}.";
+            ModelState.AddModelError(string.Empty, errorMsg);
+            TempData["Error"] = errorMsg;
 
             return null;
         }
@@ -486,16 +484,15 @@ public class CandidateProfilesController : Controller
         {
             var maxFriendly = folder switch
             {
-                "Photos" => "500 KB",
-                "Signatures" => "500 KB",
-                "CVs" => "4 MB",
+                "Photos" => "50 KB",
+                "Signatures" => "50 KB",
+                "CVs" => "400 KB",
                 _ => $"{maxSize / 1024} KB"
             };
 
-            ModelState.AddModelError(
-                string.Empty,
-                $"The {folder} file exceeds the allowed maximum size of {maxFriendly}.");
-
+            var errorMsg = $"The {folder} file exceeds the allowed maximum size of {maxFriendly}.";
+            ModelState.AddModelError(string.Empty, errorMsg);
+            TempData["Error"] = errorMsg;
             return null;
         }
 
