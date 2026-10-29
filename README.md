@@ -123,3 +123,5 @@ For the latest functionality and deployment status, visit the live demo and insp
 GitHub: [Rifat-Bin-Alam](https://github.com/Rifat-Bin-Alam)
 
 Portfolio: [rifat-bin-alam.vercel.app](https://rifat-bin-alam.vercel.app/)
+
+Co-authored-by: Farhana Karim <farhanakarim3225@gmail.com>
